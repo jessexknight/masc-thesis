@@ -1,0 +1,132 @@
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{foreground}
+\pgfsetlayers{background,main,foreground}
+\tikzset{%
+  arrow/.style = { ->, >=Latex,  very thick, rounded corners, draw = #1!60!white },
+  input/.style = { ->, >=Latex, ultra thick, rounded corners, draw = red },
+  clr/.style   = { ultra thick, rounded corners, fill = #1!60!white },
+  image/.style = { fill = black, draw = black!80!white, ultra thick, inner sep = 0 },
+  plot/.style  = { fill = white, inner sep = 0 },
+  label/.style = { fill = white, fill opacity = 0, text opacity = 1 },
+  tbox/.style  = { fill = white, draw = #1!60!white, very thick, align = center }
+  %  title/.style = { draw = #1!60!white, very thick, align = center, minimum width = 3.4 cm, minimum height = 1.2 cm, rotate=+90 },
+  %  fun/.style   = { fill = black!10!white, draw=black, circle, minimum size = 2*\fw cm, inner sep = 0 },
+}
+\newcommand*{\img}[3]{%
+  \node[image] at (#1,#2){\includegraphics[width=\ixx cm, height=\iyy cm]{#3}};
+}
+\newcommand*{\imgt}[4]{%
+	\img{#1}{#2}{#3}
+	\begin{pgfonlayer}{foreground}
+		\node[label] at (#1,#2-\iy-0.4){\large #4};
+	\end{pgfonlayer}
+}
+\newcommand*{\plot}[5]{%
+  \node[plot] at (#1,#2){\includegraphics[width=#3cm, height= #4cm]{#5}};
+}
+\newcommand*{\voxpath}[4]{%
+  \filldraw[fill=black!20!white,draw=black]
+  (#1,#2)--(#1+\vw,#2)--(#1+#3,#2-#3+\vw)--(#1+#3-\vw,#2-#3+\vw)--(#1,#2);
+  \filldraw[fill=black!20!white,draw=black]
+  (#1,#2)--(#1,#2-\vw)--(#1+#3-\vw,#2-#3)--(#1+#3-\vw,#2-#3+\vw)--(#1,#2);
+  \filldraw[fill=black!20!white,draw=black]
+  (#1+#3,#2-#3)--(#1+#3,#2-#3+\vw)--(#1+#3-\vw,#2-#3+\vw)--(#1+#3-\vw,#2-#3)--(#1+#3,#2-#3);
+  \node[below right] at (#1+#3,#2-#3) {#4};
+}
+\newcommand*{\imgstack}[5]{%
+  \foreach \x in {0,...,#3}{\img{#1-0.1*#3+0.1*\x}{#2+0.1*#3-0.1*\x}{#4}}
+  \begin{pgfonlayer}{foreground}
+	  \node[label] at (#1,#2-\iy-0.4){\large #5};
+	\end{pgfonlayer}{foreground}
+}
+\newcommand*{\imgvoxstack}[5]{%
+	\voxpath{#1+\vw+0.3-0.1*#3-\vl-\vl}
+					{#2-\vw-0.2+0.1*#3+\vl+\vl}{\vl}{}
+	\imgstack{#1}{#2}{#3}{#4}{#5}
+	\voxpath{#1+\vw+0.3}
+	        {#2-\vw-0.2}{\vl}{}
+}
+\newcommand*{\textbox}[6]{%
+  \node[tbox=#5,minimum width=#3cm,minimum height=#4cm]at(#1,#2){#6};
+}
+%\newcommand*{\blocktitle}[4]{%
+%  \node[title=#3]at(#1,#2){#4};
+%  \fill[clr=#3](#1+0.6,#2+1.7)--(#1+0.6,#2-1.7)--(#1+0.6+0.3,#2);
+%}
+\newcommand*{\vw}{0.1}
+\newcommand*{\vl}{0.7}
+\newcommand*{\ix}{0.8}\newcommand*{\ixx}{1.6}
+\newcommand*{\iy}{1}  \newcommand*{\iyy}{2}
+\newcommand*{\pw}{1.5}
+\newcommand*{\fw}{0.3}
+
+% --------------------------------------------------------------------------------------------------
+\begin{tikzpicture}
+    \useasboundingbox(1.5, 0.0) rectangle (24.0, 20.5);
+    \begin{pgfonlayer}{background}
+      % background boxes
+      \draw[black!30!white,rounded corners,very thick](-0.25, 0.25) rectangle (23.75, 9.75);
+      \draw[black!30!white,rounded corners,very thick](-0.25,10.25) rectangle (23.75,20.00);
+      % box labells
+      \node[fill=black!10!white,rounded corners,minimum width=3cm, minimum height=1.0cm]at(21.75,19.00){\textsc{Training}};
+      \node[fill=black!10!white,rounded corners,minimum width=3cm, minimum height=1.0cm]at(21.75, 8.75){\textsc{Testing}};
+      %\draw[step=0.5,black!10!white,very thin](-0.5, 0.0) grid (24.0,20.0);
+    \end{pgfonlayer}
+    % training
+    \imgt       { 1.0}{18.0}{c1}{$C_1(x)$}
+    \imgt       { 1.0}{14.0}{c2}{$C_{\textsc{n}}(x)$}
+    \imgt       { 3.0}{18.0}{i1}{$Y_1(x)$}
+    \imgt       { 3.0}{14.0}{i2}{$Y_{\textsc{n}}(x)$}
+    \node[font=\fontsize{30}{0}\selectfont,align=center] at ( 1.0,15.8) {$\vdots$};
+    \node[font=\fontsize{30}{0}\selectfont,align=center] at ( 3.0,15.8) {$\vdots$};
+    \imgstack   {10.0}{16.0}{6}{ir} {$\mathcal{Y}(x)$}
+    \imgvoxstack{13.0}{16.0}{6}{jr} {$\tilde{\mathcal{Y}}(x)$}
+    \imgvoxstack{13.0}{12.0}{6}{c1} {$\mathcal{C}(x)$}
+    \plot       {17.5}{14.0}{4}{4}  {lr-fit}
+    \imgvoxstack{22.0}{14.0}{1}{bb} {$\bm{\beta}(x)$}
+    % testing
+    \imgstack   { 3.0}{ 2.0}{1}{bb} {$\bm{\beta}(x)$}
+    \imgvoxstack{ 3.0}{ 6.0}{0}{it} {$Y_{test}(x)$}
+    \imgvoxstack{10.0}{ 2.0}{1}{bb} {$\bm{B}(x)$}
+    \imgvoxstack{10.0}{ 6.0}{0}{jt} {$\tilde{Y}_{test}(x)$}
+    \plot       {14.5}{ 4.0}{4}{4}  {lr-test}
+    \imgvoxstack{19.0}{ 4.0}{0}{qt} {$\hat{C}_{test}^*(x)$}
+    \imgt       {22.0}{ 4.0}{lt}    {$\hat{C}_{test}(x)$}
+    % training arrows
+    \draw[arrow={blue}  ]( 3.0+\ix,18.0    )--( 3.5+\ix,18.0)--( 3.5+\ix,16.0)--( 5.0,16.0);
+    \draw[arrow={blue}  ]( 3.0+\ix,16.0    )--( 5.0    ,16.0);
+    \draw[arrow={blue}  ]( 3.0+\ix,14.0    )--( 3.5+\ix,14.0)--( 3.5+\ix,16.0)--( 5.0,16.0);
+    \draw[arrow={blue}  ]( 8.0    ,16.0    )--(10.0-\ix,16.0);
+    \draw[arrow={blue}  ]( 1.0    ,12.3    )--( 1.0    ,12.0)--( 5.0,    12.0);
+    \draw[arrow={blue}  ]( 5.0    ,12.0    )--(13.0-\ix,12.0);
+    \draw[arrow={blue},dotted](6.5,16.0    )--( 6.5    ,12.5);
+    \draw[arrow={violet}](10.0    ,16.0+\iy)--(10.0    ,18.5);
+    \draw[arrow={violet}](11.5,    19.0    )--(13.0    ,19.0)--(13.0,16.0+\iy);
+    \draw[arrow={red}   ](13.0+\ix,16.0    )--(14.5    ,16.0)--(14.5,14.0)--(15.5,14.0);
+    \draw[arrow={red}   ](13.0+\ix,12.0    )--(14.5    ,12.0)--(14.5,14.0)--(15.5,14.0);
+    \draw[arrow={red}   ](19.5    ,14.0    )--(22.0-\ix,14.0);
+    % testing arrows
+    \draw[arrow={blue}  ]( 3.0+\ix, 6.0    )--( 5.0    , 6.0);
+    \draw[arrow={blue},dotted](6.5, 6.0    )--( 6.5    , 2.5);
+    \draw[arrow={blue}  ]( 3.0+\ix, 2.0    )--( 5.0    , 2.0);
+    \draw[arrow={blue}  ]( 8.0    , 2.0    )--(10.0-\ix, 2.0);
+    \draw[arrow={violet}]( 6.5    , 6.5    )--( 6.5    , 8.0);
+    \draw[arrow={violet}]( 8.0    , 8.5    )--(10.0    , 8.5)--(10.0    , 6.0+\iy);
+    \draw[arrow={red}   ](10.0+\ix, 6.0    )--(11.5    , 6.0)--(11.5, 4.0)--(12.5, 4.0);
+    \draw[arrow={red}   ](10.0+\ix, 2.0    )--(11.5    , 2.0)--(11.5, 4.0)--(12.5, 4.0);
+    \draw[arrow={red}   ](16.5    , 4.0    )--(19.0-\ix, 4.0);
+    \draw[arrow={orange}](19.0    , 4.0+\iy)--(19.0    , 6.5);
+    \draw[arrow={orange}](20.5,     7.0    )--(22.0    , 7.0)--(22.0, 4.0+\iy);
+    % training texts
+    \textbox    { 6.5}{16.0}{3}{1.0}{blue}  {Bias Correction\\\& Registration}
+    \textbox    { 6.5}{12.0}{3}{1.0}{blue}  {Same Transform\\Applied}
+    \textbox    {10.0}{19.0}{3}{1.0}{violet}{Histogram\\Matching}
+    \textbox    {17.5}{17.0}{4}{1.0}{red}   {Logistic Regression\\Model Fitting}
+    % testing texts
+    \textbox    { 6.5}{6.25}{3}{0.5}{blue}  {Bias Correction}
+    \textbox    { 6.5}{5.75}{3}{0.5}{blue}  {Registration}
+    \textbox    { 6.5}{ 2.0}{3}{1.0}{blue}  {Inverse Transform\\Applied}
+    \textbox    { 6.5}{ 8.5}{3}{1.0}{violet}{Histogram\\Matching}
+    \textbox    {14.5}{ 7.0}{4}{1.0}{red}   {Logistic Regression\\Lesion Prediction}
+    \textbox    {19.0}{ 7.0}{3}{1.0}{orange}{Post\\Processing}
+\end{tikzpicture}

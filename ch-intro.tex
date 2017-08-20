@@ -1,0 +1,341 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ==================================================================================================
+% --------------------------------------------------------------------------------------------------
+\chapter{Introduction}
+Digitization of medical imaging has facilitated innumerable advances in disease understanding and treatment. From multi-modal image fusion to image guided therapy, software tools now underpin research and clinical workflows in almost every domain of medical imaging.
+\par
+This work concerns an unsolved segmentation problem in 3D brain magnetic resonance imaging (MRI), in which the objective is to automatically predict the class, or label, of every voxel (``volume pixel'') in the image. The objects of interest are white matter hyperintensities (WMH), non-cancerous brain lesions which are correlated with several neurodegenerative diseases. This chapter presents the motivation for automated WMH segmentation, gives a problem definition, and explores the previously proposed solutions.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Motivation}
+The brain is composed of three major classes of tissue: grey matter (GM), white matter (GM), and cerebrospinal fluid (CSF). Grey matter constitutes the peripheral surface of the brain -- the cortex, approximately 5mm thick -- as well as some deeper structures called the basal ganglia. It contains neuronal cell bodies, and performs the bulk of neural processing. The white matter is composed primarily of myelinated axons, and functions to relay information between different GM structures in the brain. The brain is surrounded by CSF, which provides mechanical and immunological defence. It is produced by the choroid plexuses in the ventricles of the brain -- a series of 4 connected cavities.
+\par
+...
+% ==================================================================================================
+\subsection{White Matter Disease}
+``Normal'' ageing of the brain is characterized by a variety of physical and cognitive changes. Memory, synaptic plasticity, and brain volume decline, with observable effects on cognitive function \cite{Peters2006,Good2002}. Brain ageing is also expedited in many patients by neurodegenerative diseases targeting the white matter, including Alzheimer's disease (AD), cerebrovascular disease, and in rare cases Multiple Sclerosis (MS). While the etiologies of these diseases are not yet fully understood, there is considerable evidence to suggest that the they are intertwined \cite{Debette2010,Conklin2014,Heppner2015,Snyder2015}.
+\par
+Cerebrovascular disease describes changes to blood vessels in the brain which increase the risk of ischemic injury -- a reduction in blood flow due to vessel occlusion or hemorrhage. Ischemic injuries include major events (stroke) \cite{VanderWorp2007}, transient ischemic attacks \cite{Albers2002}, and chronic hypoperfusion due to small vessel disease \cite{Pantoni2010}. In all such events, neuronal death occurs from insufficient nutrient supply \cite{VanderWorp2007}. Strokes involving major cerebral arteries can be fatal, and post-event quality of life in survivors is highly variable \cite{Prabhakaran2015}. In the less dramatic courses, clinically quiet disease progression can lead to personality changes, memory loss, and reduced cognitive ability; such changes are termed vascular dementia \cite{Roman1993}.
+\par
+Alzheimer's Disease is another subclass of dementia with similar symptoms; in fact it is the most common type, affecting about 6\% of the population over age 65 \cite{Burns2009}. The cause of Alzheimer's disease is hotly debated. Two 30-year-old theories linking the disease to the build up of amyloid $\beta$ protein and misfolded protein $\tau$ have been widely supported by correlational studies \cite{Masters1985,Hardy2002,Lee2011}, but have lacked clear mechanisms of injury until recently. It is now thought that amyloid $\beta$ oligomers interfere with neuronal mitochondria and synapse function, leading to cell death \cite{Kim2013,Tu2014}, while aberrant $\tau$ proteins disrupt microtubules necessary for intraneuronal transport \cite{Lee2011}. During the search for these mechanisms, competing theories implicating vascular injury \cite{Snyder2015}, immune response \cite{Heppner2015}, and blood brain barrier disruption \cite{Bell2009} have emerged, painting the picture of a more complex disease.
+\par
+The pathophysiology of multiple sclerosis is similarly unclear, though genetics are a necessary factor, and it is known that symptoms arise from erosion of myelin -- a fatty insulating layer surrounding axons which is critical for normal neuron firing \cite{Trapp2008}. Several theories hypothesize either that this damage is driven by autoimmune attack, followed by neuronal dysfunction and death, or that neurodegenerative changes stimulate recruitment of immune cells as part of the usual response to injury \cite{Lucchinetti2000,Trapp2008}. Recent evidence favours the former mechanism, particularly with inflammatory injury as the initiating event \cite{Ciccarelli2014,Mahad2015}.
+%A helpful visualization of MS lesion progression over one year is available here\footnote{\hreftt{http://www.msdiscovery.org/sites/default/files/MGrid\_crop4\_full\_0.gif}}.
+\par
+Connecting all these diseases are white matter lesions (WML, \textsc{aka} Leukoariosis), which represent the macroscopic changes to brain tissue in regions of white matter damage \cite{Debette2010,Bakshi2005,Wardlaw2015}. WML are very common in elderly populations, and a small volume of lesion does not necessarily implicate one of the above diseases; in one study of 1077 subjects aged 60-90, 95\% had at least one WML \cite{DeLeeuw2001}. WML appear as bright tissue regions in T2-weighted MRI due to some combination of inflammatory injury and degradation of tissue structure \cite{Bakshi2005,Wardlaw2015}; in this imaging context, they are often called white matter hyperintensities (WMH). Lesions are often focal, as opposed to diffuse, but there is evidence to suggest that surrounding regions of moderate hyperintensity, sometimes called ``dirty appearing white matter (DAWM)'', are also related to the diseases \cite{Ge2003}. As biomarkers of the most common WM diseases -- conditions with unsolved etiologies and inadequate treatments -- WML are of special interest to many brain researchers. MR imaging of WMH is used for both research and patient management; before discussing how, the principals of MRI are first introduced.
+% ==================================================================================================
+\subsection{Magnetic Resonance Imaging}
+Magnetic resonance imaging (MRI) provides superior and flexible brain tissue contrast versus computed tomography (CT) imaging, and is the primary modality for imaging white matter disease. Whereas CT measures tissue density via attenuation of transmitted X-rays, which does not vary significantly among brain tissues, MRI measures a mutable combination of 3 tissue characteristics: the proton density (PD)\footnote{MRI can be used to image any nucleus with a net nuclear dipole, but proton (hydrogen) imaging is most common since hydrogen is biologically abundant and gives a strong signal intensity.}, and T1 and T2 relaxation constants \cite{Pooley2005}. The physics of signal generation are described below.
+\par
+\begin{figure}[b]
+  \centering\includegraphics[width=\plotwidth]{mridecay3d}
+  \caption{Visualization of T1 and T2 relaxation}
+  \label{fig:mridecay3d}
+\end{figure}
+In an MR scanner, a powerful magnetic field induces alignment of proton dipoles with the field. Only a tiny fraction of the total protons align, but they create a small magnetic field $M_z$ which is distinct from the main field \cite{Bloch1946}. The aligned protons also rotate about the axis of alignment, imperfectly, like a spinning top; this is called precession, and the frequency of rotation is roughly homogeneous and proportional to the main field strength \cite{Bloch1946}. If a second magnetic field is applied which is $90^{\circ}$ perpendicular to the first, and rotating at the precession frequency, the aligned protons can be forced into temporary alignment with this transverse rotating field, before decaying back towards their original state, as illustrated in Figure \ref{fig:mridecay3d} \cite{Bloch1946}. This transient applied magnetic field is induced by a radio frequency (RF) pulse, and the rate at which the original magnetization $M_z$ is regained is described by the tissue-specific T1 relaxation constant,
+\begin{equation}
+M_z = M_0\et\left(1-e^{-\left(\frac{t}{T1}\right)}\right)\label{eq:T1}.
+\end{equation}
+The T1 constant is dictated by the ability of protons in the tissue to transfer energy to bonded atoms and surrounding molecules, since this energy transfer defines the transition from the high energy transverse state to the low energy original state \cite{Bloch1946,Bryant2005}. Large macromolecules, membranes, and lipids are generally able to facilitate this energy transfer more effectively than small molecules like water, producing a shorter T1 \cite{Koenig1990}. For this reason, myelinated WM has a shorter T1 than GM, which in turn has a shorter T1 than CSF, which is mostly water \cite{Roberts2007}.
+\par
+The rate of decay of the transverse moment $M_{xy}$ is actually not equal to the rate of regeneration of $M_z$. Rather, this is governed by the T2 relaxation constant,
+\begin{equation}
+M_{xy} = M_0\et\left(e^{-\left(\frac{t}{T2}\right)}\right)\label{eq:T2},
+\end{equation}
+which is always shorter that T1. This is because, in addition to T1 effects, the net rotating moment $M_{xy}$ is eroded by proton dephasing. When precessing protons, having a net dipole, interact with other dipoles or charged particles, their rotational frequency can be increased or decreased, but overall less coherent, reducing the perceptible net magnetization $M_{xy}$ \cite{Bloch1946}. In highly structured tissues like GM and WM, these interactions are more variable, dephasing is faster, and T2 is shorter \cite{Roberts2007}. In fluid environments like CSF, proton interactions are more homogeneous, yielding longer T2 \cite{Roberts2007}. For this reason, T2-weighted images are especially useful in identifying pathologies which degrade tissue structure, since they will have abnormally high T2 \cite{Roberts2007}. Both relaxation constants depend in a small way on the main magnetic field strength, measured in Tesla (T); T1 and T2 values for various brain tissues at 1.5T are summarized in Table \ref{tab:t1t2tissues}.
+\par
+\begin{table}
+  \caption{T1 and T2 constants for brain tissues at 1.5 Tesla.}
+  \label{tab:t1t2tissues}
+  \centering{\setlength{\tabcolsep}{2pt}
+  \begin{tabular}{ccrclcrclcrclcl}\hline
+    Tissue && \multicolumn{3}{c}{T1 (ms)} && \multicolumn{3}{c}{T2 (ms)} && \multicolumn{3}{c}{$K [H]$ (a.u.)}&& Ref\\\hline
+    WM  &&  719 & $\pm$ &  33 &&   73 & $\pm$ &   6 && 0.81 & $\pm$ & 0.03 && \cite{Schmitt2004}\\
+    GM  && 1165 & $\pm$ &  88 &&   92 & $\pm$ &  11 && 0.98 & $\pm$ & 0.07 && \cite{Schmitt2004}\\
+    CSF && 3337 & $\pm$ & 111 && 2562 & $\pm$ & 123 && 1.00 & $\pm$ & 0.07 && \cite{Schmitt2004}\\
+    WML && 1124 & $\pm$ & 372 &&  136 & $\pm$ &  79 &&      &  $-$  &      && \cite{Stevenson2000}\ss{a}\\
+    \hline
+  \end{tabular}}\\[0.5em]
+  \footnotesize{\ss{a} Estimated from Fig 1 supratentorial data (numerical results not given); $\pm$ IQR, not SD.}
+\end{table}
+Image acquisition involves sensing the transverse magnetization $M_{xy}$ following proton excitation by an RF pulse. The problem is that this small signal decays very quickly due to proton dephasing, which occurs even faster than $T2$ would predict due to a third factor, inhomogeneity in the main magnetic field \cite{Chavhan2009}. The time constant for this decays is termed $T2^*$, and its effects are usually undesirable \cite{Chavhan2009}. As a result, $M_{xy}$ is easily overpowered by the magnetic moment from the RF pulse, even after it is turned off, due to resonance. An important solution to this, called the spin-echo, was proposed by Erwin Hahn in \citeyear{Hahn1950} \cite{Hahn1950}. If $T2^*$ for each proton is assumed to be constant, then reversing the direction of rotation at a time $t$ should cause all protons to align again at exactly $2t$. Therefore, at $2t$ the transverse magnetization $M_{xy}$ -- the image signal -- manifests again for sensing, no longer confounded by RF coil resonance \cite{Hahn1950}.
+\par
+This second signal is called the Spin Echo ($SE$), and the interval $2t$ is termed the echo time ($TE$). Reversing the direction of rotation can be achieved by a $180^{\circ}$ RF pulse at time $TE/2$, in the same way the original excitation is achieved using a $90^{\circ}$ RF pulse (amount of rotation is proportional to the energy of the pulse). Acquisition of an entire image requires repetitions of this sequence with an interval called the repetition time ($TR$). An example spin echo sequence, showing $TE$ and $TR$, as well as $T1$ and $T2$ decay, is illustrated in Figure \ref{fig:mrispinecho}. Spatial encoding for creation of 2D and 3D images requires the use of additional electromagnetic gradients; however this topic is omitted here since it is quite involved, and not essential to the current work\footnote{The interested reader is directed to this comprehensive resource on the topic: \hreftt{http://mri-q.com/}}.
+\par
+\begin{figure}
+  \centering\includegraphics[width=\plotwidth]{mrispinecho}
+  \caption{RF and MR signal for a basic Spin Echo sequence}
+  \label{fig:mrispinecho}
+\end{figure}
+Using these principals, the nature of MR image contrast can finally be understood. In particular, the signal intensity $\Psi$ for a spin echo sequence at location $x$ can be described by the following 3-term equation,
+\begin{equation}\label{eq:MRI-SE}
+\Psi_{SE}(x) = \bigg[K [H](x)\bigg]\bigg[e^{-\left(\frac{TE}{T2(x)}\right)}\bigg]\bigg[1 - e^{-\left(\frac{TR}{T1(x)}\right)}\bigg],
+\end{equation}
+where $K$ is scaling factor, and $\left[H\right]$ denotes the proton density. If $TR$ is chosen to be relatively long, then the longitudinal magnetization $M_z$ is allowed to recover completely after each repetition, the third term tends towards 1 for all tissues, and differences in tissue specific $T1$ are nullified. Similarly, if $TE$ is relatively short, then $M_{xy}$ has little time to dephase, the second term is maintained close to 1, and differences in $T2$ are nullified. In order to emphasize differences in $T1$, therefore, $TR$ can be chosen shorter; for $T2$-weighted contrast, $TE$ can be chosen longer; and if differences in $[H]$ (proton density, PD) are to be emphasized, $TR$ can be kept long and $TE$ short. An example MRI slice using each of these image sequences is shown in Figure \ref{fig:4mri}, a--c.
+\par
+For identifying WML, T2-weighted images were conventionally used, since the pathology appears bright. However, CSF in the sulci and ventricles also appears bright on T2 images, making delineation of lesions -- especially periventricular lesions -- difficult in T2 images (Figure \ref{fig:4mri} b). To solve this problem, an adaptation of the usual RF pulse sequence can be used, called an inversion recovery (IR) \cite{Bydder1985}. In this sequence, an additional $180^{\circ}$ inverting RF pulse is added before the $90^{\circ}$ pulse, so that the longitudinal magnetization $M_z$ is inverted, then recovers to the original state, passing for a brief moment through zero net magnetization. The rate of recovery is governed by $T1$, so it is tissue specific. Furthermore, if the $90^{\circ}$ pulse is applied at the instant of zero net magnetization, no transverse moment will develop, nor the subsequent spin echo. Therefore this time interval, called the inversion time ($TI$), can be chosen to null the signal from any tissue with a unique $T1$. The equation governing the image signal simply adds an inversion term,
+\begin{equation}\label{eq:MRI-IR}
+\Psi_{IR}(x) = \bigg[K \left[H(x)\right]\bigg]\bigg[e^{-\left(\frac{TE}{T2(x)}\right)}\bigg]\bigg[1 + e^{-\left(\frac{TR}{T1(x)}\right)} - 2e^{-\left(\frac{TI}{T1(x)}\right)}\bigg].
+\end{equation}
+This inversion principal is now often used to null the signal from CSF, especially for delineation of WMH, in a sequence called FLuid Attenuation Inversion Recovery (FLAIR) \cite{Hajnal1992}. Figure \ref{fig:4mri} d shows an example FLAIR image, where a WMH can be seen, posterior to the occipital horn of the left lateral ventricle, much more clearly than in the T2 image.
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.24\textwidth}\includegraphics[width=\textwidth]{i15_training01_01_mprage.png}\caption{T1}  \end{subfigure}
+  \begin{subfigure}{0.24\textwidth}\includegraphics[width=\textwidth]{i15_training01_01_t2.png}\caption{T2}      \end{subfigure}
+  \begin{subfigure}{0.24\textwidth}\includegraphics[width=\textwidth]{i15_training01_01_pd.png}\caption{PD}      \end{subfigure}
+  \begin{subfigure}{0.24\textwidth}\includegraphics[width=\textwidth]{i15_training01_01_flair.png}\caption{FLAIR}\end{subfigure}
+  \caption{Example MRI image set with WMH pathology; from \cite{WMHSEG2017}}
+  \label{fig:4mri}
+\end{figure}
+% ==================================================================================================
+\subsection{MRI in White Matter Disease}
+MR imaging of white matter lesions plays several important roles in management and research of white matter diseases. 
+\par
+In disease diagnosis, WMH are perhaps most important in 
+
+
+
+Uniquely, MS lesions also manifest in the spinal cord, though this is beyond the scope of the MR images considered here.
+
+Stroke, as an acute injury, does not fall under the usual diagnostic paradigm. 
+
+Surprisingly, while WMH have been significantly associated with vascular 
+
+they are not routinely included in dementia 
+
+\cite{Debette2010}
+
+
+
+
++ research: as endpoint for clinical trials:
+  - MS:
+  - Alz:
+  - Dem:
+  - Stroke:
++ Disease diagnosis:
+  - MS: \cite{Polman2011}
+  - AD: The main guidelines for diagnosis are strictly clinical (i.e. exclude all imaging modalities and CSF assays) \cite{McKhann2011}.
+  Yet, this omission may highlight the difficulty of large scale correlational studies of AD and WML.
+  - Dem: (vascular only) 
+  - Stroke:
++ Disease management:
+  - MS:
+  - Alz:
+  - Dem:
+  - Stroke:
+
+a \citeyear{Debette2010} meta-analysis found that WMH in brain MRI were independently correlated with association of stroke risk
+
+
+In all studies reviewed by \citeauthor{Debette2010}, however, WML were independently associated with stroke risk after controlling for vascular risk factors \cite{Debette2010}.
+
+
+
+\clearpage
+MR imaging of WMH plays several roles in management of MS and dementia, including diagnosis \cite{Polman2011,McKhann2011} and evaluation of new treatment efficacies \cite{Miller1996,Fahrbach2013,Sormani2013,Debette2010a}. In fact, it has been reported that MR imaging is up to ten times more sensitive to new lesion appearance than clinical symptoms in relapse remitting MS \cite{ORiordan1998}. In a \citeyear{Debette2010} meta-analysis, WM lesions were also associated with significantly increased risk of stroke and dementia, including AD \cite{Debette2010}, findings which have inspired several large-scale MRI-focused studies of these diseases, including the Canadian Atherosclerosis Imaging Network (CAIN) \cite{Tardif2013a} and the Alzheimer's Disease Neuroimaging Initiative (ADNI) \cite{Mueller2005}.
+\par
+Typically, analysis of WM lesions on MRI is performed manually, using specific criteria \cite{Polman2011,McKhann2011}, visual scales \cite{Pantoni2002}, or manual delineation \cite{Egger2017}. Manual delineation is most informative, providing both volumetric lesion load (LL) and exact spatial distribution of lesions. However, this approach is laborious, and is subject to large inter- and intra-rater variability. Such variability has been quantified in several works using similarity index (SI) and interclass correlation coefficient (ICC) (c.f. \ref{ss:metrics} for definitions); Table \ref{tab:interrater-cite} gives a summary of these results. Such discrepancies have motivated the development of automated segmentation tools in order to provide more consistent segmentations. These efforts have been further stimulated by the collection of large imaging databases (e.g. CAIN \& ADNI) for which manual delineation of lesions would be too time consuming.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Problem Statement}
+White matter hyperintensities, as ubiquitous biomarkers of several diseases with unsolved pathophysiology, are of great interest to brain researchers. However, the current methods of quantifying WMH 
+
+\cite{Polman2011,Pantoni2002,Egger2017}.
+
+
+There are several manual rating scales which have been proposed \cite{Fazekas1987,VanSwieten1990,Scheltens1993,Ylikoski1993,Manolio1994}
+
+
+Indeed, the majority of rating scales distinguish between deep (DL) and periventricular lesions (PVL) \cite{Kim2008}.
+
+Problem Statement:
+Advantages of segmentation over rating scales:
+- Finer resolution
+- Explicit spatial results, which can be correlated with 
+Advantages of automated segmentation over manual segmentation:
+- Perfect repeatability -- versus significant intra-/inter-rater variability
+- Less time to perform the segmentation
+
+
+
+\begin{table}[h]
+  \caption{Reported mean inter-rater agreement measures for manual WMH segmentation}
+  \centering
+  \begin{tabular}{ccccc}
+    \hline
+    Ref                  & Raters & Data       & SI   & ICC \\
+    \hline
+    \cite{Steenwijk2013} &      2 & 120 slices & 0.83 & 0.96 \\
+    \cite{DeBoer2009b}   &      2 & 6 images   & 0.75 & ---  \\
+    \cite{Harmouche2006} &      5 & 10 images  & 0.64 & ---  \\
+    \cite{Egger2017}     &      3 & 50 images  & 0.66 & 0.97 \\
+    \hline
+  \end{tabular}
+  \label{tab:interrater-cite}
+\end{table}
+
+% ==================================================================================================
+\subsection{Objective}
+The primary objective of this thesis is to develop an algorithm for fully automatic segmentation of WMH, using FLAIR MRI alone. Secondary objectives include:
+\begin{itemize}
+  \item analysis of the limitations of prior work in this area;
+  \item characterization of the important features for WMH segmentation;
+  \item exploration and definition of appropriate cross validation techniques for the task;
+  \item validation of the proposed algorithm on a large and heterogeneous database of FLAIR images.
+\end{itemize}
+% ==================================================================================================
+\subsection{Challenges to Automatic Segmentation}\label{ss:autochallenges}
+Human interpretation of MRI does has several advantages. 
+
+Expert knowledge and understanding of image artifacts usually allows radiologists to distinguish WML from healthy tissues a with relative ease. 
+
+\begin{enumerate}[itemsep=0pt,topsep=0pt]
+  \item overlapping graylevel distributions of WMH and healthy tissues;
+  \item bias field artifact, which can confound pathological hyperintensities \cite{Wardlaw2015};
+  \item delineating the boundaries of focal lesions surrounded by DAWM \cite{Ge2003};
+  \item identifying small WMH in MRI with significant partial volume effect due to large slice thickness \cite{Khademi2012};
+  \item differentiating WMH from image artifacts \cite{Wardlaw2015};
+  \item image variability.
+\end{enumerate}
+Confounding artifacts and pathologies include \cite{Wardlaw2015}:
+\begin{itemize}[itemsep=0pt,topsep=0pt]
+  \item CSF flow artifacts;
+  %  \item Recent small subcortical infarcts;
+  \item Perivascular spaces;
+  \item Motion artifacts;
+\end{itemize}
+We will take ``image'' to mean one subject-scan, which may include several MRI sequences, and we take ``image variability'' to comprise:
+\begin{itemize}[itemsep=0pt,topsep=0pt]
+  \item differences in image contrasts (i.e. tissue intensity distributions), due to selection of MRI parameters;
+  \item differences in image resolution (voxel size);
+  \item differences in MRI scanner, including field strength and proprietary image reconstruction;
+  \item inter-subject anatomical variability and lesion heterogeneity.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Prior Work}
+Our endeavour is far from original. Efforts to automate segmentation of WMH date back to \citeyear{Kapouleas1990} \cite{Kapouleas1990} and the task has been the subject of several major reviews in \citeyear{Llado2012} \cite{Llado2012}, \citeyear{Garcia-Lorenzo2013} \cite{Garcia-Lorenzo2013}, and \citeyear{Caligiuri2015} \cite{Caligiuri2015}. The task has also been featured in four international competitions at the MICCAI (Medical Image Computing and Computer Assisted Intervention) Conference (2008 \cite{MSSEG2008}, 2016 \cite{MSSEG2016}, and 2017 \cite{WMHSEG2017}), and the ISBI (International Symposium on Biomedical Imaging) Conference (2015 \cite{MSISBI2015}), in which researchers vie to produce the best segmentation algorithms (c.f. \ref{ss:competitions}). A summary of the proposed approaches -- which is likely incomplete -- is given in Table \ref{tab:wmlsegtable}\footnote{A more detailed and interactive version of this table is available at \hreftt{www.uoguelph.ca/\~jknigh04/wmlseg/table.html}}. Below, the most important contributions in this area are introduced and summarized.
+\begin{table}
+  \caption{Summary of previous approaches to WMH segmentation with respect to image variability and reported performance (SI).}
+  \footnotesize{\centering{\input{wmlsegtable}}}
+  \label{tab:wmlsegtable}
+\end{table}
+% ==================================================================================================
+\subsection{Segmentation Models}
+Segmentation models represent a mapping from the content of an observed image to an image of labels or classes -- in this case, tissues. The output class image comprises an estimated label for each observed voxel, or, in probabilistic models, the probability of each class for each voxel. As in many classification problems, models can be described as either supervised or unsupervised. Supervised models have relatively large capacity to model arbitrary mappings, but learn a mapping relevant to the current task using feedback from labelled examples (i.e. by a human). Unsupervised models, by contrast, are usually problem-specific, and leverage prior knowledge and the image features to predict the label image; they do not require labelled data for optimization, at least in principle. 
+\par
+Features used for segmentation can be derived from individual voxels (e.g. graylevel), groups of voxels (e.g. local mean graylevel), the entire image (e.g. a histogram feature), spatial location (e.g. coordinates in a standardized space), or prior knowledge (e.g. class prior probability). It is useful to imagine the space spanned by all possible values of all features; this is called the feature space. Each observed voxel, having a unique value for each feature, therefore represents a unique location in this space. The task of segmentation is therefore to divide the feature space into subspaces corresponding to each class. In probabilistic models, these subspaces are better described as distributions of the class over the features.
+% --------------------------------------------------------------------------------------------------
+\subsubsection{Features}
+Previous approaches to WMH segmentation have generally employed three types of features:
+\begin{itemize}
+  \item graylevel(s) of MRI sequence(s), often following a standardization step;
+  \item prior tissue probability, often derived from a spatially coregistered prior image (e.g. ICBM \cite{Mazziotta2001});
+  \item spatial location, often normalized to a common space;
+\end{itemize}
+Additional features are rarely used, since the combination of the above features are typically the only features employed by human raters.
+% ==================================================================================================
+\subsection{Proposed Methods}
+The specific methods proposed for WMH segmentation are now reviewed.\footnote{This section copied verbatim from a paper in submission \cite{Knight2017a} -- is this allowed?}
+% --------------------------------------------------------------------------------------------------
+\subsubsection{Thresholding Techniques}
+Since WMH are brighter than healthy brain tissue in FLAIR images, many unsupervised works have used thresholding of FLAIR intensities as the initial lesion segmentation.
+For example, in the works by \citeauthor{Jack2001} \cite{Jack2001}, \citeauthor{DeBoer2009b} \cite{DeBoer2009b}, and \citeauthor{Smart2011}, \cite{Smart2011} optimal FLAIR thresholds are empirically estimated relative to histogram statistics, though \citeauthor{DeBoer2009b} use only estimated GM voxels in the histogram.
+\citeauthor{Gibson2010} use a conservative FLAIR threshold initially, but then classify the remaining voxels using Fuzzy C Means clustering \cite{Gibson2010}.
+\citeauthor{Samaille2012} use nonlinear diffusion filtering and watershed segmentation, before classifying candidate regions based on a FLAIR image threshold.
+\citeauthor{Yoo2014} estimate the optimal threshold for FLAIR images using histogram statistics, derived from a regression model primarily considering the total lesion load \cite{Yoo2014}.
+In works by \citeauthor{Khademi2014}, a peak in the conditional probability of edge content on graylevel is used to predict the transition between healthy tissue and lesion \cite{Khademi2014,Khademi2015,Knight2016a}.
+\subsubsection{Mixture Models}
+Most other unsupervised approaches are probabilistic models, often framed as a mixture model.
+The work by \citeauthor{VanLeemput2001} \cite{VanLeemput2001} uses a similar framework as the early work by \citeauthor{Ashburner1997} \cite{Ashburner1997}, later incorporated into the SPM ``segment'' tool \cite{Ashburner2005}, which jointly estimates Gaussian graylevel distributions for each tissue class, and also bias field, using expectation maximization. In the model by \citeauthor{VanLeemput2001}, distribution parameters are estimated using outlier-insensitive estimators, and WMH are derived from model outliers using heuristic rules. The predicted classes are also smoothed spatially using a Markov Random Field (MRF).
+\par
+Similar works by \citeauthor{Bricq2008} \cite{Bricq2008}, \citeauthor{Schmidt2012} \cite{Schmidt2012}, \citeauthor{Jain2015} \cite{Jain2015}, and \citeauthor{Roura2015} \cite{Roura2015} use parametric mixture models to predict WMH as model outliers, and all but \cite{Roura2015} embed the model in a MRF.
+\citeauthor{Khayati2008} \cite{Khayati2008} and \citeauthor{Subbanna2009} \cite{Subbanna2009} also use MRF-constrained mixture models, but model WMHs as a Gaussian-distributed tissue class, rather than as outliers.
+In the works by \citeauthor{Harmouche2006}, parametric distributions are also used to model lesions, but such distributions are parameterized independently per brain region, in order to reflect lobe heterogeneity; a MRF is again used for regularization \cite{Harmouche2006,Harmouche2015}.
+\citeauthor{Schwarz2009} again employ a Bayesian MRF model, but use lognormal distributions for WM and WMH \cite{Schwarz2009}.
+\citeauthor{Souplet2008} use an augmented mixture model which includes partial volume averaging classes and an outlier class to perform initial brain tissue segmentation; WMH are subsequently classified using a FLAIR intensity threshold after contrast enhancement \cite{Souplet2008}. 
+The work by \citeauthor{Herskovits2008} is much the same, but uses statistical information from training data to classify lesions (i.e. it is supervised) \cite{Herskovits2008}.
+More recently, Graph-Cuts have been used in conjunction with mixture models, as in the works by \citeauthor{Garcia-Lorenzo2009} \cite{Garcia-Lorenzo2009}, \citeauthor{Tomas-Fernandez2015} \cite{Tomas-Fernandez2015}, and \citeauthor{Strumia2016} \cite{Strumia2016}.
+\par
+The Lesion-TOADS method by \citeauthor{Shiee2010} \cite{Shiee2010}, a lesion-specific adaptation of the TOADS algorithm \cite{Bazin2008}, presents an entirely new non-Gaussian paradigm for modelling class distributions, and incorporates topological energies in the objective function.
+Other proposed unsupervised methods have used clustering by Fuzzy C-Means, including the works by \citeauthor{Admiraal-Behloul2005} \cite{Admiraal-Behloul2005}, \citeauthor{Gibson2010} \cite{Gibson2010}, and \citeauthor{Valverde2016} \cite{Valverde2016}.
+\subsubsection{Classic Supervised Methods}
+Many early supervised methods used K-Nearest Neighbours (K-NN) for voxel-wise WMH classification.
+\citeauthor{Anbeek2005} used a K-NN model with features derived from spatial coordinates and voxel intensities from several modalities \cite{Anbeek2004,Anbeek2005}.
+In the works by \citeauthor{Wu2006} \cite{Wu2006}, \citeauthor{Steenwijk2013} \cite{Steenwijk2013}, and \citeauthor{Fartaria2015} \cite{Fartaria2015}, spatial coordinates are substituted for tissue priors as K-NN features.
+In the recently proposed BIANCA algorithm by \citeauthor{Griffanti2016} \cite{Griffanti2016}, spatial coordinates are added back, along with some patch-based features.
+\par
+Other works have also explored Support Vector Machines (SVM) for classification.
+The works by \citeauthor{Lao2006} \cite{Lao2006}, \citeauthor{Abdullah2012} \cite{Abdullah2012}, and \citeauthor{Scully2010} \cite{Scully2010} each use a selection of intensity features, neighbouring intensities, tissue priors, morphological, and texture features with an SVM classifier.
+Several more recent works have used decision tree-based classifiers, including Random Forest (RF) and AdaBoost.
+\citeauthor{Akselrod-Ballin2009} \cite{Akselrod-Ballin2009} employ over 30 features for multi-scale image representation and classify voxels using RF.
+Both \citeauthor{Geremia2011} \cite{Geremia2011} and \citeauthor{Roy2015} \cite{Roy2015} use a combination of intensity and tissue prior features to train a RF classifier, whereas \citeauthor{Wels2008} \cite{Wels2008} use a large number of Haar-like features to train an AdaBoost model.
+\par
+Logistic regression models have also gained popularity recently.
+In the OASIS model by \citeauthor{Sweeney2013} \cite{Sweeney2013}, image intensities from T1, T2, PD, and FLAIR sequences are used individually, in multiplicative combination, and with Gaussian blurring as predictors for a global set of logistic regression parameters.
+In the work by \citeauthor{Zhan2017} \cite{Zhan2017}, a similar logistic model is fitted using only the raw T1, T2, and FLAIR intensities, while bias correction is performed as preprocessing and spatial smoothness using MRF post processing.
+In the work by \citeauthor{Dadar2017} \cite{Dadar2017}, spatial and intensity features from a flexible selection of MR sequences are used to train a linear regression model, the results of which are thresholded to give the lesion prediction.
+Still more works have proposed other supervised models, including nonparametric Parzen classifiers \cite{Sajja2006}.
+\subsubsection{Deep Learning}
+A number of deep learning approaches have also been proposed, though their permeation in this problem space is surprisingly limited.
+Both \citeauthor{Zijdenbos2002} \cite{Zijdenbos2002} and \citeauthor{Dyrby2008} \cite{Dyrby2008} train fully-connected voxel-wise Neural Networks with a selection of intensity, spatial, and tissue prior features to predict the lesion class.
+In contrast, \citeauthor{Brosch2015} \cite{Brosch2015} construct a more modern deep convolutional model, which is capable of capturing both local and global dependencies.
+\subsubsection{External Toolboxes}
+Many of the proposed methods use registration, brain extraction, bias field correction, and segmentation tools available in freely available toolkits; these include the SPM\footnote{\hreftt{http://www.fil.ion.ucl.ac.uk/spm/}} toolkit
+\cite{Sajja2006,Dyrby2008,Akselrod-Ballin2009,Smart2011,Schmidt2012,Yoo2014,Roy2015,Valverde2016} and the
+FSL\footnote{\hreftt{https://fsl.fmrib.ox.ac.uk/fsl/}} toolkit
+\cite{Herskovits2008,Gibson2010,Datta2013,Steenwijk2013,Sweeney2013,Roy2015,Wang2015,Griffanti2016,Zhan2017},
+as well as bias correction by the
+N3/4
+%\footnote{\hreftt{https://www.slicer.org/wiki/Documentation/4.6/Modules/N4ITKBiasFieldCorrection}} 
+\cite{Tustison2010}
+algorithm
+\cite{Zijdenbos2002,Harmouche2006,Fartaria2015,Guizard2015,Harmouche2015,Mechrez2016,Valverde2016,Dadar2017,Zhan2017}.
+% --------------------------------------------------------------------------------------------------
+%\subsubsection{Probabilistic Frameworks}
+%Two of the most popular free segmentation tools for healthy brain MRI,
+%``Segment'' in SPM\footnote{\hreftt{http://www.fil.ion.ucl.ac.uk/spm/}} \cite{Ashburner2005}
+%and
+%``FAST'' in FSL\footnote{\hreftt{https://fsl.fmrib.ox.ac.uk}} \cite{Zhang2001},
+%employ a common mixture model framework which is estimated using expectation maximization (EM). These frameworks have been adapted in many works to segment WMH, either as model outliers, or as a new tissue class. Therefore, 
+%The probability of class $k$ at location $i$, given the graylevel $y$ and model parameters $\bm{\theta}$, is 
+%\begin{equation}
+%  P(c_i=k \mid y_i, \bm{\theta}) = \frac{P(y_i, c_i=k \mid \bm{\theta})}{P(y_i \mid \bm{\theta})}
+%\end{equation}
+% ==================================================================================================
+\subsection{Limitations}\label{ss:priorlimits}
+Despite over 50 proposed algorithms and 
+
+No 
+
+
+
+
+Examples of hyperparameters in unsupervised models which can be over-tuned to the developmental dataset:
+\begin{itemize}
+  \item Outlier definition (Mahalanobis Distance)
+  \item Histogram threshold definition.
+\end{itemize}
+
+However, 
+
+(c.f. \ref{s:CVframeworks})
+
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Contributions}
+The major contributions of this thesis are as follows:
+\begin{enumerate}
+  \item A review and critique of the previously proposed WMH segmentation algorithms;
+  \item Leave-One-Source-Out Cross Validation (LOSO-CV): a validation framework which accurately characterizes the generalization performance of medical image analysis methods;
+  \item A new FLAIR-only WMH segmentation algorithm;
+  \item Extensive validation of the proposed method and its components.
+\end{enumerate}
+The remainder of this thesis is organized as follows:
+Chapter 2 motivates and develops the voxel-wise logistic regression model, including expected challenges and solutions with this approach;
+Chapter 3 explores optimization of model components through experiment, and then presents segmentation performance results under various cross validation schemes;
+Chapter 4 discusses the performance results, summarizes the contributions, and highlights avenues of future work.
+% --------------------------------------------------------------------------------------------------
+% ==================================================================================================
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,0 +1,113 @@
+\documentclass[openany,11pt,vi,oneside]{mitthesis}
+\usepackage{lgrind}
+\usepackage{calc}
+\usepackage{cmap}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{enumitem}
+\usepackage{scrextend}
+\usepackage{lscape}
+\usepackage{geometry}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{lscape}
+\usepackage{tabu}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{nameref}
+%\usepackage{xifthen}
+\usepackage{tikz}
+\usepackage{matlab-prettifier}
+\usepackage{listings}
+%\usepackage{acronym}
+\usepackage{hyperref}
+\usepackage[hang]{footmisc}
+\usetikzlibrary{shapes,arrows.meta,calc}
+\usepackage[backend=biber,
+			style=numeric, maxcitenames=1, sorting=none, url=false, isbn=false, doi=true, eprint=false]{biblatex}
+\hypersetup{colorlinks,citecolor={purple},linkcolor={blue}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% resources
+%\include{src}
+%\include{matrices}
+\addbibresource{C:/Users/Jesse/Documents/tex/src/tex/latex/library.bib}
+\graphicspath{{figs/}{figs/tikz/}{figs/tikz/algorithm/}}
+\newcommand{\matlabdir}{C:/Users/Jesse/Documents/m/Research/wmlseg/workspace/}
+% layout
+\geometry{margin=2cm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{8pt}
+\setlength{\skip\footins}{24pt}
+\setlength{\footnotemargin}{0.8em}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% math shorthands
+\renewcommand{\Re}{\mathbb{R}}
+\newcommand{\x}{\mathbf{x}}
+\newcommand{\gm}{\textsc{gm}}
+\newcommand{\wm}{\textsc{wm}}
+\newcommand{\csf}{\textsc{csf}}
+\newcommand{\les}{\textsc{les}}
+\newcommand{\mrf}{\textsc{mrf}}
+\newcommand{\lr}{\textsc{lr}}
+\newcommand{\K}{\textsc{k}}
+\newcommand{\N}{\textsc{n}}
+\renewcommand{\d}{\partial}
+\renewcommand{\b}{\beta}
+\newcommand{\bb}{\bm{\beta}}
+\newcommand{\by}{\bm{y}}
+\renewcommand{\L}{\mathcal{L}}
+\renewcommand{\N}{\mathcal{N}}
+\newcommand{\J}{\mathcal{J}}
+\newcommand{\X}{\mathcal{X}}
+\newcommand{\Y}{\mathcal{Y}}
+\newcommand{\C}{\mathcal{C}}
+\newcommand{\bX}{\bm{\mathcal{X}}}
+\newcommand{\bY}{\bm{\mathcal{Y}}}
+\newcommand{\bC}{\bm{\mathcal{C}}}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\norm}[1]{\left|\left|#1\right|\right|}
+% colors
+\definecolor{c01}{rgb}{1.00 0.00 0.00}
+\definecolor{c02}{rgb}{1.00 0.38 0.00}
+\definecolor{c03}{rgb}{1.00 0.75 0.00}
+\definecolor{c04}{rgb}{0.13 0.80 0.00}
+\definecolor{c05}{rgb}{0.00 0.80 0.80}
+\definecolor{c06}{rgb}{0.00 0.50 1.00}
+\definecolor{c07}{rgb}{0.00 0.20 1.00}
+\definecolor{c08}{rgb}{0.50 0.00 1.00}
+\definecolor{c09}{rgb}{1.00 0.00 1.00}
+\definecolor{c10}{rgb}{0.50 0.50 0.50}
+\definecolor{gry}{rgb}{0.50 0.50 0.50}
+% little text items
+\renewcommand{\ss}[1]{\textsuperscript{#1}}
+\newcommand{\hreftt}[1]{\href{#1}{\texttt{#1}}}
+\newcommand{\et}{\thinspace}
+\newcommand{\en}{\enspace}
+% sizing
+\newcommand{\plotwidth}{0.48\textwidth}
+% appendix
+\newcommand{\matlabsty}{\color{black}\ttfamily\footnotesize}
+%\lstMakeShortInline[style=Matlab-editor,basicstyle=\matlabsty]@
+\lstnewenvironment{matlab}{\lstset{style=Matlab-editor,basicstyle=\matlabsty}}{}
+\newcommand{\includecode}[1]{\subsubsection{\ttfamily{#1}}
+  \begin{singlespace}\lstinputlisting[style=Matlab-editor,basicstyle=\linespread{0}\matlabsty]{\matlabdir#1}\end{singlespace}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+% \include{front}
+% \begin{abstract}\input{abstract}\end{abstract}
+	\include{contents}
+  \include{ch-intro}
+  \include{ch-method}
+  \include{ch-exp}
+  \include{ch-conc}
+	\begin{singlespace}
+    \printbibliography
+  \end{singlespace}
+  \appendix
+%  \include{ap-impl}
+%  \include{ap-code}
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
