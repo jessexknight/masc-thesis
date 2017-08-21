@@ -8,25 +8,25 @@ Wherever possible, concepts related to segmentation and classification will be d
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Motivation}
 
-Many of the previously proposed WMH segmentation algorithms predict the class of a voxel without any spatial information. In the absence of spatial information, 
-
-The work by \citeauthor{Khademi2012} \cite{Khademi2012,Khademi2014,Khademi2015} was particularly promising, since it overcame many of the usual requirements. These include: the use of multiple MRI modalities, which are not always available; image registration to a common space, which is never perfect and introduces interpolation artifact; the use of training data, which is difficult to find; and assumed Gaussian distribution of tissue graylevels, which is rarely valid.
-
-
-
-Assumptions which many models make, and whether they are wrong:
-
-- parametric modelling of graylevel distributions: with single Gaussians: almost certainly wrong. Confounding factors: PVA, parallel MRI signals, motion artifacts, 
-
-The most recent implementation of the EM-fit mixture model by \citeauthor{Ashburner2005} in \cite{Ashburner2005} permits a user-specified number of Gaussian distributions for each tissue class, 
-
-(though convergence is likely challenging)
-
-as well as 
-
-However, the central assumption of these methods is that the distributions of WMH graylevels do not overlap significantly with distributions of any other tissue class.
-
-However, it has been suggested that there is regional heterogeneity in relaxation rates of brain tissues \cite{Sled2004}, and that WMH intensity depends in part on location \cite{Stevenson2000}.
+%Many of the previously proposed WMH segmentation algorithms predict the class of a voxel without any spatial information. In the absence of spatial information, 
+%
+%The work by \citeauthor{Khademi2012} \cite{Khademi2012,Khademi2014,Khademi2015} was particularly promising, since it overcame many of the usual requirements. These include: the use of multiple MRI modalities, which are not always available; image registration to a common space, which is never perfect and introduces interpolation artifact; the use of training data, which is difficult to find; and assumed Gaussian distribution of tissue graylevels, which is rarely valid.
+%
+%
+%
+%Assumptions which many models make, and whether they are wrong:
+%
+%- parametric modelling of graylevel distributions: with single Gaussians: almost certainly wrong. Confounding factors: PVA, parallel MRI signals, motion artifacts, 
+%
+%The most recent implementation of the EM-fit mixture model by \citeauthor{Ashburner2005} in \cite{Ashburner2005} permits a user-specified number of Gaussian distributions for each tissue class, 
+%
+%(though convergence is likely challenging)
+%
+%as well as 
+%
+%However, the central assumption of these methods is that the distributions of WMH graylevels do not overlap significantly with distributions of any other tissue class.
+%
+%However, it has been suggested that there is regional heterogeneity in relaxation rates of brain tissues \cite{Sled2004}, and that WMH intensity depends in part on location \cite{Stevenson2000}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Proposed Model}
@@ -118,23 +118,23 @@ Substituting (\ref{eq:llgradient}) and (\ref{eq:llhessian}) into (\ref{eq:newton
 \section{Regularization}
 Even if perfect registration and graylevel standardization are achieved, three challenges remain for the VLR model. These challenges involve contradictions between prior knowledge and the MLE-fitted model using the available training data. That is, these challenges could all be overcome by a more complete training set, but this is usually not available. The three challenges are:
 \begin{enumerate}
-  \item \label{mlech:separable} \textbf{Separable classes:} 
-  When data from two classes are perfectly separable, the MLE error surface in parameter space has a convex global minimum at infinity. As a result, the fitted logistic model in voxels with separable data approaches a step-function, since $\b^1\rightarrow+\infty$. This implies that on either side of a specific graylevel threshold ($\tau$), the model is either 100\% confident in predicting the non-lesion class, or 100\% confident in predicting the lesion class. In fact, no threshold is ever so perfect, and instead a level of uncertainty should be maintained around the decision boundary. These two cases are illustrated in Figure \ref{fig:mlech-sep}.
-  \item \label{mlech:sparse} \textbf{Sparsely observed lesion class:} 
-  Since WML are often distributed in consistent locations, many brain regions contain no lesions across the entire training dataset. In some locations (e.g. the GM), this is expected, while in others (e.g. juxtacortical WM) our prior knowledge predicts lesions will eventually be observed. As illustrated in Figure \ref{fig:mlech-noles}, the MLE-fitted model does not maintain the ability to predict $\hat{c} = 1$ in this location, regardless of the features. However, we would like to keep this ability in many of these locations. 
-  \item \label{mlech:noisy} \textbf{Noisy parameter images:} 
+  \item \label{chmle:separable} \textbf{Separable classes:} 
+  When data from two classes are perfectly separable, the MLE error surface in parameter space has a convex global minimum at infinity. As a result, the fitted logistic model in voxels with separable data approaches a step-function, since $\b^1\rightarrow+\infty$. This implies that on either side of a specific graylevel threshold ($\tau$), the model is either 100\% confident in predicting the non-lesion class, or 100\% confident in predicting the lesion class. In fact, no threshold is ever so perfect, and instead a level of uncertainty should be maintained around the decision boundary. These two cases are illustrated in Figure \ref{fig:chmle-sep}.
+  \item \label{chmle:sparse} \textbf{Sparsely observed lesion class:} 
+  Since WML are often distributed in consistent locations, many brain regions contain no lesions across the entire training dataset. In some locations (e.g. the GM), this is expected, while in others (e.g. juxtacortical WM) our prior knowledge predicts lesions will eventually be observed. As illustrated in Figure \ref{fig:chmle-noles}, the MLE-fitted model does not maintain the ability to predict $\hat{c} = 1$ in this location, regardless of the features. However, we would like to keep this ability in many of these locations. 
+  \item \label{chmle:noisy} \textbf{Noisy parameter images:} 
   Modelling every voxel independently is risky. We assume that similar locations will contain similar training data, yielding smooth parameter images, which we expect. If this assumption is sometimes invalid, parameter images could contain noise or discontinuities, creating artifacts in estimated lesion class images.
 \end{enumerate}
 \begin{figure}
   \centering
   \begin{subfigure}{\plotwidth}
-    \includegraphics[width=\textwidth]{mlechallenge-sep}\caption{Separable classes}\label{fig:mlech-sep}
+    \includegraphics[width=\textwidth]{chmle-sep}\caption{Separable classes}\label{fig:chmle-sep}
   \end{subfigure}
   \begin{subfigure}{\plotwidth}
-    \includegraphics[width=\textwidth]{mlechallenge-noles}\caption{No lesions}\label{fig:mlech-noles}
+    \includegraphics[width=\textwidth]{chmle-noles}\caption{No lesions}\label{fig:chmle-noles}
   \end{subfigure}
   \caption{Challenges encountered using ML estimation of a logistic model.}
-  \label{fig:mlech}
+  \label{fig:chmle}
 \end{figure}
 Solutions to these problems are called regularizations -- methods of injecting prior knowledge about the expected model into the optimization. Model fitting which includes regularizations is termed maximum a posteriori (MAP) estimation. Several regularization strategies are explored below.
 % ==================================================================================================
@@ -145,7 +145,7 @@ Alternatively, simple image manipulations can still afford model improvements \c
 
 % ==================================================================================================
 \subsection{Classic Regularization}
-Challenge \ref{mlech:separable} is well-known in regression problems, and a good solution is to penalize the magnitude of model parameters using the $L_p$-norm: $\lambda\norm{\bb}_p$ \cite{Zou2005}. It can be shown that $L_1$ regularization corresponds to a Laplacian prior on elements of $\bb$, with scale parameter inversely proportional to $\lambda$ (equivalently, this assumes that the model error follows this distribution); similarly, $L_2$ regularization implies a Gaussian prior, with standard deviation inversely proportional to $\lambda$ \cite{Zou2005}. The penalty is appended to the objective function (\ref{eq:argmaxmle}), as in 
+Challenge \ref{chmle:separable} is well-known in regression problems, and a good solution is to penalize the magnitude of model parameters using the $L_p$-norm: $\lambda\norm{\bb}_p$ \cite{Zou2005}. It can be shown that $L_1$ regularization corresponds to a Laplacian prior on elements of $\bb$, with scale parameter inversely proportional to $\lambda$ (equivalently, this assumes that the model error follows this distribution); similarly, $L_2$ regularization implies a Gaussian prior, with standard deviation inversely proportional to $\lambda$ \cite{Zou2005}. The penalty is appended to the objective function (\ref{eq:argmaxmle}), as in 
 \begin{align}
 \bb^* &= \J(\bb)\nonumber\\
 &= \underset{\bb}{\arg\max}\en\L(\bb) - \lambda\norm{\bb}_p \nonumber\\
@@ -157,23 +157,23 @@ Due to its relatively large gradient near zero, $L_1$ regularization is typicall
 \Delta\bb = -{\left(\nabla^2_{\bb}\L-\lambda I\right)}^{-1}\left(\nabla_{\bb}\L-\lambda\bb\right)
 \label{eq:newtonmap}
 \end{equation}
-What remains is to select an appropriate value of $\lambda$. This is explored experimentally using a toy model (c.f. \ref{ss:toyreg}).
+What remains is to select an appropriate value of $\lambda$. This is explored experimentally using a toy model (cf. \ref{ss:toyreg}).
 % ==================================================================================================
 \subsection{Pseudo-Lesion}
-Challenge \ref{mlech:sparse} is less common, since discriminative models are rarely fit in the absence of one class altogether. 
-
-It is tempting to simply transfer samples from other spatial locations 
-
-sampling of the global posterior distribution of lesion graylevels
-
-
-
-However, it has been suggested that there is regional heterogeneity in relaxation rates of brain tissues \cite{Sled2004}, and that WMH intensity depends in part on location \cite{Stevenson2000}.
+%Challenge \ref{chmle:sparse} is less common, since discriminative models are rarely fit in the absence of one class altogether. 
+%
+%It is tempting to simply transfer samples from other spatial locations 
+%
+%sampling of the global posterior distribution of lesion graylevels
+%
+%
+%
+%However, it has been suggested that there is regional heterogeneity in relaxation rates of brain tissues \cite{Sled2004}, and that WMH intensity depends in part on location \cite{Stevenson2000}.
 
 
 % ==================================================================================================
 \subsection{Parameter Image Smoothing}
-Finally, 
+% Finally, 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Post-Processing}
@@ -199,15 +199,15 @@ Note that typical performance metrics like accuracy and sensitivity are avoided,
 
 
 
-A summary of the model is shown in Figure \ref{f2:modelsum}.
+A summary of the model is shown in Figure \ref{fig:modelsum}.
 \begin{figure}
   \centering\scalebox{0.65}{\input{figs/tikz/algorithm/tikz-algorithm}}
   \caption{Overview of the proposed algorithm}
-  \label{f2:modelsum}
+  \label{fig:modelsum}
 \end{figure}
 % ==================================================================================================
 \subsection{Tunable Parameters}
-In order to achieve the best possible model performance, it is prudent to track tunable model parameters (\textsc{aka} hyperparameters) which are distinct from those fitted during each cross validation fold. Considering both the underlying VLR model and the pre- and post-processing aspects, the parameters of the proposed algorithm are summarized in Table \ref{tab:hyperparams}
+In order to achieve the best possible model performance, it is prudent to track tunable model parameters (\textsc{aka} hyperparameters) which are distinct from those fitted during each cross validation fold. Considering both the main VLR model and the pre- and post-processing aspects, the parameters of the proposed algorithm are summarized in Table \ref{tab:hyperparams}. The optimization of these model components will be the subject of the next chapter. 
 %and also programmatically in \nameref{code:hypdef}.
 \begin{table}
   \centering
@@ -215,24 +215,23 @@ In order to achieve the best possible model performance, it is prudent to track 
   \label{tab:hyperparams}
   \begin{tabular}{lllll}
   	\hline
-  	Stage                                        & Parameter        & Notation                    & Type                                          & Default                   \\ \hline
-  	\multirow{2}{*}{Data Augmentation}           & Reflect          & $A_R$                       & $\mathbb{B}$                                  & 0                         \\
-  	                                             & Shift            & $A_S$                       & $\N_p$                                        & $\N_0$                    \\ \hline
-  	\multirow{2}{*}{Graylevel Standardization}   & Transformation   & $T_y$                       & $f: y\mapsto \tilde{y}$                       & $f_{he}$                  \\
-  	                                             & Sample Mask      & $M_{T}(x)$                  & $\mathbb{B}(x)$                               & $M_{\text{brain}}$        \\ \hline
-  	\multirow{6}{*}{Logistic Regression Fitting} & Iterations       & $N_{t}^{\lr}$               & $\mathbb{Z}$                                  & 30                        \\
-  	                                             & Initial $\bb$    & $\bb^{(0)}$                 & $\Re^2$                                       & $[0,0]$                   \\
-  	                                             & Learning Rate    & $\alpha$                    & $\Re$                                         & 1                         \\
-  	                                             & Regularization   & $\lambda$                   & $\Re$                                         & 0                         \\
-  	                                             & Pseudo-Lesions   & $\{\bY_{\rho},\bC_{\rho}\}$ & $\{\{\et\cdot\in\Re\},\{\et\cdot\in[0,1]\}\}$ & $\{\{\},\{\}\}$           \\
-  	                                             & $\bb$ Filter     & $F_{\bb}$                   & $f: \bb(\N_p(x)) \mapsto \tilde{\bb}(x)$      & $\tilde{\bb}(x) = \bb(x)$ \\ \hline
-  	\multirow{3}{*}{Post Processing}             & Min Lesion  Size & $\X_{\min}^{c}$             & $\Re\en(\text{mm}^{3})$                       & 0                         \\
-  	                                             & MRF Iterations   & $N_{t}^{\mrf}$              & $\mathbb{Z}$                                  & 0                         \\
-  	                                             & MRF Weights      & $W_{\mrf}$                  & $\{w_{\Delta},w_{F},w_y\}$                    & $\{1,1,1\}$               \\ \hline
+  	Stage                            & Parameter            & Notation                    & Type                                          & Default                   \\ \hline
+  	\multirow{4}{*}{Pre-Processing}  & Reflect Augmentation & $A_R$                       & $\mathbb{B}$                                  & 0                         \\
+  	                                 & Shift Augmentation   & $A_S$                       & $\N_p$                                        & $\N_0$                    \\
+  	                                 & Graylevel Transform  & $T_y$                       & $f: y\mapsto \tilde{y}$                       & $f_{he}$                  \\
+  	                                 & Transform Mask       & $M_{T}(x)$                  & $\mathbb{B}(x)$                               & $M_{\text{brain}}$        \\ \hline
+  	\multirow{6}{*}{VLR Fitting}     & Iterations           & $N_{t}^{\lr}$               & $\mathbb{Z}$                                  & 30                        \\
+  	                                 & Initial $\bb$        & $\bb^{(0)}$                 & $\Re^2$                                       & $[0,0]$                   \\
+  	                                 & Learning Rate        & $\alpha$                    & $\Re$                                         & 1                         \\
+  	                                 & Regularization       & $\lambda$                   & $\Re$                                         & 0                         \\
+  	                                 & Pseudo-Lesions       & $\{\bY_{\rho},\bC_{\rho}\}$ & $\{\{\et\cdot\in\Re\},\{\et\cdot\in[0,1]\}\}$ & $\{\{\},\{\}\}$           \\
+  	                                 & $\bb$ Filter         & $F_{\bb}$                   & $f: \bb(\N_p(x)) \mapsto \tilde{\bb}(x)$      & $\tilde{\bb}(x) = \bb(x)$ \\ \hline
+  	\multirow{3}{*}{Post-Processing} & Min Lesion  Size     & $\X_{\min}^{c}$             & $\Re\en(\text{mm}^{3})$                       & 0                         \\
+  	                                 & MRF Iterations       & $N_{t}^{\mrf}$              & $\mathbb{Z}$                                  & 0                         \\
+  	                                 & MRF Weights          & $W_{\mrf}$                  & $\{w_{\Delta},w_{F},w_y\}$                    & $\{1,1,1\}$               \\ \hline
   \end{tabular}
+  \tablepost{Notation. $\mathbb{B}$: boolean value; $\mathbb{Z}$: integer value; $\mathbb{R}^n$: real value ($n=1$) or vector ($n > 1$); $\N_p$: nearest $p$ voxel neighbourhood.}
 \end{table}
-
-The optimization of these model components will be the subject of the next chapter. 
 % --------------------------------------------------------------------------------------------------
 % ==================================================================================================
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

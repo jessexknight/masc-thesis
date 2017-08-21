@@ -26,8 +26,7 @@
 \usepackage{hyperref}
 \usepackage[hang]{footmisc}
 \usetikzlibrary{shapes,arrows.meta,calc}
-\usepackage[backend=biber,
-			style=numeric, maxcitenames=1, sorting=none, url=false, isbn=false, doi=true, eprint=false]{biblatex}
+\usepackage[backend=biber, style=numeric, maxcitenames=1, sorting=none, url=false, isbn=false, doi=true, eprint=false]{biblatex}
 \hypersetup{colorlinks,citecolor={purple},linkcolor={blue}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % resources
@@ -83,11 +82,15 @@
 \definecolor{gry}{rgb}{0.50 0.50 0.50}
 % little text items
 \renewcommand{\ss}[1]{\textsuperscript{#1}}
-\newcommand{\hreftt}[1]{\href{#1}{\texttt{#1}}}
+\newcommand{\hreftt}[1]{\href{#1}{\footnotesize{\texttt{\lstinline|#1|}}}}
 \newcommand{\et}{\thinspace}
 \newcommand{\en}{\enspace}
+\renewcommand\labelitemi{\raisebox{0.2em}{\fontsize{0.3em}{0}$\blacksquare$}}
+\renewcommand\labelitemii{\raisebox{0.2em}{\fontsize{0.3em}{0}$\square$}}
+\newcommand{\tablepost}[1]{\\[0.5em]\raggedright{\footnotesize{#1}}}
 % sizing
 \newcommand{\plotwidth}{0.48\textwidth}
+\renewcommand*{\bibfont}{\footnotesize}
 % appendix
 \newcommand{\matlabsty}{\color{black}\ttfamily\footnotesize}
 %\lstMakeShortInline[style=Matlab-editor,basicstyle=\matlabsty]@
@@ -107,7 +110,9 @@
     \printbibliography
   \end{singlespace}
   \appendix
+%  \include{ap-math}
 %  \include{ap-impl}
 %  \include{ap-code}
+%  \include{ap-res}
 \end{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
