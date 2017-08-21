@@ -6,10 +6,8 @@
 *.ico
 *.log
 *.out
-*.pdf
 *.run.xml
 *.synctex.gz
 *.toc
 ignore/
 outline/
-main.pdf
