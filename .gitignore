@@ -12,5 +12,6 @@
 *.run.xml
 *.synctex.gz
 *.toc
+tmp*
 ignore/
 outline/

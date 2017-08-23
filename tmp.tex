@@ -1,0 +1,34 @@
+\documentclass{article}
+\newlength{\sliceheight}\setlength{\sliceheight}{3.5cm}
+\usepackage{subcaption,graphicx,calc,tabu,xcolor}
+\usepackage[margin=2cm]{geometry}
+\graphicspath{{figs/}}
+\newenvironment{subfigureside}[1][\sliceheight]{\begin{subfigure}{\textwidth}\centering\parbox[b][#1-1em][c]{0.5cm}{\subcaption{}} }{\end{subfigure}}
+\newenvironment{subfiguretop}[1][\sliceheight]{\begin{minipage}{#1}\begin{subfigure}{\textwidth}\centering\subcaption{}}{\end{subfigure}\end{minipage}}
+\begin{document}
+%  \begin{figure}
+%    \centering\noindent
+%    \begin{subfigureside}\includegraphics[height=\sliceheight]{rawthropt-tp.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-05}\end{subfigureside}\\[0.5em]
+%    \begin{subfigureside}\includegraphics[height=\sliceheight]{rawthropt-fp.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-05}\end{subfigureside}\\[0.5em]
+%    \begin{subfigureside}\includegraphics[height=\sliceheight]{rawthropt-fn.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-05}\end{subfigureside}\\[0.5em]
+%    \caption{}
+%  \end{figure}
+\begin{figure}\centering
+  \begin{minipage}{6cm}
+    \begin{subfigure}{\textwidth}
+      \centering\subcaption{Original}\label{fig:m08-rev-o}
+      \includegraphics[height=6cm]{m08rev-01-d2-z146-o}\\[0.2em]
+      \includegraphics[height=6cm]{m08rev-05-d2-z107-o}\\[0.2em]
+      \includegraphics[height=6cm]{m08rev-06-d2-z101-o}
+    \end{subfigure}
+  \end{minipage}
+  \begin{minipage}{6cm}
+    \begin{subfigure}{\textwidth}
+      \centering\subcaption{Revision}\label{fig:m08-rev-r}
+      \includegraphics[height=6cm]{m08rev-01-d2-z146-r}\makebox[0pt][r]{\textcolor{white}{ CHB 01 }}\\[0.2em]
+      \includegraphics[height=6cm]{m08rev-05-d2-z107-r}\makebox[0pt][r]{\textcolor{white}{ CHB 05 }}\\[0.2em]
+      \includegraphics[height=6cm]{m08rev-06-d2-z101-r}\makebox[0pt][r]{\textcolor{white}{ CHB 06 }}
+    \end{subfigure}
+  \end{minipage}
+\end{figure}
+\end{document}

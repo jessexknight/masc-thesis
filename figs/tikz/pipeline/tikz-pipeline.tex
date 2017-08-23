@@ -1,0 +1,37 @@
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{foreground}
+\pgfsetlayers{background,main,foreground}
+\tikzset{%
+  arrow/.style = { ->, >=Latex,  very thick, rounded corners, draw = #1!60!white },
+  tbox/.style  = { fill = white, draw = #1!60!white, very thick, align = center }
+}
+\newcommand*{\textbox}[6]{%
+  \node[tbox=#5,minimum width=#3cm,minimum height=#4cm]at(#1,#2){#6};
+}
+
+\newcommand*{\ix}{0.8}\newcommand*{\ixx}{1.6}
+\newcommand*{\iy}{1}  \newcommand*{\iyy}{2}
+\newcommand*{\pw}{1.5}
+\newcommand*{\fw}{0.3}
+
+% --------------------------------------------------------------------------------------------------
+\begin{tikzpicture}
+    \useasboundingbox(0.0, 0.0) rectangle (24.0,  2.0);
+    \draw[black!30!white,rounded corners,very thick](00.0, 00.0) rectangle (24.0,  2.0);
+    \textbox{ 2.0}{ 1.0}{3}{1}{black} {FLAIR MRI}
+    \textbox{ 6.0}{ 1.0}{3}{1}{blue}  {Bias Correction\\\& Registration}
+    \textbox{10.0}{ 1.0}{3}{1}{violet}{Graylevel\\Standardization}
+    \textbox{14.0}{ 1.0}{3}{1}{red}   {Lesion\\Classification}
+    \textbox{18.0}{ 1.0}{3}{1}{orange}{Post-Processing}
+    \textbox{22.0}{ 1.0}{3}{1}{black} {Label Image}
+    \draw[arrow={black}  ]( 3.5, 1.0)--( 4.5, 1.0);
+    \draw[arrow={black}  ]( 7.5, 1.0)--( 8.5, 1.0);
+    \draw[arrow={black}  ](11.5, 1.0)--(12.5, 1.0);
+    \draw[arrow={black}  ](15.5, 1.0)--(16.5, 1.0);
+    \draw[arrow={black}  ](19.5, 1.0)--(20.5, 1.0);
+%    \draw[arrow={black} ]( 3.5, 1.0)--( 4.5, 1.0);
+%    \draw[arrow={blue}  ]( 7.5, 1.0)--( 8.5, 1.0);
+%    \draw[arrow={violet}](11.5, 1.0)--(12.5, 1.0);
+%    \draw[arrow={red}   ](15.5, 1.0)--(16.5, 1.0);
+%    \draw[arrow={orange}](19.5, 1.0)--(20.5, 1.0);
+\end{tikzpicture}

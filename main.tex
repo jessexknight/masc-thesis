@@ -88,8 +88,15 @@
 \renewcommand\labelitemi{\raisebox{0.2em}{\fontsize{0.3em}{0}$\blacksquare$}}
 \renewcommand\labelitemii{\raisebox{0.2em}{\fontsize{0.3em}{0}$\square$}}
 \newcommand{\tablepost}[1]{\\[0.5em]\raggedright{\footnotesize{#1}}}
+\newcommand{\slicefig}[4]{\foreach \i in {#3}{\includegraphics[width=#4\textwidth]{#1\i#2}}}
+\newenvironment{subfigureside}[1][\sliceheight]{\begin{subfigure}{\textwidth}\centering\parbox[b][#1-1em][c]{0.5cm}{\subcaption{}} }{\end{subfigure}}
+% LaTeX penalties
+\interfootnotelinepenalty=10000
+\widowpenalty=500
+\clubpenalty=500
 % sizing
-\newcommand{\plotwidth}{0.48\textwidth}
+\newlength{\plotwidth}\setlength{\plotwidth}{0.48\textwidth}
+\newlength{\sliceheight}\setlength{\sliceheight}{3.5cm}
 \renewcommand*{\bibfont}{\footnotesize}
 % appendix
 \newcommand{\matlabsty}{\color{black}\ttfamily\footnotesize}
@@ -99,8 +106,7 @@
   \begin{singlespace}\lstinputlisting[style=Matlab-editor,basicstyle=\linespread{0}\matlabsty]{\matlabdir#1}\end{singlespace}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
-% \include{front}
-% \begin{abstract}\input{abstract}\end{abstract}
+  %\include{front}
 	\include{contents}
   \include{ch-intro}
   \include{ch-method}
@@ -110,9 +116,9 @@
     \printbibliography
   \end{singlespace}
   \appendix
-%  \include{ap-math}
-%  \include{ap-impl}
-%  \include{ap-code}
-%  \include{ap-res}
+  \include{ap-math}
+  \include{ap-impl}
+  \include{ap-code}
+  \include{ap-res}
 \end{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
