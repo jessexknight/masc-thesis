@@ -62,8 +62,8 @@ For the reasons outlined above, it was important to collect a large and diverse 
        5   & MS 2016  (3) {\color{c06}$\blacksquare$} & \cite{MSSEG2016}  & 3T Siemens Verio   & 399  & 5000  & 1800 & $0.74\times0.70\times0.74$ & 7 \ss{b} \\
        21  & MS 2015 ISBI {\color{c07}$\blacksquare$} & \cite{MSISBI2015} & 3T Philips         & 68   & 11000 & 2800 & $0.43\times0.43\times3.00$ & 2 \ss{c} \\ \hline
        13  &     In-House {\color{c08}$\blacksquare$} &        ---        & 3T Philips Achieva & 125  & 9000  & 2800 & $1.00\times1.00\times1.00$ & 1 \ss{d} \\
-       10  & MS 2008  (1) {\color{c09}$\blacksquare$} & \cite{MSSEG2008}  & ---                & ---  & ---   & ---  & $0.50\times0.50\times0.50$ & 1 \ss{e} \\
-       10  & MS 2008  (2) {\color{c10}$\blacksquare$} & \cite{MSSEG2008}  & 3T Siemens Allegra & 125  & 9000  & 2800 & $0.50\times0.50\times0.50$ & 1 \ss{f} \\ \hline
+       10  & MS 2008 CHB  {\color{c09}$\blacksquare$} & \cite{MSSEG2008}  & ---                & ---  & ---   & ---  & $0.50\times0.50\times0.50$ & 1 \ss{e} \\
+       10  & MS 2008 UNC  {\color{c10}$\blacksquare$} & \cite{MSSEG2008}  & 3T Siemens Allegra & 125  & 9000  & 2800 & $0.50\times0.50\times0.50$ & 1 \ss{f} \\ \hline
     \end{tabu}}
   \tablepost{\ss{a}~Manuals were generated following the standards outlined in \cite{Caligiuri2015}, and were subsequently reviewed by a second rater, only WMH labels were included; \ss{b}~Manuals were fused using the LOP-STAPLE method \cite{Akhondi-Asl2014}; \ss{c}~Manuals were fused using logical `and'; \ss{d}~Manuals were generated in-house; \ss{e}~REVIEW; \ss{f}~REVIEW.}
   \label{tab:database}
@@ -96,7 +96,15 @@ It is also possible to plot the MAP objective function $\J(\bb)$ in the 2D plane
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Full Model}
 % ==================================================================================================
-\subsection{Parameter Images}
+\subsection{Parameter Images}\label{ss:paramimg}
+
+For comparison with the LPA algorithm, the
+\begin{figure}
+  \centering\includegraphics[height=\sliceheight]{beta-LPA.png} \includegraphics[height=\sliceheight]{cbar-NIH3-LPA}
+  \caption{Spatial effect parameter image from the LPA toolbox after registration to MNI space.}
+  \label{fig:B-lpa}
+\end{figure}
+
 % ==================================================================================================
 \subsection{Quantitative Performance}
 % ==================================================================================================
