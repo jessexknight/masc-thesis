@@ -6,7 +6,9 @@
 #### To Do
 - [x] Finish motivating, introducing, and selling the VLR model
 - [x] Support claim of spatial heterogeneity of lesion graylevels
+- [x] Add FLAIR contrast simulation
 - [ ] Where to discuss how (un)important pseudo-lesion regularization is? (like paper)
 - [ ] Double check notation: bold, caligraphic/roman, capitals
+- [ ] Double check scanner notation: colours, ordering (.m vs .tex too)
 - [ ] Introduce image registration / spatial standardization earlier & more gracefully
-
+- [ ] 
