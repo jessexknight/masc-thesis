@@ -73,10 +73,10 @@
       %\draw[step=0.5,black!10!white,very thin](-0.5, 0.0) grid (24.0,20.0);
     \end{pgfonlayer}
     % training
-    \imgt       { 1.0}{18.0}{c1}{$C_1(x)$}
-    \imgt       { 1.0}{14.0}{c2}{$C_{\textsc{n}}(x)$}
-    \imgt       { 3.0}{18.0}{i1}{$Y_1(x)$}
-    \imgt       { 3.0}{14.0}{i2}{$Y_{\textsc{n}}(x)$}
+    \imgt       { 1.0}{18.0}{c1}{$\mathrm{C}_1(x)$}
+    \imgt       { 1.0}{14.0}{c2}{$\mathrm{C}_{\textsc{n}}(x)$}
+    \imgt       { 3.0}{18.0}{i1}{$\mathrm{Y}_1(x)$}
+    \imgt       { 3.0}{14.0}{i2}{$\mathrm{Y}_{\textsc{n}}(x)$}
     \node[font=\fontsize{30}{0}\selectfont,align=center] at ( 1.0,15.8) {$\vdots$};
     \node[font=\fontsize{30}{0}\selectfont,align=center] at ( 3.0,15.8) {$\vdots$};
     \imgstack   {10.0}{16.0}{6}{ir} {$\mathcal{Y}(x)$}
@@ -87,11 +87,11 @@
     % testing
     \imgstack   { 3.0}{ 2.0}{1}{bb} {$\bm{\beta}(x)$}
     \imgvoxstack{ 3.0}{ 6.0}{0}{it} {$Y_{test}(x)$}
-    \imgvoxstack{10.0}{ 2.0}{1}{bb} {$\bm{B}(x)$}
-    \imgvoxstack{10.0}{ 6.0}{0}{jt} {$\tilde{Y}_{test}(x)$}
+    \imgvoxstack{10.0}{ 2.0}{1}{bb} {$\bm{\upbeta}(x)$}
+    \imgvoxstack{10.0}{ 6.0}{0}{jt} {$\tilde{\mathrm{Y}}_{test}(x)$}
     \plot       {14.5}{ 4.0}{4}{4}  {lr-test}
-    \imgvoxstack{19.0}{ 4.0}{0}{qt} {$\hat{C}_{test}^*(x)$}
-    \imgt       {22.0}{ 4.0}{lt}    {$\hat{C}_{test}(x)$}
+    \imgvoxstack{19.0}{ 4.0}{0}{qt} {$\hat{\mathrm{C}}_{test}^*(x)$}
+    \imgt       {22.0}{ 4.0}{lt}    {$\hat{\mathrm{C}}_{test}(x)$}
     % training arrows
     \draw[arrow={blue}  ]( 3.0+\ix,18.0    )--( 3.5+\ix,18.0)--( 3.5+\ix,16.0)--( 5.0,16.0);
     \draw[arrow={blue}  ]( 3.0+\ix,16.0    )--( 5.0    ,16.0);

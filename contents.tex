@@ -8,34 +8,61 @@
 \newpage
 \subsection*{Abbreviations}
 \begin{table}[H]
-  \begin{tabu} to \textwidth{lX[l]}\hline
-    GM      & Grey matter \\
-    WM      & White matter \\
-    CSF     & Cerebrospinal fluid \\
-    PD      & Proton density \\
-    FLAIR   & Fluid attenuation inversion recovery \\
-    WML     & White matter lesion \\
-    WMH     & White matter hyperintensity \\
-    DAWM    & Dirty appearing WM \\
-    MS      & Multiple Sclerosis \\ 
-    AD      & Alzheimer's Disease \\
-    PVE     & Partial volume effect \\
-    VLR     & Voxel-Wise Logistic Regression \\
-    MLE     & Maximum likelihood estimation \\
-    MAP     & Maximum a posteriori \\
-    SI      & Similarity index \\
-    ICC     & Interclass Correlation Coefficient \\
-    LL      & Lesion load \\
-    CV      & Cross validation \\
-    LOO-CV  & Leave-one-out CV \\
-    KF-CV   & K-fold CV \\
-    LOSO-CV & Leave-one-source-out \\
-    SVM     & Support vector machine \\
-    K-NN    & K-nearest neighbours \\
-    MRF     & Markov random field \\
-    FPR     & False positive reduction \\
+  \begin{tabular}{ll}
+  	\hline
+  	GM      & Grey matter                          \\
+  	WM      & White matter                         \\
+  	CSF     & Cerebrospinal fluid                  \\
+  	PD      & Proton density                       \\
+  	FLAIR   & Fluid attenuation inversion recovery \\
+  	WML     & White matter lesion                  \\
+  	WMH     & White matter hyperintensity          \\
+  	DAWM    & Dirty appearing WM                   \\
+  	MS      & Multiple Sclerosis                   \\
+  	AD      & Alzheimer's Disease                  \\
+  	PVE     & Partial volume effect                \\
+  	VLR     & Voxel-Wise Logistic Regression       \\
+  	MLE     & Maximum likelihood estimation        \\
+  	MAP     & Maximum a posteriori                 \\
+  	SI      & Similarity index                     \\
+  	ICC     & Interclass Correlation Coefficient   \\
+  	LL      & Lesion load                          \\
+  	CV      & Cross validation                     \\
+  	LOO-CV  & Leave-one-out CV                     \\
+  	KF-CV   & K-fold CV                            \\
+  	LOSO-CV & Leave-one-source-out                 \\
+  	SVM     & Support vector machine               \\
+  	K-NN    & K-nearest neighbours                 \\
+  	MRF     & Markov random field                  \\
+  	FPR     & False positive reduction             \\ \hline
+  \end{tabular}
+\end{table}
+\clearpage
+\subsection*{Notation}
+\begin{table}[H]
+  \begin{tabular}{lll}
     \hline
-  \end{tabu}
+    \multicolumn{3}{l}{Variables}                                                                       \\ \hline
+    $y$                   & feature                                              & $\in\Re$             \\
+    $\tilde{y}$           & standardized feature                                 & $\in\Re$             \\
+    $c$                   & true class                                           & $\in\{0,1\}$         \\
+    $\hat{c}$             & estimated class                                      & $\in[0,1]$           \\
+    $\beta$               & logistic model feature weight                        & $\in\Re$             \\ \hline
+    \multicolumn{3}{l}{Indexing -- e.g. arbitrary variable $a$}                                         \\ \hline
+    $k$                   & feature index                                        & $\in \{1,\dots,K\}$  \\
+    $n$                   & subject index                                        & $\in \{1,\dots,N\}$  \\
+    $x$                   & spatial location                                     & $= [\xxx]$           \\
+    $a_n^k(x)$            & $k$\ss{th} feature; $n$\ss{th} subject; location $x$ &                      \\ \hline
+    \multicolumn{3}{l}{Images \& sets -- e.g. arbitrary variable $a$}                                   \\ \hline
+    $a$                   & one voxel, one feature, one subject                  &                      \\
+    $\bm{a}$              & one voxel, all features, one subject                 &                      \\
+    $\mathrm{A}(x)$       & image in native space                                &                      \\
+    $A(x)$                & image in standard space (MNI)                        &                      \\
+    $\bm{A}(x)$           & image set: all features, one subject                 &                      \\
+    $\mathcal{A}(x)$      & image set: one feature, all subjects                 &                      \\
+    $\bm{\mathcal{A}}(x)$ & image superset: all features, all subjects           &                      \\
+    $\x{A}$               & full dataset: all features, subjects, voxels         &                      \\ \hline
+  \end{tabular}
 \end{table}
 \end{singlespacing}
 \clearpage
