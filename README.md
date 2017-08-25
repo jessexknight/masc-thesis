@@ -24,5 +24,5 @@
 - [ ] Introduce image registration / spatial standardization earlier & more gracefully
 - [x] Add brainmask to appendix
 - [x] Write vectorized implementation maths
-- [ ] Resolve: when to introduce classic lambda regularization / implementation
+- [x] Resolve: when to introduce classic lambda regularization / implementation (moved parallel fitting to ap-impl)
 

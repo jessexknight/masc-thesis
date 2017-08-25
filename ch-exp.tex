@@ -93,8 +93,15 @@ It is also possible to plot the MAP objective function $\J(\bb)$ in the 2D plane
   \caption{MAP objective function in 2D; initialization (diamond), fitting (dotted), optimum (star).}
 \end{figure}
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Full Model}
+% ==================================================================================================
+\subsection{Convergence}
+The rate of convergence in each voxel will be unique. During parallel fitting, it is prudent to stop training after a reasonable number of iterations, rather than wait for all voxels to achieve a certain stopping criterion, in case a few aberrant voxels do not converge. In order to determine this number, the model was fitted using [X] selection(s) of the training data, and the value of the MAP objective 
+%__JK__ not sure how to chose this: see which are faster / slower?
+
+
 % ==================================================================================================
 \subsection{Parameter Images}\label{ss:paramimg}
 

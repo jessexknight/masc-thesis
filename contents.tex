@@ -41,27 +41,28 @@
 \subsection*{Notation}
 \begin{table}[H]
   \begin{tabular}{lll}
-    \hline
-    \multicolumn{3}{l}{Variables}                                                                       \\ \hline
-    $y$                   & feature                                              & $\in\Re$             \\
-    $\tilde{y}$           & standardized feature                                 & $\in\Re$             \\
-    $c$                   & true class                                           & $\in\{0,1\}$         \\
-    $\hat{c}$             & estimated class                                      & $\in[0,1]$           \\
-    $\beta$               & logistic model feature weight                        & $\in\Re$             \\ \hline
-    \multicolumn{3}{l}{Indexing -- e.g. arbitrary variable $a$}                                         \\ \hline
-    $k$                   & feature index                                        & $\in \{1,\dots,K\}$  \\
-    $n$                   & subject index                                        & $\in \{1,\dots,N\}$  \\
-    $x$                   & spatial location                                     & $= [\xxx]$           \\
-    $a_n^k(x)$            & $k$\ss{th} feature; $n$\ss{th} subject; location $x$ &                      \\ \hline
-    \multicolumn{3}{l}{Images \& sets -- e.g. arbitrary variable $a$}                                   \\ \hline
-    $a$                   & one voxel, one feature, one subject                  &                      \\
-    $\bm{a}$              & one voxel, all features, one subject                 &                      \\
-    $\mathrm{A}(x)$       & image in native space                                &                      \\
-    $A(x)$                & image in standard space (MNI)                        &                      \\
-    $\bm{A}(x)$           & image set: all features, one subject                 &                      \\
-    $\mathcal{A}(x)$      & image set: one feature, all subjects                 &                      \\
-    $\bm{\mathcal{A}}(x)$ & image superset: all features, all subjects           &                      \\
-    $\x{A}$               & full dataset: all features, subjects, voxels         &                      \\ \hline
+  	\hline
+  	\multicolumn{3}{l}{Variables}                                                                                            \\ \hline
+  	$y$                   & feature                                                                    & $\in\Re$            \\
+  	$\tilde{y}$           & standardized feature                                                       & $\in\Re$            \\
+  	$c$                   & true class                                                                 & $\in\{0,1\}$        \\
+  	$\hat{c}$             & estimated class                                                            & $\in[0,1]$          \\
+  	$\beta$               & logistic model feature weight                                              & $\in\Re$            \\ \hline
+  	\multicolumn{3}{l}{Indexing -- e.g. arbitrary variable $a$}                                                              \\ \hline
+  	$k$                   & feature index                                                              & $\in \{1,\dots,K\}$ \\
+  	$n$                   & subject index                                                              & $\in \{1,\dots,N\}$ \\
+    $t$                   & iteration index                                                            & $\in \{1,\dots,T\}$ \\
+  	$x$                   & spatial location                                                           & $= [\xxx]$          \\
+  	${a_n^k}^{(t)}(x)$    & $k$\ss{th} feature; $n$\ss{th} subject; $t$\ss{th} iteration; location $x$ &                     \\ \hline
+  	\multicolumn{3}{l}{Images \& sets -- e.g. arbitrary variable $a$}                                                        \\ \hline
+  	$a$                   & one voxel, one feature, one subject                                        &                     \\
+  	$\bm{a}$              & one voxel, all features, one subject                                       &                     \\
+  	$\mathrm{A}(x)$       & image in native space                                                      &                     \\
+  	$A(x)$                & image in standard space (MNI)                                              &                     \\
+  	$\bm{A}(x)$           & image set: all features, one subject                                       &                     \\
+  	$\mathcal{A}(x)$      & image set: one feature, all subjects                                       &                     \\
+  	$\bm{\mathcal{A}}(x)$ & image superset: all features, all subjects                                 &                     \\
+  	$\x{A}$               & full dataset: all features, subjects, voxels                               &                     \\ \hline
   \end{tabular}
 \end{table}
 \end{singlespacing}
