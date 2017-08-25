@@ -28,7 +28,7 @@ and used to generate binary class images ($0 =$ healthy, $1 =$ lesion). Comparin
   \centering
   \begin{subfigureside}{TP}\includegraphics[height=\sliceheight]{rawthropt-tp.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-025}\end{subfigureside}\\[0.5em]
   \begin{subfigureside}{FP}\includegraphics[height=\sliceheight]{rawthropt-fp.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-025}\end{subfigureside}\\[0.5em]
-  \begin{subfigureside}{FN}\includegraphics[height=\sliceheight]{rawthropt-fn.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-025}\end{subfigureside}\\[0.5em]
+  \begin{subfigureside}{FN}\includegraphics[height=\sliceheight]{rawthropt-fn.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-025}\end{subfigureside}s
   \caption{Distributions of TP, FP, and FN in 96 FLAIR MRI, following supervised optimal thresholding in MNI space.}
   \label{fig:thropt-tpfpfn}
 \end{figure}
@@ -111,12 +111,8 @@ Three major challenges emerge during model fitting. These challenges involve con
 \end{enumerate}
 \begin{figure}
   \centering
-  \begin{subfigure}{\plotwidth}
-    \includegraphics[width=\textwidth]{chmle-sep}\caption{Separable classes}\label{fig:chmle-sep}
-  \end{subfigure}
-  \begin{subfigure}{\plotwidth}
-    \includegraphics[width=\textwidth]{chmle-noles}\caption{No lesions}\label{fig:chmle-noles}
-  \end{subfigure}
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{chmle-sep}  \caption{Separable classes}\label{fig:chmle-sep}  \end{subfigure}
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{chmle-noles}\caption{No lesions}       \label{fig:chmle-noles}\end{subfigure}
   \caption{Challenges encountered during estimation of a logistic model.}
   \label{fig:chmle}
 \end{figure}
@@ -197,18 +193,37 @@ and the Hessian by
 \nabla^2_{\bb}\L = \sum_{n=1}^{N} \by_n{\by_n}^T \left(c_n - \hat{c}_n\right).
 \label{eq:llhessian}
 \end{equation}
-Substituting (\ref{eq:llgradient}) and (\ref{eq:llhessian}) into (\ref{eq:newtonmle}), the explicit update $\Delta\bb$ for (\ref{eq:update}) is obtained. At each iteration, $\Delta\bb^{(t)}$ is re-computed, and the process continues until some convergence criterion is satisfied. This procedure is repeated for all voxels of interest. Such voxels can be selected using a ``brain mask'', denoted $M(x)$ -- a binary image denoting the expected location of the brain in standardized space (c.f. \S\ \ref{ss:brainmask} for details about the brain mask used in this work). Since the parameters of each voxel are estimated independently, this can also be computed in parallel. The details of this implementation are presented in \S\ \ref{s:parallelfit}, after incorporation of certain regularization terms described in the next section.
+Substituting (\ref{eq:llgradient}) and (\ref{eq:llhessian}) into (\ref{eq:newtonmle}), the explicit update $\Delta\bb$ for (\ref{eq:update}) is obtained. At each iteration, $\Delta\bb^{(t)}$ is re-computed, and the process continues until some convergence criterion is satisfied.
+% --------------------------------------------------------------------------------------------------
+\subsubsection{Simplification}
+It is not necessary to complete the above procedure for all voxels in the standardized space. Instead, only voxels in the expected location of the brain need to be computed; such voxels can be selected using a binary ``brain mask'', denoted $M(x)$. More details about the brain mask used in this work can be found in \S\ \ref{ss:brainmask}. Moreover, since the parameters of each voxel are estimated independently, this can also be computed in parallel. The details of this implementation are presented in \S\ \ref{s:parallelfit}, after incorporation of the regularizations described in the next section.
+\par
+Finally, the model has so far been derived in general terms, so that any choice of feature can be used. However, with only one feature -- the FLAIR graylevel -- it is possible to reparameterize the sigmoid argument as
+\begin{align}
+\bb^T\by &= \b^0 + \b^1 y^1\nonumber\\
+&= s(y-\tau) \qquad\begin{cases} s = \b^1\\ \tau = -\frac{\b^0}{\b^1} \end{cases}.
+\label{eq:reparameterize}
+\end{align}
+In this form, the parameters $\tau$ and $s$ emerge as a graylevel threshold and a slope parameter, respectively. Specifically, when $y = \tau$, the predicted probability of lesion is $\hat{c} = \tfrac{1}{1+e^{0}} = 0.5$, so $\tau$ controls the location of the class discrimination, as shown in Figure \ref{fig:reparam-t}. Similarly, the $s$ parameter defines the sensitivity of the logistic function to $y$, as shown in Figure \ref{fig:reparam-s}. These parameters, and the corresponding images $\mathcal{T}(x)$ and $\mathcal{S}(x)$, are therefore salient descriptors of the predictive model.
+\begin{figure}
+  \centering
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{reparam-t}\caption{Threshold parameter $\tau$}\label{fig:reparam-t}\end{subfigure}
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{reparam-s}\caption{Slope aparameter $s$}      \label{fig:reparam-s}\end{subfigure}
+  \caption{Effect of varying the logistic model parameters $\tau$ and $s$.}
+  \label{fig:reparam}
+\end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Regularization}\label{s:reg-method}
-Regularizations are methods of injecting prior knowledge about the expected model into the optimization. Assuming voxel-wise independence of model parameters requires the use of regularization strategies to solve the challenges outlined in \S\ \ref{ss:modelfitting}. Model fitting which includes regularization is termed maximum a posteriori (MAP) estimation. Several regularization methods are explored below.
+Regularizations are methods of injecting prior knowledge about the expected model into the optimization. Assuming voxel-wise independence of model parameters requires the use of regularization strategies to solve the challenges outlined in \S\ \ref{ss:modelfitting}. Several regularization methods are explored below.
 % ==================================================================================================
 \subsection{Data Augmentation}
 Noting the central role of training data in each of the challenges, methods of artificially increasing the training dataset size may be particularly useful in solving them. Data augmentation has long been used in machine learning tasks with limited training data, and there are several methods of generating synthetic data. In low dimensional input/output spaces, random sampling of fitted class-conditional posterior distributions can produce reasonable samples with known labels \cite{Tanner1987}. In higher dimensional problem spaces, however, imputation is more difficult \cite{Goodfellow2014}. For example, the space of potential $100\times100\times100$-sized images has $100^3$ dimensions (one per voxel), yet only a small inner subspace represents plausible images. Generating synthetic examples in this space is therefore challenging, especially for segmentation tasks, where the outputs have dimensionality roughly equal to the input.
 \par
-Alternatively, simple image manipulations can still afford model improvements \cite{Krizhevsky2012}. In segmentation tasks, both the input image(s) and the corresponding label images can be translated, reflected, rotated, and perhaps resized, thereby avoiding the generation of genuinely synthetic examples. In the current work, reflections and small (one-voxel) translations can be applied to the label and FLAIR images following registration to the MNI brainspace.
+Alternatively, simple image manipulations can still afford model improvements \cite{Krizhevsky2012}. In segmentation tasks, both the input image(s) and the corresponding label images can be translated, reflected, rotated, and perhaps resized, thereby avoiding the generation of genuinely synthetic examples. In the current work, reflections and small (one-voxel) translations can be applied to the label and FLAIR images following registration to the MNI brainspace. The potential benefits of this augmentation are explored in 
+%__JK__ need to define this reference
 % ==================================================================================================
 \subsection{Classic Regularization}
-The separable classes challenge is well-known in regression problems, and a good solution is to penalize the magnitude of model parameters using the $L_p$-norm: $\lambda\norm{\bb}_p$ \cite{Zou2005}. It can be shown that $L_1$ regularization corresponds to a Laplacian prior on elements of $\bb$, with scale parameter inversely proportional to $\lambda$ (equivalently, this assumes that the model error follows this distribution); similarly, $L_2$ regularization implies a Gaussian prior, with standard deviation inversely proportional to $\lambda$ \cite{Zou2005}. This penalty can then be appended to the objective function (\ref{eq:argmaxmle}), as in 
+The separable classes challenge is well-known in regression problems, and a good solution is to penalize the magnitude of model parameters using the $L_p$-norm: $\lambda\norm{\bb}_p$ \cite{Zou2005}. It can be shown that $L_1$ regularization corresponds to a Laplacian prior on elements of $\bb$, with scale parameter inversely proportional to $\lambda$ (equivalently, this assumes that the model error follows this distribution); similarly, $L_2$ regularization implies a Gaussian prior, with standard deviation inversely proportional to $\lambda$ \cite{Zou2005}. Model fitting which includes this prior-derived term is called maximum a posteriori (MAP) estimation. The penalty can be appended to the objective function (\ref{eq:argmaxmle}), as in
 \begin{align}
 \bb^* &= \underset{\bb}{\arg\max}\en\J(\bb) \nonumber\\
 &=\underset{\bb}{\arg\max}\en\L(\bb) - \lambda\norm{\bb}_p \nonumber\\
@@ -224,18 +239,49 @@ Due to its relatively large gradient near zero, $L_1$ regularization is typicall
 What remains is to select an appropriate value of $\lambda$. This is explored experimentally in \S\ \ref{ss:toyreg} using a toy model.
 % ==================================================================================================
 \subsection{Pseudo-Lesions}
-The Sparsely observed lesion class challenge is less common, since discriminative models are rarely fit in the absence of one class altogether. This occurs here because all voxels are modelled independently. It is therefore tempting to simply sample features (FLAIR graylevels) from the lesion class at other spatial locations in order to fit the logistic model in the healthy training voxels. However, as noted in \S\ \ref{ss:autochallenges} and \S\ \ref{s:modelconcept}, there may be spatially-correlated heterogeneity in the appearance of lesions \cite{Sled2004,Stevenson2000}, and some locations will likely never contain any lesion. Considering these facts, generating additional synthetic lesion-class samples, or ``pseudo-lesions'', for these locations using static, spatially parameterized definitions would have two advantages. First, this approach would not be subject to variations in the training data. Second, it would be feasible to consider the prior probability of healthy tissues (GM / WM / CSF) in the definition.
-\par...\par
+The sparsely observed lesion class challenge is less common, since discriminative models are rarely fit in the absence of one class altogether. This occurs here because all voxels are modelled independently. It is therefore tempting to simply sample features from the lesion class at other spatial locations in order to fit the logistic model in the healthy training voxels, similar to the approach by \citeauthor{Schmidt2017a}. However, as noted in \S\ \ref{ss:autochallenges} and \S\ \ref{s:modelconcept}, there may be spatially-correlated heterogeneity in the appearance of WMH \cite{Sled2004,Stevenson2000}, and some locations will likely never contain any WMH. Considering these facts, the use of deterministic synthetic lesion-class samples, or ``pseudo-lesions'', could instead provide more flexibility and consistency. These synthetic observations could be appended to the training data for each voxel so as to minimally balance the training classes, and act as a prior on the distribution of lesion-class features.
+%This approach would not be subject to variations in the training data, and it would be feasible to consider the prior probability of healthy tissues (GM / WM / CSF) in the definition.
+\par
+If the same number of synthetic observations are appended to the training data for each voxel, this is equivalent to appending a number of synthetic images to the training set. The synthetic feature data are denoted
+$\bV(x) = \{\bm{\gamma}_{1}(x),\dots,\bm{\gamma}_{\V}(x)\}$. It is assumed that the labels of all synthetic data are ``lesion'', so the set of synthetic class images is simply denoted $\bm{1}(x)$. The updated training set is therefore $\bY_{\gamma}(x) = \{\bY(x),\bV(x)\}$, and $\bC_{\gamma}(x) = \{\bC(x),\bm{1}(x)\}$.
+\par
+Design of the synthetic image set $\bV(x)$ should be guided by prior knowledge. For the same reasons as described above, this knowledge should not derive from the training set. Unfortunately, few other sources of structured information are available. One reasonable approach could make use of healthy tissue prior probability images (Figure \ref{fig:tpm-3}), denoted $\rho(x)$. Specifically, the expected intensity for the lesion class in each tissue can be multiplied by the tissue probability image, and the results summed to give the overall synthetic image,
+\begin{equation}
+\gamma(x) = \gamma_{\gm}\cdot\rho_{\gm}(x) + \gamma_{\wm}\cdot\rho_{\wm}(x) + \gamma_{\csf}\cdot\rho_{\csf}(x)
+\end{equation}
+While WMH are not possible in either the GM or the CSF, it is necessary to select a graylevel -- perhaps the maximum possible intensity -- to complete this model. Additionally, such parameters will inevitably play a role for subjects with imperfect registration or outlier anatomy. The contributions of pseudo-lesions to model fitting are explored experimentally in \S\ \ref{ss:toyreg}.
+%__JK__ should TPMs be introduced sooner?
+\begin{figure}[h]
+  \centering
+  \begin{subfigureside}{$\rho_{\gm}(x)$}\raggedleft\includegraphics[height=\sliceheight]{tpm-gm.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-1}\end{subfigureside}\\[0.5em]
+  \begin{subfigureside}{$\rho_{\wm}(x)$}\raggedleft\includegraphics[height=\sliceheight]{tpm-wm.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-1}\end{subfigureside}\\[0.5em]
+  \begin{subfigureside}{$\rho_{\csf}(x)$}\raggedleft\includegraphics[height=\sliceheight]{tpm-csf.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-1}\end{subfigureside}
+  \caption{Tissue prior probability images in MNI space. Derived from \cite{Mazziotta2001}.}
+  \label{fig:tpm-3}
+\end{figure}
 % ==================================================================================================
 \subsection{Parameter Image Smoothing}
-Finally, 
-\par...\par
-While an alternative approach might involve modelling the parameter images as a spatial function (e.g. band-limited discrete cosine / Fourier transform), there are two challenges with this approach.
-First, deriving the update gradients for such a model would be challenging, and their computation might increase training time.
+Finally, independent model fitting in every voxel risks yielding noisy parameter images. The simplest solution to this problem involves filtering the reconstructed parameter images after estimation. A wide range of possible filters for this task exist, and a selection of these are summarized in Table \ref{tab:filters}, including the tunable parameters requiring optimization.
+\begin{table} % __JK__ finish him!
+  \centering
+  \caption{Image filters considered for smoothing the estimated parameter images.}
+  \label{tab:filters}
+  \begin{tabular}{llllc}
+  	\hline
+  	Name                  &   Parameters   & Advantages      & Disadvantages    & Ref. \\ \hline
+  	Gaussian              & width $\sigma$ & no artifacts    & blurs edges      &      \\
+  	Median                &   width $w$    & preserves edges & square artifacts &      \\
+  	Anisotropic Diffusion &                &                 &                  &      \\
+  	Bilateral             &                &                 &                  &      \\ \hline
+  \end{tabular}
+\end{table}
+\par
+An alternative solution might involve modelling the parameter images as a spatial function (e.g. band-limited discrete cosine / Fourier transform). However, there are two challenges with this approach.
+First, deriving the update gradients for such a model would be challenging, and their computation could significantly increase training time.
 Second, such an encoding may introduce artifacts in the resulting parameter images.
 Moreover, it is well known that frequency domain band-limiting can be equivalently achieved by convolution (i.e. filtering) in the spatial domain \cite{Gonzalez2006}.
-\par...\par
-\citeauthor{Harmouche2015} \cite{Harmouche2015} also note that in smoothly varying models, small registration errors can be expected to have only a minor impact.
+%__JK__ address MRFs for smoothing here? Check back answer on Quora.
+%\citeauthor{Harmouche2015} \cite{Harmouche2015} also note that in smoothly varying models, small registration errors can be expected to have only a minor impact.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Bias Correction \& Registration}
 Two objectives of preprocessing 
@@ -292,21 +338,21 @@ In order to achieve the best possible model performance, it is prudent to track 
   \caption{Model hyperparameters.}
   \label{tab:hyperparams}
   \begin{tabular}{lllll}
-    \hline
-    Stage                            & Parameter            & Notation                    & Type                                          & Default                   \\ \hline
-    \multirow{4}{*}{Pre-Processing}  & Reflect Augmentation & $A_R$                       & $\mathbb{B}$                                  & 0                         \\
-                                     & Shift Augmentation   & $A_S$                       & $\mathcal{N}_p$                                        & $\mathcal{N}_0$                    \\
-                                     & Graylevel Transform  & $T_y$                       & $f: y\mapsto \tilde{y}$                       & $f_{he}$                  \\
-                                     & Transform Mask       & $M_{T}(x)$                  & $\mathbb{B}(x)$                               & $M_{\text{brain}}$        \\ \hline
-    \multirow{6}{*}{VLR Fitting}     & Iterations           & $N_{t}^{\lr}$               & $\mathbb{Z}$                                  & 30                        \\
-                                     & Initial $\bb$        & $\bb^{(0)}$                 & $\Re^2$                                       & $[0,0]$                   \\
-                                     & Learning Rate        & $\alpha$                    & $\Re$                                         & 1                         \\
-                                     & Regularization       & $\lambda$                   & $\Re$                                         & 0                         \\
-                                     & Pseudo-Lesions       & $\{\bY_{\rho},\bC_{\rho}\}$ & $\{\{\et\cdot\in\Re\},\{\et\cdot\in[0,1]\}\}$ & $\{\{\},\{\}\}$           \\
-                                     & $\bb$ Filter         & $F_{\bb}$                   & $f: \bb(\mathcal{N}_p(x)) \mapsto \tilde{\bb}(x)$      & $\tilde{\bb}(x) = \bb(x)$ \\ \hline
-    \multirow{3}{*}{Post-Processing} & Min Lesion  Size     & $\X_{\min}^{c}$             & $\Re\en(\text{mm}^{3})$                       & 0                         \\
-                                     & MRF Iterations       & $N_{t}^{\mrf}$              & $\mathbb{Z}$                                  & 0                         \\
-                                     & MRF Weights          & $W_{\mrf}$                  & $\{w_{\Delta},w_{F},w_y\}$                    & $\{1,1,1\}$               \\ \hline
+  	\hline
+  	Stage                            & Parameter            & Notation                    & Type                                              & Default                   \\ \hline
+  	\multirow{4}{*}{Pre-Processing}  & Reflect Augmentation & $A_R$                       & $\mathbb{B}$                                      & $0$                       \\
+  	                                 & Shift Augmentation   & $A_S$                       & $\mathcal{N}_p$                                   & $\mathcal{N}_0$           \\
+  	                                 & Graylevel Transform  & $T_y$                       & $f: y\mapsto \tilde{y}$                           & $f_{he}$                  \\
+  	                                 & Transform Mask       & $M_{T}(x)$                  & $\mathbb{B}(x)$                                   & $M_{\text{brain}}$        \\ \hline
+  	\multirow{6}{*}{VLR Fitting}     & Iterations           & $N_{t}^{\lr}$               & $\mathbb{Z}$                                      & $30$                      \\
+  	                                 & Initial $\bb$        & $\bb^{(0)}$                 & $\Re^2$                                           & $[0,0]$                   \\
+  	                                 & Learning Rate        & $\alpha$                    & $\Re$                                             & $1$                       \\
+  	                                 & Regularization       & $\lambda$                   & $\Re$                                             & $0$                       \\
+  	                                 & Pseudo-Lesions       & $\{\bY_{\rho},\bC_{\rho}\}$ & $\{\{\et\cdot\in\Re\},\{\et\cdot\in[0,1]\}\}$     & $\{\{\},\{\}\}$           \\
+  	                                 & $\bb$ Filter         & $F_{\bb}$                   & $f: \bb(\mathcal{N}_p(x)) \mapsto \tilde{\bb}(x)$ & $\tilde{\bb}(x) = \bb(x)$ \\ \hline
+  	\multirow{3}{*}{Post-Processing} & Min Lesion  Size     & $\mathrm{x}_{\min}^{c}$     & $\Re\en(\text{mm}^{3})$                           & $0$                       \\
+  	                                 & MRF Iterations       & $N_{t}^{\mrf}$              & $\mathbb{Z}$                                      & $0$                       \\
+  	                                 & MRF Weights          & $W_{\mrf}$                  & $\{w_{\Delta},w_{F},w_y\}$                        & $\{1,1,1\}$               \\ \hline
   \end{tabular}
   \tablepost{Notation. $\mathbb{B}$: boolean value; $\mathbb{Z}$: integer value; $\mathbb{R}^n$: real value ($n=1$) or vector ($n > 1$); $\mathcal{N}_p$: nearest $p$ voxel neighbourhood.}
 \end{table}
