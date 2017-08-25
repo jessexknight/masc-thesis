@@ -19,48 +19,49 @@ Speed of model fitting is a significant factor during development, particularly 
 \par
 % __JK__ does this (below) belong in the appendix?
 % __JK__ (yes!)
-To begin, the standardized training data from all subjects -- features $\tilde{\bm{\Y}}(x)$, with $\tilde{\Y}^{\et0}=1$, and labels $\C(x)$ -- are sampled from nonzero locations in the brain mask $M(x)$. These data are stored in two matrices $\x{Y}$ and $\x{C}$, with dimensions $[V,N,K+1]$ and $[V,N,1]$, respectively, where $V$ is the total number of nonzero voxels in the brain mask, $N$ is the number of subjects, and $K$ is the number of features. A similar matrix is constructed for the initial parameters $\bb^{(0)}(x)$, denoted $\x{B}^{(0)}$, with dimensions $[V,1,K+1]$. Let $\x{Y}_n^k$ denote the vector of data from all voxels for the $k$\ss{th} feature from the $n$\ss{th} subject, and so on for $\x{C}$ and $\x{B}$.
+% __JK__ add some details about gpuArray in Matlab
+To begin, the standardized training data from all subjects -- features $\tilde{\bm{\Y}}_{\gamma}(x)$, with $\tilde{\Y}_{\bV}^{\et0}=1$, and labels $\C(x)$ -- are sampled from nonzero locations in the brain mask $M(x)$. These data are stored in two matrices $\X{Y}$ and $\X{C}$, with dimensions $[X,N,K+1]$ and $[X,N,1]$, respectively, where $X$ is the total number of nonzero voxels in the brain mask, $N$ is the number of subjects, and $K$ is the number of features. A similar matrix is constructed for the initial parameters $\bb^{(0)}(x)$, denoted $\X{B}^{(0)}$, with dimensions $[X,1,K+1]$. Let $\X{Y}_n^k$ denote the vector of data from all voxels for the $k$\ss{th} feature from the $n$\ss{th} subject, and so on for $\X{C}$ and $\X{B}$.
 \par
 In order to simplify subsequent calculations, the feature data are rectified according to the class labels, before the first iteration, as in
 \begin{equation}
-\x{Y}_n^k =
+\X{Y}_n^k =
 \begin{cases}
-+\x{Y}_n^k, & \x{C}_n \ge 0.5\\
--\x{Y}_n^k, & \x{C}_n <  0.5\\
++\X{Y}_n^k, & \X{C}_n \ge 0.5\\
+-\X{Y}_n^k, & \X{C}_n <  0.5\\
 \end{cases},\qquad\forall\et k \in \{1,\dots,K\}.
 \end{equation}
-Next, for a given iteration $t$, the following vector-compatible expansions of Equations (\ref{eq:llgradient}), (\ref{eq:llhessian}), and (\ref{eq:newtonmap}) yield the desired update matrix $\Delta\x{B}^{(t)}$. These calculations are performed in \nameref{m:logreg.m}.
+Next, for a given iteration $t$, the following vector-compatible expansions of Equations (\ref{eq:llgradient}), (\ref{eq:llhessian}), and (\ref{eq:newtonmap}) yield the desired update matrix $\Delta\X{B}^{(t)}$. These calculations are performed in \nameref{m:logreg.m}.
 Regarding notation:
 1) the iteration index ${}^{(t)}$ is omitted for clarity,
 2) element-wise multiplication is denoted by $\circ$, and
 3) the variable $K$ is now defined as $1$, since this is essential to the simplification.
 \begin{align}
-\x{S} &= \frac{1}{1+e^{\et\eta}},\qquad \eta = \x{B}^0 + \left(\x{B}^1\ep\x{Y}^1\right)\\
-\x{A} &= \x{S}\ep\left(1-\x{S}\right)\\
-\x{G} &= \nabla_{\x{B}}\L - \lambda\x{B} \nonumber \\
+\X{S} &= \frac{1}{1+e^{\et\eta}},\qquad \eta = \X{B}^0 + \left(\X{B}^1\ep\X{Y}^1\right)\\
+\X{A} &= \X{S}\ep\left(1-\X{S}\right)\\
+\X{G} &= \nabla_{\X{B}}\L - \lambda\X{B} \nonumber \\
 &= \left[\begin{array}{c}
-\x{G}^1 \\ \x{G}^2
+\X{G}^1 \\ \X{G}^2
 \end{array}\right] \nonumber \\
 &= \left[\begin{array}{c}
-\sum_{n=1}^{N}\left( \x{Y}_n^1\circ\x{S} \right) \\
-\sum_{n=1}^{N}\left( \x{Y}_n^2\circ\x{S} \right)
-\end{array}\right] - \lambda\left[\begin{array}{c} \x{B}^1 \\ \x{B}^2\end{array}\right]\\
-\x{H} &= \nabla_{\x{B}}^2\L -\lambda\x{I} \nonumber \\
+\sum_{n=1}^{N}\left( \X{Y}_n^1\ep\X{S} \right) \\
+\sum_{n=1}^{N}\left( \X{Y}_n^2\ep\X{S} \right)
+\end{array}\right] - \lambda\left[\begin{array}{c} \X{B}^1 \\ \X{B}^2\end{array}\right]\\
+\X{H} &= \nabla_{\X{B}}^2\L -\lambda\X{I} \nonumber \\
 &= \left[\begin{array}{cc}
-\x{H}^{1,1} & \x{H}^{1,2} \\ \x{H}^{2,1} & \x{H}^{2,2}
+\X{H}^{1,1} & \X{H}^{1,2} \\ \X{H}^{2,1} & \X{H}^{2,2}
 \end{array}\right] \nonumber \\
 &= \left[\begin{array}{cc}
-\sum_{n=1}^{N}\left( \x{A}\circ\x{Y}_n^1\circ\x{Y}_n^1 \right) & 
-\sum_{n=1}^{N}\left( \x{A}\circ\x{Y}_n^2\circ\x{Y}_n^1 \right) \\
-\sum_{n=1}^{N}\left( \x{A}\circ\x{Y}_n^1\circ\x{Y}_n^2 \right) & 
-\sum_{n=1}^{N}\left( \x{A}\circ\x{Y}_n^2\circ\x{Y}_n^2 \right)
+\sum_{n=1}^{N}\left( \X{A}\ep\X{Y}_n^1\ep\X{Y}_n^1 \right) & 
+\sum_{n=1}^{N}\left( \X{A}\ep\X{Y}_n^2\ep\X{Y}_n^1 \right) \\
+\sum_{n=1}^{N}\left( \X{A}\ep\X{Y}_n^1\ep\X{Y}_n^2 \right) & 
+\sum_{n=1}^{N}\left( \X{A}\ep\X{Y}_n^2\ep\X{Y}_n^2 \right)
 \end{array}\right] - \lambda\left[\begin{array}{cc} 1 & \\ & 1\end{array}\right]\\
-\x{D} &= \det{\x{H}} \nonumber \\
-&= \left(\x{H}^{1,1}\circ\x{H}^{2,2}\right) - \left(\x{H}^{1,2}\circ\x{H}^{2,1}\right) \\
-\Delta\x{B} &= -\x{H}^{-1}\x{G} \nonumber \\
-&= \dfrac{1}{\x{D}} \left[\begin{array}{cc}
-\left(\x{H}^{2,2}\circ\x{G}^{1} - \x{H}^{2,1}\circ\x{G}^{2} \right) & 
-\left(\x{H}^{1,2}\circ\x{G}^{2} - \x{H}^{1,1}\circ\x{G}^{1} \right)
+\X{D} &= \det{\X{H}} \nonumber \\
+&= \left(\X{H}^{1,1}\ep\X{H}^{2,2}\right) - \left(\X{H}^{1,2}\ep\X{H}^{2,1}\right) \\
+\Delta\X{B} &= -\X{H}^{-1}\X{G} \nonumber \\
+&= \dfrac{1}{\X{D}} \left[\begin{array}{cc}
+\left(\X{H}^{2,2}\ep\X{G}^{1} - \X{H}^{2,1}\ep\X{G}^{2} \right) & 
+\left(\X{H}^{1,2}\ep\X{G}^{2} - \X{H}^{1,1}\ep\X{G}^{1} \right)
 \end{array}\right]^{T}
 \end{align}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
