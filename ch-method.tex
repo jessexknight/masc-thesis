@@ -80,7 +80,7 @@ In the two class formulation, the lesion class is denoted $c=1$, and the healthy
   P(c=1\mid\by,\bb) = \frac{1}{1+e^{-\eta}},\qquad\eta = \bb^T\by.
   \label{eq:lrmodel}
 \end{equation}
-This probability -- the estimated lesion class label -- is denoted $\hat{c} = P(c=1\mid\by,\bb) \in [0,1]$. Considering the spatial location $x = [\x_1,\x_2,\x_3]$, the label image is defined as $\hat{C}(x) = P(c(x)=1\mid\bm{Y}(x),\bb)$.
+This probability -- the estimated lesion class label -- is denoted $\hat{c} = P(c=1\mid\by,\bb) \in [0,1]$. Considering the spatial location $x = [\xxx]$, the label image is defined as $\hat{C}(x) = P(C(x)=1\mid\bm{Y}(x),\bb)$.
 \par
 Previous works have not included spatial dimensions in the logistic feature set $\by$, since $\hat{c}$ is not expected to be monotonically related to any spatial dimension. The circumvention proposed by \citeauthor{Schmidt2015} is to parameterize the feature weights spatially -- that is $\bb\rightarrow\bb(x)$,
 \begin{equation}
@@ -103,7 +103,7 @@ Fitting the VLR model involves estimating $\bb$ for each voxel $x$. This require
 Three major challenges emerge during model fitting. These challenges involve contradictions between prior knowledge and the fitted model using the available training data. That is, these challenges could all be overcome by a more complete training set, but this is usually not available. The three challenges are:
 \begin{enumerate}
   \item \label{chmle:separable} \textbf{Separable classes:} 
-  When data from two classes are perfectly separable, the MLE-fitted logistic model can approach a step-function -- i.e. $\b^1\rightarrow+\infty$. This implies that on either side of a specific graylevel threshold, the model is either 100\% confident in predicting the healthy class, or 100\% confident in predicting the lesion class. In fact, no threshold is ever so perfect, and instead a level of uncertainty should be maintained around the decision boundary. These two cases are illustrated in Figure \ref{fig:chmle-sep}.
+  When data from two classes are perfectly separable, the MLE-fitted logistic model can approach a step-function -- i.e. $\b^k\rightarrow+\infty$. This implies that on either side of a specific graylevel threshold, the model is either 100\% confident in predicting the healthy class, or 100\% confident in predicting the lesion class. In fact, no threshold is ever so perfect, and instead a level of uncertainty should be maintained around the decision boundary. These two cases are illustrated in Figure \ref{fig:chmle-sep}.
   \item \label{chmle:sparse} \textbf{Sparsely observed lesion class:} 
   Since WML are often distributed in consistent locations, many brain regions contain no lesions across the entire training dataset. These voxels will be termed ``healthy training'' voxels. In some locations, this is expected (e.g. the GM, since by definition WMH manifest in the WM), while in others, our prior knowledge predicts lesions will eventually be observed (e.g. the rest of the WM). As illustrated in Figure \ref{fig:chmle-noles}, the MLE-fitted model may not maintain the ability to predict $\hat{c} = 1$ in such locations, regardless of the features. However, the ability to predict lesion should be maintained in many of these locations.
   \item \label{chmle:noisy} \textbf{Smooth parameter images:} 
@@ -127,7 +127,7 @@ In the LPA algorithm, the logistic feature weights for each voxel are not consid
 Efficient fitting of such models was the subject of major works by \citeauthor{Schmidt2017} \cite{Schmidt2017,Schmidt2017a}, but several drawbacks remain.
 First, Markov Chain Monte Carlo estimation of the model appears to create discontinuity artifacts in the spatial effect image $\b^0(x)$, as shown in Figure \ref{fig:B-lpa}.
 Second, MRF modelling of the parameter images assumes that the missing data (i.e. WMH training examples in the more superficial brain regions) can be interpolated spatially, but this may not be justified.
-Third, the proposed joint estimation procedures are computationally expensive (versus the methods proposed here), requiring approximately two hours to estimate all $\bb(x)$ \cite{Schmidt2017a}.
+Third, the proposed joint estimation procedures are computationally expensive (versus the methods proposed here), requiring approximately two hours to estimate $\bb(x)$ \cite{Schmidt2017a}.
 Finally, it is not clear whether any tied $\b$ are necessary or advantageous in this context.
 These deficiencies then motivate investigations into alternative solutions to the above challenges.
 \par
@@ -139,7 +139,7 @@ Finally, no segmentation performance results are given in either of the associat
 Therefore, while the open-source release of the LPA algorithm is greatly appreciated, significant improvements can be made to this algorithm.
 % --------------------------------------------------------------------------------------------------
 \subsubsection{Independent Estimation}
-An alternative approach is to consider each parameter vector $\bb(x)$ independent. Doing so greatly simplifies model fitting, but does not address the challenges described above. These must instead be addressed using regularization strategies, as discussed below in \S\ \ref{s:reg-method}. In this section, ML estimation of independent parameter vectors $\bb$ is developed. For clarity, only a single voxel is considered, and the $(x)$ notation is omitted.
+An alternative approach is to consider each parameter vector $\bb(x)$ independent. Doing so greatly simplifies model fitting, but does not address the challenges described above. These must instead be addressed using regularization strategies, as discussed below in \S\ \ref{s:reg-method}. In this section, ML estimation of independent parameter vectors $\bb$ is developed. For clarity, only a single voxel is considered -- i.e. $y$ from $Y(x)$, etc.
 \par
 As note above, the optimal $\bb$ for each independent voxel can be resolved using MLE. If the training data are also assumed to be independently observed, then the likelihood (conditioned on the data) is defined from binomial theory as
 \begin{align}
@@ -200,7 +200,59 @@ and the Hessian by
 Substituting (\ref{eq:llgradient}) and (\ref{eq:llhessian}) into (\ref{eq:newtonmle}), the explicit update  $\Delta\bb$ for (\ref{eq:update}) is obtained.
 % --------------------------------------------------------------------------------------------------
 \subsubsection{Implementation}
+Speed of model fitting is a significant factor during development, particularly considering optimization of so-called hyperparameters. Faster training yields more model iterations, which inevitably bear improvements. While the above estimation procedure must be repeated for the voxels of interest in the standardized space, there are several ways of accelerating this procedure.
+\par
+First, it is prudent to only estimate the parameters for voxels in the brain. These voxels can be selected using a ``brain mask'', denoted $M(x)$ -- a binary image denoting the expected location of the brain in standardized space (c.f. \S\ \ref{ss:brainmask} for details about the brain mask used in this work).
+\par
+% __JK__ does this (below) belong in the appendix?
+Second, since every estimation is independent in the current model, it is possible to compute these in parallel. To do so, the training data must be vectorized with respect to spatial location $x$, and the matrix operations outlined above must be expanded explicitly to accommodate the new dimension. To begin, the training data from all subjects -- features $\bm{\Y}(x)$, with $\Y^0=1$, and labels $\C(x)$ -- are sampled from nonzero locations in the MNI-space brain mask. These data are stored in two matrices $\x{Y}$ and $\x{C}$, with dimensions $[V,N,K+1]$ and $[V,N,1]$, respectively, where $V$ is the total number of nonzero voxels in the brain mask, $N$ is the number of subjects, and $K$ is the number of features. A similar matrix is constructed for the initial parameters $\bb^{(0)}(x)$, denoted $\x{B}^{(0)}$, with dimensions $[V,1,K+1]$. Let $\x{Y}_n^k$ denote the vector of data from all voxels for the $k$\ss{th} feature from the $n$\ss{th} subject, and so on for $\x{C}$ and $\x{B}$.
+\par
+% damn it: have not yet introduced lambda yet here... how to resolve this?
+% need a smoother transition here.
+In order to simplify subsequent calculations, the feature data are rectified according to the class labels, before the first iteration, as in
+\begin{equation}
+\x{Y}_n^k =
+\begin{cases}
++\x{Y}_n^k, & \x{C}_n \ge 0.5\\
+-\x{Y}_n^k, & \x{C}_n <  0.5\\
+\end{cases},\qquad\forall\et k \in \{1,\dots,K\}.
+\end{equation}
+Next, for a given iteration $t$, the following vectorized calculations yield the update matrix $\Delta\x{B}^{(t)}$.
+Regarding notation:
+1) the iteration index ${}^{(t)}$ is omitted for clarity,
+2) element-wise multiplication is denoted by $\circ$, and
+3) the variable $K$ is now defined as $1$, since this is essential to the simplification.
+\begin{align}
+\x{S} &= \frac{1}{1+e^{\et\eta}},\qquad \eta = \x{B}^0 + \left(\x{B}^1\ep\x{Y}^1\right)\\
+\x{A} &= \x{S}\ep\left(1-\x{S}\right)\\
+\x{G} &= \nabla_{\x{B}}\L - \lambda\x{B} \nonumber \\
+&= \left[\begin{array}{c}
+\x{G}^1 \\ \x{G}^2
+\end{array}\right] \nonumber \\
+&= \left[\begin{array}{c}
+\sum_{n=1}^{N}\left( \x{Y}_n^1\circ\x{S} \right) \\
+\sum_{n=1}^{N}\left( \x{Y}_n^2\circ\x{S} \right)
+\end{array}\right] - \lambda\left[\begin{array}{c} \x{B}^1 \\ \x{B}^2\end{array}\right]\\
+\x{H} &= \nabla_{\x{B}}^2\L -\lambda\x{I} \nonumber \\
+&= \left[\begin{array}{cc}
+\x{H}^{1,1} & \x{H}^{1,2} \\ \x{H}^{2,1} & \x{H}^{2,2}
+\end{array}\right] \nonumber \\
+&= \left[\begin{array}{cc}
+\sum_{n=1}^{N}\left( \x{A}\circ\x{Y}_n^1\circ\x{Y}_n^1 \right) & 
+\sum_{n=1}^{N}\left( \x{A}\circ\x{Y}_n^2\circ\x{Y}_n^1 \right) \\
+\sum_{n=1}^{N}\left( \x{A}\circ\x{Y}_n^1\circ\x{Y}_n^2 \right) & 
+\sum_{n=1}^{N}\left( \x{A}\circ\x{Y}_n^2\circ\x{Y}_n^2 \right)
+\end{array}\right] - \lambda\left[\begin{array}{cc} 1 & \\ & 1\end{array}\right]\\
+\x{D} &= \det{\x{H}} \nonumber \\
+&= \left(\x{H}^{1,1}\circ\x{H}^{2,2}\right) - \left(\x{H}^{1,2}\circ\x{H}^{2,1}\right) \\
+\Delta\x{B} &= -\x{H}^{-1}\x{G} \nonumber \\
+&= \dfrac{1}{\x{D}} \left[\begin{array}{cc}
+\left(\x{H}^{2,2}\circ\x{G}^{1} - \x{H}^{2,1}\circ\x{G}^{2} \right) & 
+\left(\x{H}^{1,2}\circ\x{G}^{2} - \x{H}^{1,1}\circ\x{G}^{1} \right)
+\end{array}\right]^{T}
+\end{align}
 \par...\par
+Finally, 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Regularization}\label{s:reg-method}
 Regularizations are methods of injecting prior knowledge about the expected model into the optimization. Assuming voxel-wise independence of model parameters requires the use of regularization strategies to solve the challenges outlined in \S\ \ref{ss:modelfitting}. Model fitting which includes regularization is termed maximum a posteriori (MAP) estimation. Several regularization methods are explored below.
@@ -218,7 +270,7 @@ The separable classes challenge is well-known in regression problems, and a good
 &= \underset{\bb}{\arg\max}\en\sum_{n=1}^{N} \Big[ c_n \bb^T\by_n - \log (1+e^{\et\bb^T\by_n}) \Big] - \lambda\norm{\bb}_p
 \label{eq:argmaxmap}
 \end{align}
-Due to its relatively large gradient near zero, $L_1$ regularization is typically used to encourage sparsity in the feature weights (i.e. $\b^k\rightarrow0$) \cite{Tibshirani1996}. This is not desirable in our model, since the feature (FLAIR graylevel) is known to be discriminative. Moreover, the expansion of the $\norm{\bb}_1$ term in the gradient of the objective function is not straightforward, since it is non-differentiable at zero \cite{Tibshirani1996,Lee2006}. Conversely, $L_2$ regularization is more effective at limiting parameter magnitude -- which is the current aim -- and the first and second order gradients of (\ref{eq:argmaxmap}) derive easily \cite{Minka2003}. For these reasons, we consider only $L_2$ regularization, yielding the following change to the Newton update expression (\ref{eq:newtonmle}),
+Due to its relatively large gradient near zero, $L_1$ regularization is typically used to encourage sparsity in the feature weights (i.e. $\b^k\rightarrow0$) \cite{Tibshirani1996}. This is not desirable in the current model, since the feature (FLAIR graylevel) is known to be discriminative. Moreover, the expansion of the $\norm{\bb}_1$ term in the gradient of the objective function is not straightforward, since it is non-differentiable at zero \cite{Tibshirani1996,Lee2006}. Conversely, $L_2$ regularization is more effective at limiting parameter magnitude -- which is the current aim -- and the first and second order gradients of (\ref{eq:argmaxmap}) derive easily \cite{Minka2003}. For these reasons, only $L_2$ regularization is considered, yielding the following change to the Newton update expression (\ref{eq:newtonmle}),
 \begin{equation}
 \Delta\bb = -{\left(\nabla^2_{\bb}\L-\lambda I\right)}^{-1}\left(\nabla_{\bb}\L-\lambda\bb\right)
 \label{eq:newtonmap}
@@ -237,7 +289,7 @@ First, deriving the update gradients for such a model would be challenging, and 
 Second, such an encoding may introduce artifacts in the resulting parameter images.
 Moreover, it is well known that frequency domain band-limiting can be equivalently achieved by convolution (i.e. filtering) in the spatial domain \cite{Gonzalez2006}.
 \par...\par
-\citeauthor{Harmouche2015} also note that in smoothly varying models, small registration errors can be expected to have only a minor impact.
+\citeauthor{Harmouche2015} \cite{Harmouche2015} also note that in smoothly varying models, small registration errors can be expected to have only a minor impact.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Bias Correction \& Registration}
 Two objectives of preprocessing 
@@ -283,7 +335,7 @@ Overall volume agreement between segmentations is characterized using the 2-way 
 A summary of the model is shown in Figure \ref{fig:modelsum}.
 \begin{figure}
   \centering\scalebox{0.65}{\input{figs/tikz/algorithm/tikz-algorithm}}
-  \caption{Overview of the proposed algorithm. Roman letters denote images in native space, while calligraphic letters denote images in standard space; image sets are bold; $C(x)$: manual segmentation; $Y(x)$: FLAIR image, $\b(x)$: parameter image; $\hat{C}(x)$: estimated lesion segmentation.}
+  \caption{Overview of the proposed algorithm. Typefaces -- upright Roman: images in native space; italic Roman: images in standard (MNI) space; calligraphic: a set of images from several patients; bold: a set of images corresponding to different features; Variables -- $C(x)$: manual segmentation; $Y(x)$: FLAIR image, $\beta(x)$: parameter image; $\hat{C}(x)$: estimated lesion segmentation.}
   \label{fig:modelsum}
 \end{figure}
 % ==================================================================================================
@@ -298,7 +350,7 @@ In order to achieve the best possible model performance, it is prudent to track 
     \hline
     Stage                            & Parameter            & Notation                    & Type                                          & Default                   \\ \hline
     \multirow{4}{*}{Pre-Processing}  & Reflect Augmentation & $A_R$                       & $\mathbb{B}$                                  & 0                         \\
-                                     & Shift Augmentation   & $A_S$                       & $\N_p$                                        & $\N_0$                    \\
+                                     & Shift Augmentation   & $A_S$                       & $\mathcal{N}_p$                                        & $\mathcal{N}_0$                    \\
                                      & Graylevel Transform  & $T_y$                       & $f: y\mapsto \tilde{y}$                       & $f_{he}$                  \\
                                      & Transform Mask       & $M_{T}(x)$                  & $\mathbb{B}(x)$                               & $M_{\text{brain}}$        \\ \hline
     \multirow{6}{*}{VLR Fitting}     & Iterations           & $N_{t}^{\lr}$               & $\mathbb{Z}$                                  & 30                        \\
@@ -306,12 +358,12 @@ In order to achieve the best possible model performance, it is prudent to track 
                                      & Learning Rate        & $\alpha$                    & $\Re$                                         & 1                         \\
                                      & Regularization       & $\lambda$                   & $\Re$                                         & 0                         \\
                                      & Pseudo-Lesions       & $\{\bY_{\rho},\bC_{\rho}\}$ & $\{\{\et\cdot\in\Re\},\{\et\cdot\in[0,1]\}\}$ & $\{\{\},\{\}\}$           \\
-                                     & $\bb$ Filter         & $F_{\bb}$                   & $f: \bb(\N_p(x)) \mapsto \tilde{\bb}(x)$      & $\tilde{\bb}(x) = \bb(x)$ \\ \hline
+                                     & $\bb$ Filter         & $F_{\bb}$                   & $f: \bb(\mathcal{N}_p(x)) \mapsto \tilde{\bb}(x)$      & $\tilde{\bb}(x) = \bb(x)$ \\ \hline
     \multirow{3}{*}{Post-Processing} & Min Lesion  Size     & $\X_{\min}^{c}$             & $\Re\en(\text{mm}^{3})$                       & 0                         \\
                                      & MRF Iterations       & $N_{t}^{\mrf}$              & $\mathbb{Z}$                                  & 0                         \\
                                      & MRF Weights          & $W_{\mrf}$                  & $\{w_{\Delta},w_{F},w_y\}$                    & $\{1,1,1\}$               \\ \hline
   \end{tabular}
-  \tablepost{Notation. $\mathbb{B}$: boolean value; $\mathbb{Z}$: integer value; $\mathbb{R}^n$: real value ($n=1$) or vector ($n > 1$); $\N_p$: nearest $p$ voxel neighbourhood.}
+  \tablepost{Notation. $\mathbb{B}$: boolean value; $\mathbb{Z}$: integer value; $\mathbb{R}^n$: real value ($n=1$) or vector ($n > 1$); $\mathcal{N}_p$: nearest $p$ voxel neighbourhood.}
 \end{table}
 % --------------------------------------------------------------------------------------------------
 % ==================================================================================================
