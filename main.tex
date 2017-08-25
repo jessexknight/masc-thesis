@@ -91,8 +91,7 @@
 \renewcommand\labelitemi{\raisebox{0.2em}{\fontsize{0.3em}{0}$\blacksquare$}}
 \renewcommand\labelitemii{\raisebox{0.2em}{\fontsize{0.3em}{0}$\square$}}
 \newcommand{\tablepost}[1]{\\[0.5em]\raggedright{\footnotesize{#1}}}
-%\newcommand{\slicefig}[4]{\foreach \i in {#3}{\includegraphics[width=#4\textwidth]{#1\i#2}}}
-\newenvironment{subfigureside}[1][\sliceheight]{\begin{subfigure}{\textwidth}\centering\parbox[b][#1-1em][c]{0.5cm}{\subcaption{}} }{\end{subfigure}}
+\newenvironment{subfigureside}[2][\sliceheight]{\begin{subfigure}{\textwidth}\centering\parbox[b][#1-1em][c]{1cm+\widthof{#2}}{\subcaption{#2}}}{\end{subfigure}}
 % LaTeX penalties
 \interfootnotelinepenalty=10000
 \widowpenalty=500
@@ -106,7 +105,7 @@
 \newcommand{\matlabsty}{\color{black}\ttfamily\footnotesize}
 \global\mdfdefinestyle{graybar}{topline=false,rightline=false,bottomline=false,linewidth=0.2em,linecolor=lightgray,innertopmargin=0pt,innerbottommargin=0pt}
 \lstnewenvironment{matlab}{\linespread{1}\mdframed[style=graybar]\lstset{style=Matlab-editor,basicstyle=\matlabsty,basewidth=0.5em}}{\endmdframed}
-\newcommand{\includecode}[1]{\subsubsection{\ttfamily{#1}}
+\newcommand{\includecode}[1]{\subsubsection[\ttfamily{#1}]{\hspace*{-1.5em}\ttfamily{>> #1}}\label{m:#1}%
   \begin{mdframed}[style=graybar]\lstinputlisting[style=Matlab-editor,basicstyle=\linespread{1}\matlabsty]{\matlabdir#1}\end{mdframed}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}

@@ -26,10 +26,10 @@ Preliminary investigations sought to characterize the spatial distribution of fa
 and used to generate binary class images ($0 =$ healthy, $1 =$ lesion). Comparing these results with the manual segmentations, the average distribution of true positives (TP), false positives (FP), and false negatives (FN) was computed, as shown in Figure \ref{fig:thropt-tpfpfn}. The median optimal similarity index (SI) was 0.36.
 \begin{figure}[h]
   \centering
-  \begin{subfigureside}\includegraphics[height=\sliceheight]{rawthropt-tp.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-025}\end{subfigureside}\\[0.5em]
-  \begin{subfigureside}\includegraphics[height=\sliceheight]{rawthropt-fp.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-025}\end{subfigureside}\\[0.5em]
-  \begin{subfigureside}\includegraphics[height=\sliceheight]{rawthropt-fn.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-025}\end{subfigureside}\\[0.5em]
-  \caption{Distributions of (a) TP, (b) FP, and (c) FN in 96 FLAIR MRI, following supervised optimal thresholding in MNI space.}
+  \begin{subfigureside}{TP}\includegraphics[height=\sliceheight]{rawthropt-tp.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-025}\end{subfigureside}\\[0.5em]
+  \begin{subfigureside}{FP}\includegraphics[height=\sliceheight]{rawthropt-fp.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-025}\end{subfigureside}\\[0.5em]
+  \begin{subfigureside}{FN}\includegraphics[height=\sliceheight]{rawthropt-fn.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-025}\end{subfigureside}\\[0.5em]
+  \caption{Distributions of TP, FP, and FN in 96 FLAIR MRI, following supervised optimal thresholding in MNI space.}
   \label{fig:thropt-tpfpfn}
 \end{figure}
 \par
@@ -197,62 +197,7 @@ and the Hessian by
 \nabla^2_{\bb}\L = \sum_{n=1}^{N} \by_n{\by_n}^T \left(c_n - \hat{c}_n\right).
 \label{eq:llhessian}
 \end{equation}
-Substituting (\ref{eq:llgradient}) and (\ref{eq:llhessian}) into (\ref{eq:newtonmle}), the explicit update  $\Delta\bb$ for (\ref{eq:update}) is obtained.
-% --------------------------------------------------------------------------------------------------
-\subsubsection{Implementation}
-Speed of model fitting is a significant factor during development, particularly considering optimization of so-called hyperparameters. Faster training yields more model iterations, which inevitably bear improvements. While the above estimation procedure must be repeated for the voxels of interest in the standardized space, there are several ways of accelerating this procedure.
-\par
-First, it is prudent to only estimate the parameters for voxels in the brain. These voxels can be selected using a ``brain mask'', denoted $M(x)$ -- a binary image denoting the expected location of the brain in standardized space (c.f. \S\ \ref{ss:brainmask} for details about the brain mask used in this work).
-\par
-% __JK__ does this (below) belong in the appendix?
-Second, since every estimation is independent in the current model, it is possible to compute these in parallel. To do so, the training data must be vectorized with respect to spatial location $x$, and the matrix operations outlined above must be expanded explicitly to accommodate the new dimension. To begin, the training data from all subjects -- features $\bm{\Y}(x)$, with $\Y^0=1$, and labels $\C(x)$ -- are sampled from nonzero locations in the MNI-space brain mask. These data are stored in two matrices $\x{Y}$ and $\x{C}$, with dimensions $[V,N,K+1]$ and $[V,N,1]$, respectively, where $V$ is the total number of nonzero voxels in the brain mask, $N$ is the number of subjects, and $K$ is the number of features. A similar matrix is constructed for the initial parameters $\bb^{(0)}(x)$, denoted $\x{B}^{(0)}$, with dimensions $[V,1,K+1]$. Let $\x{Y}_n^k$ denote the vector of data from all voxels for the $k$\ss{th} feature from the $n$\ss{th} subject, and so on for $\x{C}$ and $\x{B}$.
-\par
-% damn it: have not yet introduced lambda yet here... how to resolve this?
-% need a smoother transition here.
-In order to simplify subsequent calculations, the feature data are rectified according to the class labels, before the first iteration, as in
-\begin{equation}
-\x{Y}_n^k =
-\begin{cases}
-+\x{Y}_n^k, & \x{C}_n \ge 0.5\\
--\x{Y}_n^k, & \x{C}_n <  0.5\\
-\end{cases},\qquad\forall\et k \in \{1,\dots,K\}.
-\end{equation}
-Next, for a given iteration $t$, the following vectorized calculations yield the update matrix $\Delta\x{B}^{(t)}$.
-Regarding notation:
-1) the iteration index ${}^{(t)}$ is omitted for clarity,
-2) element-wise multiplication is denoted by $\circ$, and
-3) the variable $K$ is now defined as $1$, since this is essential to the simplification.
-\begin{align}
-\x{S} &= \frac{1}{1+e^{\et\eta}},\qquad \eta = \x{B}^0 + \left(\x{B}^1\ep\x{Y}^1\right)\\
-\x{A} &= \x{S}\ep\left(1-\x{S}\right)\\
-\x{G} &= \nabla_{\x{B}}\L - \lambda\x{B} \nonumber \\
-&= \left[\begin{array}{c}
-\x{G}^1 \\ \x{G}^2
-\end{array}\right] \nonumber \\
-&= \left[\begin{array}{c}
-\sum_{n=1}^{N}\left( \x{Y}_n^1\circ\x{S} \right) \\
-\sum_{n=1}^{N}\left( \x{Y}_n^2\circ\x{S} \right)
-\end{array}\right] - \lambda\left[\begin{array}{c} \x{B}^1 \\ \x{B}^2\end{array}\right]\\
-\x{H} &= \nabla_{\x{B}}^2\L -\lambda\x{I} \nonumber \\
-&= \left[\begin{array}{cc}
-\x{H}^{1,1} & \x{H}^{1,2} \\ \x{H}^{2,1} & \x{H}^{2,2}
-\end{array}\right] \nonumber \\
-&= \left[\begin{array}{cc}
-\sum_{n=1}^{N}\left( \x{A}\circ\x{Y}_n^1\circ\x{Y}_n^1 \right) & 
-\sum_{n=1}^{N}\left( \x{A}\circ\x{Y}_n^2\circ\x{Y}_n^1 \right) \\
-\sum_{n=1}^{N}\left( \x{A}\circ\x{Y}_n^1\circ\x{Y}_n^2 \right) & 
-\sum_{n=1}^{N}\left( \x{A}\circ\x{Y}_n^2\circ\x{Y}_n^2 \right)
-\end{array}\right] - \lambda\left[\begin{array}{cc} 1 & \\ & 1\end{array}\right]\\
-\x{D} &= \det{\x{H}} \nonumber \\
-&= \left(\x{H}^{1,1}\circ\x{H}^{2,2}\right) - \left(\x{H}^{1,2}\circ\x{H}^{2,1}\right) \\
-\Delta\x{B} &= -\x{H}^{-1}\x{G} \nonumber \\
-&= \dfrac{1}{\x{D}} \left[\begin{array}{cc}
-\left(\x{H}^{2,2}\circ\x{G}^{1} - \x{H}^{2,1}\circ\x{G}^{2} \right) & 
-\left(\x{H}^{1,2}\circ\x{G}^{2} - \x{H}^{1,1}\circ\x{G}^{1} \right)
-\end{array}\right]^{T}
-\end{align}
-\par...\par
-Finally, 
+Substituting (\ref{eq:llgradient}) and (\ref{eq:llhessian}) into (\ref{eq:newtonmle}), the explicit update $\Delta\bb$ for (\ref{eq:update}) is obtained. At each iteration, $\Delta\bb^{(t)}$ is re-computed, and the process continues until some convergence criterion is satisfied. This procedure is repeated for all voxels of interest. Such voxels can be selected using a ``brain mask'', denoted $M(x)$ -- a binary image denoting the expected location of the brain in standardized space (c.f. \S\ \ref{ss:brainmask} for details about the brain mask used in this work). Since the parameters of each voxel are estimated independently, this can also be computed in parallel. The details of this implementation are presented in \S\ \ref{s:parallelfit}, after incorporation of certain regularization terms described in the next section.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Regularization}\label{s:reg-method}
 Regularizations are methods of injecting prior knowledge about the expected model into the optimization. Assuming voxel-wise independence of model parameters requires the use of regularization strategies to solve the challenges outlined in \S\ \ref{ss:modelfitting}. Model fitting which includes regularization is termed maximum a posteriori (MAP) estimation. Several regularization methods are explored below.
@@ -265,16 +210,17 @@ Alternatively, simple image manipulations can still afford model improvements \c
 \subsection{Classic Regularization}
 The separable classes challenge is well-known in regression problems, and a good solution is to penalize the magnitude of model parameters using the $L_p$-norm: $\lambda\norm{\bb}_p$ \cite{Zou2005}. It can be shown that $L_1$ regularization corresponds to a Laplacian prior on elements of $\bb$, with scale parameter inversely proportional to $\lambda$ (equivalently, this assumes that the model error follows this distribution); similarly, $L_2$ regularization implies a Gaussian prior, with standard deviation inversely proportional to $\lambda$ \cite{Zou2005}. This penalty can then be appended to the objective function (\ref{eq:argmaxmle}), as in 
 \begin{align}
-\bb^* &= \J(\bb)\nonumber\\
-&= \underset{\bb}{\arg\max}\en\L(\bb) - \lambda\norm{\bb}_p \nonumber\\
+\bb^* &= \underset{\bb}{\arg\max}\en\J(\bb) \nonumber\\
+&=\underset{\bb}{\arg\max}\en\L(\bb) - \lambda\norm{\bb}_p \nonumber\\
 &= \underset{\bb}{\arg\max}\en\sum_{n=1}^{N} \Big[ c_n \bb^T\by_n - \log (1+e^{\et\bb^T\by_n}) \Big] - \lambda\norm{\bb}_p
 \label{eq:argmaxmap}
 \end{align}
 Due to its relatively large gradient near zero, $L_1$ regularization is typically used to encourage sparsity in the feature weights (i.e. $\b^k\rightarrow0$) \cite{Tibshirani1996}. This is not desirable in the current model, since the feature (FLAIR graylevel) is known to be discriminative. Moreover, the expansion of the $\norm{\bb}_1$ term in the gradient of the objective function is not straightforward, since it is non-differentiable at zero \cite{Tibshirani1996,Lee2006}. Conversely, $L_2$ regularization is more effective at limiting parameter magnitude -- which is the current aim -- and the first and second order gradients of (\ref{eq:argmaxmap}) derive easily \cite{Minka2003}. For these reasons, only $L_2$ regularization is considered, yielding the following change to the Newton update expression (\ref{eq:newtonmle}),
-\begin{equation}
-\Delta\bb = -{\left(\nabla^2_{\bb}\L-\lambda I\right)}^{-1}\left(\nabla_{\bb}\L-\lambda\bb\right)
+\begin{align}
+\Delta\bb &= -{\nabla^2_{\bb}\J}^{-1}\nabla_{\bb}\J \nonumber\\
+&= -{\left(\nabla^2_{\bb}\L-\lambda I\right)}^{-1}\left(\nabla_{\bb}\L-\lambda\bb\right)
 \label{eq:newtonmap}
-\end{equation}
+\end{align}
 What remains is to select an appropriate value of $\lambda$. This is explored experimentally in \S\ \ref{ss:toyreg} using a toy model.
 % ==================================================================================================
 \subsection{Pseudo-Lesions}
@@ -340,8 +286,7 @@ A summary of the model is shown in Figure \ref{fig:modelsum}.
 \end{figure}
 % ==================================================================================================
 \subsection{Tunable Parameters}
-In order to achieve the best possible model performance, it is prudent to track tunable model parameters (\textsc{aka} hyperparameters) which are distinct from those fitted during each cross validation fold. Considering both the main VLR model and the pre- and post-processing aspects, the parameters of the proposed algorithm are summarized in Table \ref{tab:hyperparams}. The optimization of these model components will be the subject of the next chapter. 
-%and also programmatically in \nameref{code:hypdef}.
+In order to achieve the best possible model performance, it is prudent to track tunable model parameters (\textsc{aka} hyperparameters) which are distinct from those fitted during each cross validation fold. Considering both the main VLR model and the pre- and post-processing aspects, the parameters of the proposed algorithm are summarized in Table \ref{tab:hyperparams} and also programmatically in \nameref{m:hypdef.m}. The optimization of these model components will be the subject of the next chapter. 
 \begin{table}
   \centering
   \caption{Model hyperparameters.}
