@@ -287,12 +287,15 @@ However, with only one feature -- the FLAIR graylevel -- it is possible to repar
 In this form, the parameters $\tau$ and $s$ emerge as a graylevel threshold and a slope parameter, respectively.
 Specifically, when $y = \tau$, the predicted probability of lesion is $\hat{c} = \tfrac{1}{1+e^{0}} = 0.5$, so $\tau$ controls the location of the class discrimination, as shown in Figure \ref{fig:reparam-t}.
 Similarly, the $s$ parameter defines the sensitivity of the logistic function to $y$, as shown in Figure \ref{fig:reparam-s}.
-These parameters, and the corresponding images $\mathcal{T}(x)$ and $\mathcal{S}(x)$, are therefore salient descriptors of the predictive model.
+By contrast, varying the original parameter $\beta^1$ with $\beta^0$ constant (Figure \ref{fig:reparam-b1}) results in correlation of these characteristics.
+These new parameters, and the corresponding images $\mathcal{T}(x)$ and $\mathcal{S}(x)$, are therefore salient descriptors of the predictive model.
 \begin{figure}
   \centering
-  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{reparam-t}\caption{Threshold parameter $\tau$}\label{fig:reparam-t}\end{subfigure}
-  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{reparam-s}\caption{Slope aparameter $s$}      \label{fig:reparam-s}\end{subfigure}
-  \caption{Effect of varying the logistic model parameters $\tau$ and $s$.}
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{reparam-t} \caption{Vary $\tau$ with $s = 16$ constant.}\label{fig:reparam-t}\end{subfigure}
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{reparam-s} \caption{Vary $s$ with $\tau = 0.5$ constant.}\label{fig:reparam-s}\end{subfigure}
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{reparam-b0}\caption{Vary $\b^0$ with $\b^1 = 16$ constant.}\label{fig:reparam-b0}\end{subfigure}
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{reparam-b1}\caption{Vary $\b^1$ with $\b^0 = -6$ constant.}\label{fig:reparam-b1}\end{subfigure}
+  \caption{Effect of varying the logistic model parameters.}
   \label{fig:reparam}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -405,9 +408,49 @@ Therefore, only conventional filtering is explored in this work (cf. \S\ \ref{})
 %\citeauthor{Harmouche2015} \cite{Harmouche2015} also note that in smoothly varying models, small registration errors can be expected to have only a minor impact.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Pre-Processing}\label{s:meth-pre}
-
+% [x] Overlapping distributions
+% [ ] Bias field
+% [x] DAWM
+% [x] Partial volume effect
+% [-] Artifacts
+% [-] Image variability
+% [ ] (registration)
+% [ ] (standardization)
+The proposed VLR classification model addresses several of the challenges outlined in \S\ \ref{ss:autochallenges}.
+The problem of overlapping tissue graylevel distributions is mostly solved through expansion of the feature space to include spatial features.
+CSF flow-through artifacts, which appear in roughly consistent locations, are similarly managed.
+Spatial heterogeneity in the appearance of lesions is also considered by the spatial parametrization of logistic parameters.
+Finally, ambiguity regarding moderately hyperintense DAWM, and voxels affected by partial volume effect, is captured in the probabilistic output.
+\par
+Several challenges, however, still remain.
+In particular, a number of assumptions were made about the input data for the VLR model which are likely invalid for raw data.
+These assumptions are that:
+1) input MRI images are free of bias field artifact;
+2) feature intensities are consistent across different subjects;
+3) images are consistently sized and voxels represent the same anatomical regions across different subjects.
+Solving these challenges must therefore be accomplished by one or more pre-processing steps.
 % ==================================================================================================
-\subsection{Bias Correction \& Registration}\label{ss:meth-bias+reg}
+\subsection{Registration \& Bias Correction}\label{ss:meth-reg+bias}
+Image registration is the process of geometrically transforming a source image so that the image content is aligned per-voxel with a target image of the same subject.
+Such transformations are parameterized mathematically, and fitted by maximizing some measure of overlap between the images \cite{Sotiras2013}.
+Several similarity measures have been proposed which do not require the source and target images to be of the same modality, permitting multi-modal image registration (e.g. PET-CT or different MRI sequences) \cite{Maes1997,Klein2009,Sotiras2013}.
+\par
+Simple registration methods employ only affine transformations, comprising a combination of translation, scaling, and shear transformations (e.g. the FLIRT tool \cite{Jenkinson2002} in FSL).
+The utility of these methods for neuroimage analysis is limited, since there are significant differences in brain anatomy between subjects.
+Rather, most tools parametrize a spatial warping model, permitting local nonlinear deformations to better match brain structures (e.g.
+cubic B-splines in FSL FNIRT \cite{Andersson2007},
+discrete cosine transform in SPM Normalize \cite{Ashburner1997,Ashburner2005},
+a general diffeomorphism in the SyN algorithm \cite{Avants2008}).
+While these models are more difficult to fit, several well-performing methods have emerged.
+
+
+%N3/4 \citeauthor{Tustison2010} \cite{Tustison2010}
+%SPM New Segment \citeauthor{Ashburner2005} \cite{Ashburner2005}
+%FSL FLIRT \citeauthor{Jenkinson2002} \cite{Jenkinson2002}
+%THERE ARE SO MANY \citeauthor{Klein2009} \cite{Klein2009}...
+%ans SPM is definitely not the best...
+%BUT: SPM is one of only a few which can do multi-modal image registration, which is helpful, since 
+%still: a FLAIR template does exist \cite{Winkler2012}
 
 % ==================================================================================================
 \subsection{Graylevel Standardization}\label{ss:meth-ystd}

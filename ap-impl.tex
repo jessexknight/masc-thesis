@@ -14,56 +14,62 @@ All computation in the current work was performed using the following workstatio
   \item \textbf{Code:} MATLAB R2011a
 \end{itemize}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Parallel Model Fitting}\label{s:parallelfit}
-Speed of model fitting is a significant factor during development, particularly considering optimization of so-called hyperparameters. Faster training yields more model iterations, which inevitably bear improvements. While the estimation procedure outlined in \S\ \ref{ss:modelfitting} must be repeated for all standardized voxels in the brain mask, it is possible to do this in parallel, since every estimation is independent. To do so, the training data must first be vectorized with respect to spatial location $x$, and matrix operations expanded explicitly to accommodate the new dimension.
+\section{Parallelization}
+Speed of model fitting is a significant factor during development, particularly considering optimization of so-called hyperparameters. Faster training yields more model iterations, which inevitably bear improvements. 
+% ==================================================================================================
+\subsection{Model Estimation}\label{s:parallelfit}
+While the estimation procedure outlined in \S\ \ref{ss:modelfitting} must be repeated for all standardized voxels in the brain mask, it is possible to do this in parallel, since every estimation is independent. To do so, the training data must first be vectorized with respect to spatial location $x$, and matrix operations expanded explicitly to accommodate the new dimension.
 \par
-% __JK__ does this (below) belong in the appendix?
-% __JK__ (yes!)
 % __JK__ add some details about gpuArray in Matlab
-To begin, the standardized training data from all subjects -- features $\tilde{\bm{\Y}}_{\gamma}(x)$, with $\tilde{\Y}_{\bV}^{\et0}=1$, and labels $\C(x)$ -- are sampled from nonzero locations in the brain mask $M(x)$. These data are stored in two matrices $\X{Y}$ and $\X{C}$, with dimensions $[X,N,K+1]$ and $[X,N,1]$, respectively, where $X$ is the total number of nonzero voxels in the brain mask, $N$ is the number of subjects, and $K$ is the number of features. A similar matrix is constructed for the initial parameters $\bb^{(0)}(x)$, denoted $\X{B}^{(0)}$, with dimensions $[X,1,K+1]$. Let $\X{Y}_n^k$ denote the vector of data from all voxels for the $k$\ss{th} feature from the $n$\ss{th} subject, and so on for $\X{C}$ and $\X{B}$.
+To begin, the standardized training data from all subjects -- features $\tilde{\bm{\Y}}_{\gamma}(x)$, with $\tilde{\Y}_{\bV}^{\et0}=1$, and labels $\C(x)$ -- are sampled from nonzero locations in the brain mask $M(x)$. These data are stored in two matrices $\vox{Y}$ and $\vox{C}$, with dimensions $[X,N,K+1]$ and $[X,N,1]$, respectively, where $X$ is the total number of nonzero voxels in the brain mask, $N$ is the number of subjects, and $K$ is the number of features. A similar matrix is constructed for the initial parameters $\bb^{(0)}(x)$, denoted $\vox{B}^{(0)}$, with dimensions $[X,1,K+1]$. Let $\vox{Y}_n^k$ denote the vector of data from all voxels for the $k$\ss{th} feature from the $n$\ss{th} subject, and so on for $\vox{C}$ and $\vox{B}$.
 \par
 In order to simplify subsequent calculations, the feature data are rectified according to the class labels, before the first iteration, as in
 \begin{equation}
-\X{Y}_n^k =
+\vox{Y}_n^k =
 \begin{cases}
-+\X{Y}_n^k, & \X{C}_n \ge 0.5\\
--\X{Y}_n^k, & \X{C}_n <  0.5\\
++\vox{Y}_n^k, & \vox{C}_n \ge 0.5\\
+-\vox{Y}_n^k, & \vox{C}_n <  0.5\\
 \end{cases},\qquad\forall\et k \in \{1,\dots,K\}.
 \end{equation}
-Next, for a given iteration $t$, the following vector-compatible expansions of Equations (\ref{eq:llgradient}), (\ref{eq:llhessian}), and (\ref{eq:newtonmap}) yield the desired update matrix $\Delta\X{B}^{(t)}$. These calculations are performed in \nameref{m:logreg.m}.
+Next, for a given iteration $t$, the following vector-compatible expansions of Equations (\ref{eq:llgradient}), (\ref{eq:llhessian}), and (\ref{eq:newtonmap}) yield the desired update matrix $\Delta\vox{B}^{(t)}$. These calculations are performed in \nameref{m:logreg.m}.
 Regarding notation:
 1) the iteration index ${}^{(t)}$ is omitted for clarity,
 2) element-wise multiplication is denoted by $\circ$, and
 3) the variable $K$ is now defined as $1$, since this is essential to the simplification.
 \begin{align}
-\X{S} &= \frac{1}{1+e^{\et\eta}},\qquad \eta = \X{B}^0 + \left(\X{B}^1\ep\X{Y}^1\right)\\
-\X{A} &= \X{S}\ep\left(1-\X{S}\right)\\
-\X{G} &= \nabla_{\X{B}}\L - \lambda\X{B} \nonumber \\
+\vox{S} &= \frac{1}{1+e^{\et\eta}},\qquad \eta = \vox{B}^0 + \left(\vox{B}^1\ep\vox{Y}^1\right)\\
+\vox{A} &= \vox{S}\ep\left(1-\vox{S}\right)\\
+\vox{G} &= \nabla_{\vox{B}}\L - \lambda\vox{B} \nonumber \\
 &= \left[\begin{array}{c}
-\X{G}^1 \\ \X{G}^2
+\vox{G}^1 \\ \vox{G}^2
 \end{array}\right] \nonumber \\
 &= \left[\begin{array}{c}
-\sum_{n=1}^{N}\left( \X{Y}_n^1\ep\X{S} \right) \\
-\sum_{n=1}^{N}\left( \X{Y}_n^2\ep\X{S} \right)
-\end{array}\right] - \lambda\left[\begin{array}{c} \X{B}^1 \\ \X{B}^2\end{array}\right]\\
-\X{H} &= \nabla_{\X{B}}^2\L -\lambda\X{I} \nonumber \\
+\sum_{n=1}^{N}\left( \vox{Y}_n^1\ep\vox{S} \right) \\
+\sum_{n=1}^{N}\left( \vox{Y}_n^2\ep\vox{S} \right)
+\end{array}\right] - \lambda\left[\begin{array}{c} \vox{B}^1 \\ \vox{B}^2\end{array}\right]\\
+\vox{H} &= \nabla_{\vox{B}}^2\L -\lambda\vox{I} \nonumber \\
 &= \left[\begin{array}{cc}
-\X{H}^{1,1} & \X{H}^{1,2} \\ \X{H}^{2,1} & \X{H}^{2,2}
+\vox{H}^{1,1} & \vox{H}^{1,2} \\ \vox{H}^{2,1} & \vox{H}^{2,2}
 \end{array}\right] \nonumber \\
 &= \left[\begin{array}{cc}
-\sum_{n=1}^{N}\left( \X{A}\ep\X{Y}_n^1\ep\X{Y}_n^1 \right) & 
-\sum_{n=1}^{N}\left( \X{A}\ep\X{Y}_n^2\ep\X{Y}_n^1 \right) \\
-\sum_{n=1}^{N}\left( \X{A}\ep\X{Y}_n^1\ep\X{Y}_n^2 \right) & 
-\sum_{n=1}^{N}\left( \X{A}\ep\X{Y}_n^2\ep\X{Y}_n^2 \right)
+\sum_{n=1}^{N}\left( \vox{A}\ep\vox{Y}_n^1\ep\vox{Y}_n^1 \right) & 
+\sum_{n=1}^{N}\left( \vox{A}\ep\vox{Y}_n^2\ep\vox{Y}_n^1 \right) \\
+\sum_{n=1}^{N}\left( \vox{A}\ep\vox{Y}_n^1\ep\vox{Y}_n^2 \right) & 
+\sum_{n=1}^{N}\left( \vox{A}\ep\vox{Y}_n^2\ep\vox{Y}_n^2 \right)
 \end{array}\right] - \lambda\left[\begin{array}{cc} 1 & \\ & 1\end{array}\right]\\
-\X{D} &= \det{\X{H}} \nonumber \\
-&= \left(\X{H}^{1,1}\ep\X{H}^{2,2}\right) - \left(\X{H}^{1,2}\ep\X{H}^{2,1}\right) \\
-\Delta\X{B} &= -\X{H}^{-1}\X{G} \nonumber \\
-&= \dfrac{1}{\X{D}} \left[\begin{array}{cc}
-\left(\X{H}^{2,2}\ep\X{G}^{1} - \X{H}^{2,1}\ep\X{G}^{2} \right) & 
-\left(\X{H}^{1,2}\ep\X{G}^{2} - \X{H}^{1,1}\ep\X{G}^{1} \right)
+\vox{D} &= \det{\vox{H}} \nonumber \\
+&= \left(\vox{H}^{1,1}\ep\vox{H}^{2,2}\right) - \left(\vox{H}^{1,2}\ep\vox{H}^{2,1}\right) \\
+\Delta\vox{B} &= -\vox{H}^{-1}\vox{G} \nonumber \\
+&= \dfrac{1}{\vox{D}} \left[\begin{array}{cc}
+\left(\vox{H}^{2,2}\ep\vox{G}^{1} - \vox{H}^{2,1}\ep\vox{G}^{2} \right) & 
+\left(\vox{H}^{1,2}\ep\vox{G}^{2} - \vox{H}^{1,1}\ep\vox{G}^{1} \right)
 \end{array}\right]^{T}
 \end{align}
+% ==================================================================================================
+\subsection{Image Deformations}
+Following training, each indi
+
+While these deformations are saved after initial estimation, their application is computationally expensive.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Manual Segmentations}
 It was necessary to create and edit a small number of binary segmentation masks during this work. To do this, the Editor module from the 3D Slicer imaging platform \cite{Fedorov2012} was used\footnote{3D Slicer Editor tool documentation is available here: \hreftt{https://www.slicer.org/wiki/Documentation/4.6/Modules/Editor}.}, including the Wand, Paint, and Erase functions. Figure \ref{fig:m08-rev-slicer} shows the user interface during a lesion segmentation.
@@ -103,7 +109,7 @@ In order to vectorize image data for parallel processing, a binary mask selectin
 \begin{figure}
   \centering
   \includegraphics[height=2\sliceheight]{brainmask.png}
-  \caption{Manually refined brain mask in MNI space. Mask outline is highlighted in red; inclusions are shown in grayscale; exclusions are tinted red.}
+  \caption{Manually refined brain mask in MNI space, overlaid on a simulated BrainWeb FLAIR image. Mask outline is highlighted in red; inclusions are shown in grayscale; exclusions are tinted red.}
   \label{fig:brainmask}
 \end{figure}
 % --------------------------------------------------------------------------------------------------
