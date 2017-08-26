@@ -2,14 +2,25 @@
 % ==================================================================================================
 % --------------------------------------------------------------------------------------------------
 \chapter{Methodology}
-In this section we motivate and introduce the proposed model, and explore its parametrization. Wherever possible, concepts related to segmentation and classification will be described in their most general sense, since many of the these may also apply to other image analysis and machine learning tasks.
+In this section we motivate and introduce the proposed model, and explore its parametrization.
+Wherever possible, concepts related to segmentation and classification will be described in their most general sense, since many of the these may also apply to other image analysis and machine learning tasks.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Model Design}\label{s:modelconcept}
-As suggested in \S\ \ref{ss:priorproposed}, three general paradigms have emerged for segmentation of brain MRI. The first and most popular is the pipeline, in which sub-tasks are completed in sequence, such as: pre-processing, classification, post-processing. This approach permits a flexible model definition which can incorporate existing algorithms for individual steps. Most thresholding and classic supervised models fall under this category. The main drawback of this approach is that some steps could be improved by the results of downstream steps. For example, tissue classifying modules typically assume that the bias field is already corrected, but bias field estimation can be more accurate if the tissue segmentation is known.
+As suggested in \S\ \ref{ss:priorproposed}, three general paradigms have emerged for segmentation of brain MRI.
+The first and most popular is the pipeline, in which sub-tasks are completed in sequence, such as: pre-processing, classification, post-processing.
+This approach permits a flexible model definition which can incorporate existing algorithms for individual steps.
+Most thresholding and classic supervised models fall under this category.
+The main drawback of this approach is that some steps could be improved by the results of downstream steps.
+For example, tissue classifying modules typically assume that the bias field is already corrected, but bias field estimation can be more accurate if the tissue segmentation is known.
 \par
-The second paradigm, a unified generative model, aims to solve this chicken-egg problem. The segmentation is parameterized in one integrated probabilistic model, which often combines the input images with tissue prior probability images, a bias field model, and smoothness terms. Parameters of each sub-model are estimated using several expectation maximization iterations before the final segmentation is inferred. The challenges to this approach include balancing model complexity with estimability, robust convergence issues, and reduced ability to include external tools.
+The second paradigm, a unified generative model, aims to solve this chicken-egg problem.
+The segmentation is parameterized in one integrated probabilistic model, which often combines the input images with tissue prior probability images, a bias field model, and smoothness terms.
+Parameters of each sub-model are estimated using several expectation maximization iterations before the final segmentation is inferred.
+The challenges to this approach include balancing model complexity with estimability, robust convergence issues, and reduced ability to include external tools.
 \par
-The final paradigm, deep learning, uses error back-propagation to update thousands of parameters in a large, relatively unstructured model mapping the input MRI to the output segmentation image. Using so-called ``end-to-end'' training, there is no guarantee that the usual sub-components (e.g. bias field, tissue graylevel distributions, etc.) will be estimated, though such elements could be expected to develop in the internal relationships if they are relevant to the task at hand. Most deep learning models still require standardization in space and graylevel, and more importantly, large training datasets -- which are rare in medical imaging.
+The final paradigm, deep learning, uses error back-propagation to update thousands of parameters in a large, relatively unstructured model mapping the input MRI to the output segmentation image.
+Using so-called ``end-to-end'' training, there is no guarantee that the usual sub-components (e.g. bias field, tissue graylevel distributions, etc.) will be estimated, though such elements could be expected to develop in the internal relationships if they are relevant to the task at hand.
+Most deep learning models still require standardization in space and graylevel, and more importantly, large training datasets -- which are rare in medical imaging.
 \par
 For several reasons, the supervised pipeline approach was selected for this work.
 First, preliminary work drawing on existing algorithms \cite{Khademi2014,Schmidt2015} showed the feasibility of several relatively simple thresholding methods, which confer robustness through simplicity.
@@ -18,12 +29,18 @@ Third, only a small number of training cases were available during initial devel
 Finally, time constraints favoured the incorporation of existing tools to address challenges like bias correction and image registration, which would have been otherwise difficult to develop in a unified model.
 % ==================================================================================================
 \subsection{Features}
-Many FLAIR-only WMH segmentation algorithms use a thresholding technique: map a single graylevel feature directly to a class or class probability (e.g. ``healthy'' or ``lesion''). Such models often have complex methods of deriving this mapping (e.g. using mixture model parameters \cite{Roura2015}, histogram features \cite{Yoo2014}, or conditional edge probability \cite{Knight2016}), but the final rule is applied equally to the entire graylevel image, usually the FLAIR sequence. The most common challenge for these methods is a high number of false positives (c.f. \S\ \ref{ss:metrics} for definitions), since several artifacts and GM can overlap the WMH intensity distribution. As a result, nearly all previously proposed thresholding algorithms employ heuristic ``false positive reduction'' (FPR) rules as post-processing to remove these errors.
+Many FLAIR-only WMH segmentation algorithms use a thresholding technique: map a single graylevel feature directly to a class or class probability (e.g. ``healthy'' or ``lesion'').
+Such models often have complex methods of deriving this mapping (e.g. using mixture model parameters \cite{Roura2015}, histogram features \cite{Yoo2014}, or conditional edge probability \cite{Knight2016}), but the final rule is applied equally to the entire graylevel image, usually the FLAIR sequence.
+The most common challenge for these methods is a high number of false positives (cf. \S\ \ref{ss:metrics} for definitions), since several artifacts and GM can overlap the WMH intensity distribution.
+As a result, nearly all previously proposed thresholding algorithms employ heuristic ``false positive reduction'' (FPR) rules as post-processing to remove these errors.
 \par
 % Need to introduce registration \& MNI space earlier (\cite{Evans1993})
-Preliminary investigations sought to characterize the spatial distribution of false positives, in order to explore possible FPR rules. Using a database of 96 FLAIR images in MNI space (c.f. \S\ \ref{ss:data} for details), the optimal threshold for each image was calculated%
+Preliminary investigations sought to characterize the spatial distribution of false positives, in order to explore possible FPR rules.
+Using a database of 96 FLAIR images in MNI space (cf. \S\ \ref{ss:data} for details), the optimal threshold for each image was calculated%
 \footnote{The \texttt{fminsearch} function in Matlab maximized the similarity index with respect to the manual segmentation.}
-and used to generate binary class images ($0 =$ healthy, $1 =$ lesion). Comparing these results with the manual segmentations, the average distribution of true positives (TP), false positives (FP), and false negatives (FN) was computed, as shown in Figure \ref{fig:thropt-tpfpfn}. The median optimal similarity index (SI) was 0.36.
+and used to generate binary class images ($0 =$ healthy, $1 =$ lesion).
+Comparing these results with the manual segmentations, the average distribution of true positives (TP), false positives (FP), and false negatives (FN) was computed, as shown in Figure \ref{fig:thropt-tpfpfn}.
+The median optimal similarity index (SI) was 0.36.
 \begin{figure}[h]
   \centering
   \begin{subfigureside}{TP}\includegraphics[height=\sliceheight]{rawthropt-tp.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-025}\end{subfigureside}\\[0.5em]
@@ -33,12 +50,26 @@ and used to generate binary class images ($0 =$ healthy, $1 =$ lesion). Comparin
   \label{fig:thropt-tpfpfn}
 \end{figure}
 \par
-Evidently, even if an optimal threshold could be estimated for these data, a high proportion of FP and FN would be incurred. Yet in Figure \ref{fig:thropt-tpfpfn} there are regular and distinct spatial distributions of these errors. Moreover, is it has been suggested that there is regional heterogeneity in relaxation rates of brain tissues \cite{Sled2004}, and that WML intensity depends in part on location \cite{Stevenson2000,Harmouche2015}. This implies that spatial coordinates would be useful features for WMH segmentation, especially when incorporated into the main classification model (i.e. not as post-processing). Indeed such features have previously been used \cite{Anbeek2004,Anbeek2005,Dyrby2008,Griffanti2016,Dadar2017}.
+Evidently, even if an optimal threshold could be estimated for these data, a high proportion of FP and FN would be incurred.
+Yet in Figure \ref{fig:thropt-tpfpfn} there are regular and distinct spatial distributions of these errors.
+Moreover, is it has been suggested that there is regional heterogeneity in relaxation rates of brain tissues \cite{Sled2004}, and that WML intensity depends in part on location \cite{Stevenson2000,Harmouche2015}.
+This implies that spatial coordinates would be useful features for WMH segmentation, especially when incorporated into the main classification model (i.e. not as post-processing).
+Indeed such features have previously been used \cite{Anbeek2004,Anbeek2005,Dyrby2008,Griffanti2016,Dadar2017}.
 \par
-Spatial features could be used with FLAIR intensities in supervised classification models like K-NN, SVM, RF, etc. However, such models treat all features equally, which can lead to artifacts in the decision boundary that contradict prior knowledge. For example, in spatial locations which do not observe any lesions during training, the optimized model may learn to never predict the lesion class, regardless of graylevel features. Similarly, there is no guarantee that FLAIR graylevels will map monotonically to the lesion class, as would be expected. Therefore, spatial features should be treated differently.
+Spatial features could be used with FLAIR intensities in supervised classification models like K-NN, SVM, RF, etc.
+However, such models treat all features equally, which can lead to artifacts in the decision boundary that contradict prior knowledge.
+For example, in spatial locations which do not observe any lesions during training, the optimized model may learn to never predict the lesion class, regardless of graylevel features.
+Similarly, there is no guarantee that FLAIR graylevels will map monotonically to the lesion class, as would be expected.
+Therefore, spatial features should be treated differently.
 % ==================================================================================================
 \subsection{Overview}
-The proposed pipeline can be summarized as follows. Pre-processing steps will aim to correct any bias field effect and standardize spatial coordinates. The classification model will employ FLAIR intensities and spatial features to give the initial segmentation. Since most classification models assume features are drawn from a consistent distribution, a graylevel standardization step is appended to the pre-processing. Post-processing steps will generally aim to improve segmentation performance. This pipeline is illustrated in Figure \ref{fig:pipeline}. Next, the proposed classification model is developed.
+The proposed pipeline can be summarized as follows.
+Pre-processing steps will aim to correct any bias field effect and standardize spatial coordinates.
+The classification model will employ FLAIR intensities and spatial features to give the initial segmentation.
+Since most classification models assume features are drawn from a consistent distribution, a graylevel standardization step is appended to the pre-processing.
+Post-processing steps will generally aim to improve segmentation performance.
+This pipeline is illustrated in Figure \ref{fig:pipeline}.
+Next, the proposed classification model is developed.
 \begin{figure}
   \centering\scalebox{0.65}{\input{figs/tikz/pipeline/tikz-pipeline}}
   \caption{Overview of the necessary processing steps.}
@@ -50,10 +81,13 @@ The proposed pipeline can be summarized as follows. Pre-processing steps will ai
 %- DAWM \& PVA: maintain probabilistic output 
 %- image variability: graylevel standardization, image registration, spatial parametrization
 %However, it has been suggested that there is regional heterogeneity in relaxation rates of brain tissues \cite{Sled2004}, and that WMH intensity depends in part on location \cite{Stevenson2000}.
-%Many of the previously proposed WMH segmentation algorithms predict the class of a voxel without any spatial information. In the absence of spatial information, 
-%The work by \citeauthor{Khademi2012} \cite{Khademi2012,Khademi2014,Khademi2015} was particularly promising, since it overcame many of the usual requirements. These include: the use of multiple MRI modalities, which are not always available; image registration to a common space, which is never perfect and introduces interpolation artifact; the use of training data, which is difficult to find; and assumed Gaussian distribution of tissue graylevels, which is rarely valid.
+%Many of the previously proposed WMH segmentation algorithms predict the class of a voxel without any spatial information.
+%In the absence of spatial information, 
+%The work by \citeauthor{Khademi2012} \cite{Khademi2012,Khademi2014,Khademi2015} was particularly promising, since it overcame many of the usual requirements.
+%These include: the use of multiple MRI modalities, which are not always available; image registration to a common space, which is never perfect and introduces interpolation artifact; the use of training data, which is difficult to find; and assumed Gaussian distribution of tissue graylevels, which is rarely valid.
 %Assumptions which many models make, and whether they are wrong:
-%%- parametric modelling of graylevel distributions: with single Gaussians: almost certainly wrong. Confounding factors: PVA, parallel MRI signals, motion artifacts, 
+%%- parametric modelling of graylevel distributions: with single Gaussians: almost certainly wrong.
+%Confounding factors: PVA, parallel MRI signals, motion artifacts, 
 %%The most recent implementation of the EM-fit mixture model by \citeauthor{Ashburner2005} in \cite{Ashburner2005} permits a user-specified number of Gaussian distributions for each tissue class, 
 %However, 
 %\begin{figure}
@@ -65,31 +99,46 @@ The proposed pipeline can be summarized as follows. Pre-processing steps will ai
 %\end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Voxel-Wise Logistic Regression}\label{s:vlr}
-This section presents the proposed classification model: Voxel-wise Logistic Regression (VLR). The VLR model solves the problem of differential treatment for spatial and graylevel features, and produces uniquely interpretable parameters following training. The model is inspired by the LPA algorithm in the LST toolbox for SPM by \citeauthor{Schmidt2015} \cite{Schmidt2015,Schmidt2017a}%
+This section presents the proposed classification model: Voxel-wise Logistic Regression (VLR).
+The VLR model solves the problem of differential treatment for spatial and graylevel features, and produces uniquely interpretable parameters following training.
+The model is inspired by the LPA algorithm in the LST toolbox for SPM by \citeauthor{Schmidt2015} \cite{Schmidt2015,Schmidt2017a}%
 \footnote{This algorithm was originally understood through the Matlab code, after downloading the toolbox. Section 6.1 of \cite{Schmidt2017a}, published in \citeyear{Schmidt2017a}, provides more details.}%
 , however, novel methods of model parametrization and estimation are presented here, in addition to differences in pre- and post-processing from the LPA algorithm.
 \par
 Logistic regression models have recently gained popularity for WMH segmentation \cite{Sweeney2013a,Sweeney2013,Schmidt2017a,Zhan2017}, and have several advantages.
 First, model parameters are generally more interpretable than those in other models, permitting better design of regularizations.
-Second, the simplicity of the model reduces its capacity for over-fitting. 
+Second, the simplicity of the model reduces its capacity for over-fitting.
 Third, model foundations in statistical theory allow probabilistic interpretations of the outputs, which may be helpful for quantifying marginally pathological tissues like DAWM.
 The major drawback of logistic models for WMH segmentation is that standardization of graylevels is required.
 \par
-In the two class formulation, the lesion class is denoted $c=1$, and the healthy class $c=0$. The probability of the lesion class, given a set of features $\by = [1,y^1,\dots,y^\K]^T$ is modelled by a logistic function, parameterized by a vector of feature weights $\bb = [\b^0,\b^1,\dots,\b^\K]^T$,
+In the two class formulation, the lesion class is denoted $c=1$, and the healthy class $c=0$.
+The probability of the lesion class, given a set of features $\by = [1,y^1,\dots,y^\K]^T$ is modelled by a logistic function, parameterized by a vector of feature weights $\bb = [\b^0,\b^1,\dots,\b^\K]^T$,
 \begin{equation}
   P(c=1\mid\by,\bb) = \frac{1}{1+e^{-\eta}},\qquad\eta = \bb^T\by.
   \label{eq:lrmodel}
 \end{equation}
-This probability -- the estimated lesion class label -- is denoted $\hat{c} = P(c=1\mid\by,\bb) \in [0,1]$. Considering the spatial location $x = [\xxx]$, the label image is defined as $\hat{C}(x) = P(C(x)=1\mid\bm{Y}(x),\bb)$.
+This probability -- the estimated lesion class label -- is denoted $\hat{c} = P(c=1\mid\by,\bb) \in [0,1]$.
+Considering the spatial location $x = [\xxx]$, the estimated label image is defined as $\hat{C}(x) = P(C(x)=1\mid\bm{Y}(x),\bb)$.
+Figure \ref{fig:lr-basic} shows an example class prediction for an arbitrary input graylevel.
+\begin{figure}[b]
+  \centering\includegraphics[width=\plotwidth]{lr-basic}
+  \caption{The logistic regression model.}
+  \label{fig:lr-basic}
+\end{figure}
 \par
-Previous works have not included spatial dimensions in the logistic feature set $\by$, since $\hat{c}$ is not expected to be monotonically related to any spatial dimension. The circumvention proposed by \citeauthor{Schmidt2015} is to parameterize the feature weights spatially -- that is $\bb\rightarrow\bb(x)$,
+Previous works have not included spatial dimensions in the logistic feature set $\by$, since $\hat{c}$ is not expected to be monotonically related to any spatial dimension.
+The circumvention proposed by \citeauthor{Schmidt2015} is to parameterize the feature weights themselves spatially -- that is $\bb\rightarrow\bb(x)$,
 \begin{equation}
   \hat{C}(x) = \frac{1}{1+e^{-\eta(x)}},\qquad\eta = \bb(x)^T\bm{Y}(x).
   \label{eq:eq:vlrmodel}
 \end{equation}
-In this way, the characteristics of the logistic regression model are maintained with respect to graylevel features, but spatial features can have more complex relationships with the output. A second pre-processing step, however, is now required: standardization of spatial dimensions -- i.e. registration of the input image to a consistent target -- so that the same voxel in every input image corresponds to the same brain region. Training the VLR model then yields a unique vector $\bb$ for each voxel, or equivalently, one complete image for each parameter. Such ``parameter images'', as they will be called, are then readily interpretable and can be regularized intuitively.
+In this way, the characteristics of the logistic regression model are maintained with respect to graylevel features, but spatial features can have more complex relationships with the output.
+A second pre-processing step, however, is now required: standardization of spatial dimensions -- i.e. registration of the input image to a consistent target -- so that the same voxel in every input image corresponds to the same brain region (cf. \S\ \ref{ss:meth-bias+reg} for more details).
+Training the VLR model then yields a unique vector $\bb$ for each voxel, or equivalently, one complete image for each parameter.
+Such ``parameter images'', as they will be called, are then readily interpretable and can be regularized intuitively.
 %Regarding notation in the following subsections: 1) the $(x)$ is omitted here, for clarity, and 2) while only the FLAIR graylevels are used in this implementation, the $\by$ notation is maintained below for compatibility with arbitrary input feature images.
-%This approach is similar to the work by \citeauthor{Harmouche2015} \cite{Harmouche2015}, wherein different mixture models are fitted for each of 6 different anatomical regions. Since no group statistics are needed in the current model, anatomical parcellations can be replaced by a smooth spatial parametrization.
+%This approach is similar to the work by \citeauthor{Harmouche2015} \cite{Harmouche2015}, wherein different mixture models are fitted for each of 6 different anatomical regions.
+%Since no group statistics are needed in the current model, anatomical parcellations can be replaced by a smooth spatial parametrization.
 %The assumptions of this model include the following:
 %\begin{itemize}[itemsep=0pt]
 %  \item only 2 tissues classes are modelled: WMH and healthy brain tissue;
@@ -98,16 +147,29 @@ In this way, the characteristics of the logistic regression model are maintained
 %\end{itemize}
 % ==================================================================================================
 \subsection{Model Fitting}\label{ss:modelfitting}
-Fitting the VLR model involves estimating $\bb$ for each voxel $x$. This requires some training data: feature vectors from a population of $N$ observations $\bY = \{\by_1,\dots,\by_\N\}$, and the corresponding labels $\C = \{c_1,\dots,c_\N\}$. Typically, parameter estimation involves maximizing the likelihood of the model, given this data -- i.e. maximum likelihood estimation (MLE).
+Fitting the VLR model involves estimating $\bb$ for each voxel $x$.
+This requires some training data: feature vectors from a population of $N$ observations $\bY(x) = \{\bY_1(x),\dots,\bY_{\N}(x)\}$, and the corresponding labels $\C(x) = \{C_1(x),\dots,C_{\N}(x)\}$.
+Typically, parameter estimation involves maximizing the likelihood of the model, given this data -- i.e. maximum likelihood estimation (MLE).
 \par
-Three major challenges emerge during model fitting. These challenges involve contradictions between prior knowledge and the fitted model using the available training data. That is, these challenges could all be overcome by a more complete training set, but this is usually not available. The three challenges are:
+Three major challenges emerge during model fitting.
+These challenges involve contradictions between prior knowledge and the fitted model using the available training data.
+That is, these challenges could all be overcome by a more complete training set, but this is rarely available.
+The three challenges are:
 \begin{enumerate}
   \item \label{chmle:separable} \textbf{Separable classes:} 
-  When data from two classes are perfectly separable, the MLE-fitted logistic model can approach a step-function -- i.e. $\b^k\rightarrow+\infty$. This implies that on either side of a specific graylevel threshold, the model is either 100\% confident in predicting the healthy class, or 100\% confident in predicting the lesion class. In fact, no threshold is ever so perfect, and instead a level of uncertainty should be maintained around the decision boundary. These two cases are illustrated in Figure \ref{fig:chmle-sep}.
+  When data from two classes are perfectly separable, the MLE-fitted logistic model can approach a step-function -- i.e. $\b^k\rightarrow+\infty$.
+This implies that on either side of a specific graylevel threshold, the model is either 100\% confident in predicting the healthy class, or 100\% confident in predicting the lesion class.
+In fact, no threshold is ever so perfect, and instead a level of uncertainty should be maintained around the decision boundary.
+These two cases are illustrated in Figure \ref{fig:chmle-sep}.
   \item \label{chmle:sparse} \textbf{Sparsely observed lesion class:} 
-  Since WML are often distributed in consistent locations, many brain regions contain no lesions across the entire training dataset. These voxels will be termed ``healthy training'' voxels. In some locations, this is expected (e.g. the GM, since by definition WMH manifest in the WM), while in others, our prior knowledge predicts lesions will eventually be observed (e.g. the rest of the WM). As illustrated in Figure \ref{fig:chmle-noles}, the MLE-fitted model may not maintain the ability to predict $\hat{c} = 1$ in such locations, regardless of the features. However, the ability to predict lesion should be maintained in many of these locations.
+  Since WML are often distributed in consistent locations, many brain regions contain no lesions across the entire training dataset.
+These voxels will be termed ``healthy training'' voxels, and denoted $\x_{h}$.
+In some locations, this is expected (e.g. the GM, since by definition WMH manifest in the WM), while in others, prior knowledge predicts lesions will eventually be observed (e.g. the rest of the WM).
+As illustrated in Figure \ref{fig:chmle-noles}, the MLE-fitted model may not maintain the ability to predict $\hat{c} = 1$ in such locations, regardless of the features.
+However, the ability to predict lesion should be maintained in many of these locations.
   \item \label{chmle:noisy} \textbf{Smooth parameter images:} 
-  It is assumed that similar locations will contain similar training data, yielding smooth parameter images. If this assumption is sometimes invalid, parameter images could contain noise or discontinuities, creating artifacts in estimated lesion class images.
+  It is assumed that similar locations will contain similar training data, yielding smooth parameter images.
+If this assumption is sometimes invalid, parameter images could contain noise or discontinuities, creating artifacts in estimated lesion class images.
 \end{enumerate}
 \begin{figure}
   \centering
@@ -118,7 +180,10 @@ Three major challenges emerge during model fitting. These challenges involve con
 \end{figure}
 % --------------------------------------------------------------------------------------------------
 \subsubsection{Joint Estimation}
-In the LPA algorithm, the logistic feature weights for each voxel are not considered independent. The FLAIR graylevel effect is tied across all voxels -- i.e. $\b^1(x) \rightarrow \b^1$, so $\eta(x) = \b^0(x) + \b^1Y(x)$ -- and a Gaussian MRF model is used to estimate the spatially varying intercept $\b^0(x)$. This design addresses the aforementioned challenges by greatly increasing the number of observations used to estimate each parameter. However, it requires joint estimation of all parameters simultaneously, and dramatically increases the complexity of estimation \cite{Schmidt2017a}.
+In the LPA algorithm, the logistic feature weights for each voxel are not considered independent.
+The FLAIR graylevel effect is tied across all voxels -- i.e. $\b^1(x) \rightarrow \b^1$, so $\eta(x) = \b^0(x) + \b^1Y(x)$ -- and a Gaussian MRF model is used to estimate the spatially varying intercept $\b^0(x)$.
+This design addresses the aforementioned challenges by greatly increasing the number of observations used to estimate each parameter.
+However, it requires joint estimation of all parameters simultaneously, and dramatically increases the complexity of estimation \cite{Schmidt2017a}.
 \par
 Efficient fitting of such models was the subject of major works by \citeauthor{Schmidt2017} \cite{Schmidt2017,Schmidt2017a}, but several drawbacks remain.
 First, Markov Chain Monte Carlo estimation of the model appears to create discontinuity artifacts in the spatial effect image $\b^0(x)$, as shown in Figure \ref{fig:B-lpa}.
@@ -135,9 +200,14 @@ Finally, no segmentation performance results are given in either of the associat
 Therefore, while the open-source release of the LPA algorithm is greatly appreciated, significant improvements can be made to this algorithm.
 % --------------------------------------------------------------------------------------------------
 \subsubsection{Independent Estimation}
-An alternative approach is to consider each parameter vector $\bb(x)$ independent. Doing so greatly simplifies model fitting, but does not address the challenges described above. These must instead be addressed using regularization strategies, as discussed below in \S\ \ref{s:reg-method}. In this section, ML estimation of independent parameter vectors $\bb$ is developed. For clarity, only a single voxel is considered -- i.e. $y$ from $Y(x)$, etc.
+An alternative approach is to consider each parameter vector $\bb(x)$ independent.
+Doing so greatly simplifies model fitting, but does not address the challenges described above.
+These must instead be addressed using regularization strategies, as discussed below in \S\ \ref{s:reg-method}.
+In this section, ML estimation of independent parameter vectors $\bb$ is developed.
+For clarity, only a single voxel is considered -- i.e. $y$ from $Y(x)$, etc.
 \par
-As note above, the optimal $\bb$ for each independent voxel can be resolved using MLE. If the training data are also assumed to be independently observed, then the likelihood (conditioned on the data) is defined from binomial theory as
+As note above, the optimal $\bb$ for each independent voxel can be resolved using MLE.
+If the training data are also assumed to be independently observed, then the likelihood (conditioned on the data) is defined from binomial theory as
 \begin{align}
   L(\bb\mid\C,\bY) &= \prod_{n=1}^{N} P(c=1\mid\by_n,\bb)^{c_n} \left(1-P(c=1\mid\by_n,\bb)^{1-c_n}\right)\nonumber\\
   &= \prod_{n=1}^{N} \Big[\hat{c}_n^{\en c_n} \left(1-\hat{c}_n^{\en 1-c_n}\right)\Big].
@@ -163,9 +233,13 @@ Estimation of $\bb^*$ can be performed using iterative optimization, using an in
 \bb^{(t+1)} \leftarrow \bb^{(t)} + \alpha\thinspace\Delta\bb^{(t)},
 \label{eq:update}
 \end{equation}
-where $\alpha$ is a small valued learning rate parameter. There are many possible definitions of $\Delta\bb$, including simply the gradient of $\L(\bb)$, denoted $\nabla_{\bb}\L$. However, it can be shown that $\L(\bb)$ is convex, so higher order update equations can be used. The work by \citeauthor{Minka2003} \cite{Minka2003} compares several options, including Newton's method (and variants), conjugate gradient, iterative scaling (and variants), and dual optimization%
+where $\alpha$ is a small valued learning rate parameter.
+There are many possible definitions of $\Delta\bb$, including simply the gradient of $\L(\bb)$, denoted $\nabla_{\bb}\L$.
+However, it can be shown that $\L(\bb)$ is convex, so higher order update equations can be used.
+The work by \citeauthor{Minka2003} \cite{Minka2003} compares several options, including Newton's method (and variants), conjugate gradient, iterative scaling (and variants), and dual optimization%
 \footnote{Matlab code available at \hreftt{https://github.com/tminka/logreg/}}.
-For small feature dimensionality ($K$), performance differences among the options were small. Classic Newton updates gave a good balance between memory requirements and computational order, so they are used.
+For small feature dimensionality ($K$), performance differences among the options were small.
+Classic Newton updates gave a good balance between memory requirements and computational order, so they are used.
 \par
 If the gradient $\nabla_{\bb}\L$ and Hessian matrix $\nabla^2_{\bb}\L$ are defined as
 \begin{align}
@@ -193,18 +267,27 @@ and the Hessian by
 \nabla^2_{\bb}\L = \sum_{n=1}^{N} \by_n{\by_n}^T \left(c_n - \hat{c}_n\right).
 \label{eq:llhessian}
 \end{equation}
-Substituting (\ref{eq:llgradient}) and (\ref{eq:llhessian}) into (\ref{eq:newtonmle}), the explicit update $\Delta\bb$ for (\ref{eq:update}) is obtained. At each iteration, $\Delta\bb^{(t)}$ is re-computed, and the process continues until some convergence criterion is satisfied.
+Substituting (\ref{eq:llgradient}) and (\ref{eq:llhessian}) into (\ref{eq:newtonmle}), the explicit update $\Delta\bb$ for (\ref{eq:update}) is obtained.
+At each iteration, $\Delta\bb^{(t)}$ is re-computed, and the process continues until some convergence criterion is satisfied.
 % --------------------------------------------------------------------------------------------------
-\subsubsection{Simplification}
-It is not necessary to complete the above procedure for all voxels in the standardized space. Instead, only voxels in the expected location of the brain need to be computed; such voxels can be selected using a binary ``brain mask'', denoted $M(x)$. More details about the brain mask used in this work can be found in \S\ \ref{ss:brainmask}. Moreover, since the parameters of each voxel are estimated independently, this can also be computed in parallel. The details of this implementation are presented in \S\ \ref{s:parallelfit}, after incorporation of the regularizations described in the next section.
+\subsubsection{Simplification}\label{ss:meth-simple}
+It is not necessary to complete the above procedure for all voxels in the standardized space.
+Instead, only voxels in the expected location of the brain need to be computed; such voxels can be selected using a binary ``brain mask'', denoted $M(x)$.
+More details about the brain mask used in this work can be found in \S\ \ref{ss:brainmask}.
+Moreover, since the parameters of each voxel are estimated independently, this can also be computed in parallel.
+The details of this implementation are presented in \S\ \ref{s:parallelfit}, after incorporation of the regularizations described in the next section.
 \par
-Finally, the model has so far been derived in general terms, so that any choice of feature can be used. However, with only one feature -- the FLAIR graylevel -- it is possible to reparameterize the sigmoid argument as
+Finally, the model has so far been derived in general terms, so that any choice of feature set $\by$ can be used.
+However, with only one feature -- the FLAIR graylevel -- it is possible to reparameterize the sigmoid argument as
 \begin{align}
 \bb^T\by &= \b^0 + \b^1 y^1\nonumber\\
 &= s(y-\tau) \qquad\begin{cases} s = \b^1\\ \tau = -\frac{\b^0}{\b^1} \end{cases}.
 \label{eq:reparameterize}
 \end{align}
-In this form, the parameters $\tau$ and $s$ emerge as a graylevel threshold and a slope parameter, respectively. Specifically, when $y = \tau$, the predicted probability of lesion is $\hat{c} = \tfrac{1}{1+e^{0}} = 0.5$, so $\tau$ controls the location of the class discrimination, as shown in Figure \ref{fig:reparam-t}. Similarly, the $s$ parameter defines the sensitivity of the logistic function to $y$, as shown in Figure \ref{fig:reparam-s}. These parameters, and the corresponding images $\mathcal{T}(x)$ and $\mathcal{S}(x)$, are therefore salient descriptors of the predictive model.
+In this form, the parameters $\tau$ and $s$ emerge as a graylevel threshold and a slope parameter, respectively.
+Specifically, when $y = \tau$, the predicted probability of lesion is $\hat{c} = \tfrac{1}{1+e^{0}} = 0.5$, so $\tau$ controls the location of the class discrimination, as shown in Figure \ref{fig:reparam-t}.
+Similarly, the $s$ parameter defines the sensitivity of the logistic function to $y$, as shown in Figure \ref{fig:reparam-s}.
+These parameters, and the corresponding images $\mathcal{T}(x)$ and $\mathcal{S}(x)$, are therefore salient descriptors of the predictive model.
 \begin{figure}
   \centering
   \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{reparam-t}\caption{Threshold parameter $\tau$}\label{fig:reparam-t}\end{subfigure}
@@ -213,55 +296,90 @@ In this form, the parameters $\tau$ and $s$ emerge as a graylevel threshold and 
   \label{fig:reparam}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Regularization}\label{s:reg-method}
-Regularizations are methods of injecting prior knowledge about the expected model into the optimization. Assuming voxel-wise independence of model parameters requires the use of regularization strategies to solve the challenges outlined in \S\ \ref{ss:modelfitting}. Several regularization methods are explored below.
+\section{Regularization}\label{s:method-reg}
+Regularizations are methods of injecting prior knowledge about the expected model into the optimization.
+Assuming voxel-wise independence of model parameters requires the use of regularization strategies to solve the challenges outlined in \S\ \ref{ss:modelfitting}.
+Several regularization methods are explored below.
 % ==================================================================================================
-\subsection{Data Augmentation}
-Noting the central role of training data in each of the challenges, methods of artificially increasing the training dataset size may be particularly useful in solving them. Data augmentation has long been used in machine learning tasks with limited training data, and there are several methods of generating synthetic data. In low dimensional input/output spaces, random sampling of fitted class-conditional posterior distributions can produce reasonable samples with known labels \cite{Tanner1987}. In higher dimensional problem spaces, however, imputation is more difficult \cite{Goodfellow2014}. For example, the space of potential $100\times100\times100$-sized images has $100^3$ dimensions (one per voxel), yet only a small inner subspace represents plausible images. Generating synthetic examples in this space is therefore challenging, especially for segmentation tasks, where the outputs have dimensionality roughly equal to the input.
+\subsection{Data Augmentation}\label{ss:meth-aug}
+Noting the central role of training data in each of the challenges, methods of artificially increasing the training dataset size may be particularly useful in solving them.
+Data augmentation has long been used in machine learning tasks with limited training data, and there are several methods of generating synthetic data.
+In low dimensional input/output spaces, random sampling of fitted class-conditional posterior distributions can produce reasonable samples with known labels \cite{Tanner1987}.
+In higher dimensional problem spaces, however, imputation is more difficult \cite{Goodfellow2014}.
+For example, the space of potential $100\times100\times100$-sized images has $100^3$ dimensions (one per voxel), yet only a small subspace represents plausible images.
+Generating synthetic examples in this space is therefore challenging, especially for segmentation tasks, where the outputs have dimensionality roughly equal to the input.
 \par
-Alternatively, simple image manipulations can still afford model improvements \cite{Krizhevsky2012}. In segmentation tasks, both the input image(s) and the corresponding label images can be translated, reflected, rotated, and perhaps resized, thereby avoiding the generation of genuinely synthetic examples. In the current work, reflections and small (one-voxel) translations can be applied to the label and FLAIR images following registration to the MNI brainspace. The potential benefits of this augmentation are explored in 
+Alternatively, simple image manipulations can still afford model improvements \cite{Krizhevsky2012}.
+In segmentation tasks, both the input image(s) and the corresponding label images can be translated, reflected, rotated, and perhaps resized, thereby avoiding the generation of genuinely synthetic examples.
+In the current work, reflections and small (one-voxel) translations can be applied to the label and FLAIR images following registration to the MNI brainspace.
+The potential benefits of this augmentation are explored in \S\ \ref{}.
 %__JK__ need to define this reference
 % ==================================================================================================
-\subsection{Classic Regularization}
-The separable classes challenge is well-known in regression problems, and a good solution is to penalize the magnitude of model parameters using the $L_p$-norm: $\lambda\norm{\bb}_p$ \cite{Zou2005}. It can be shown that $L_1$ regularization corresponds to a Laplacian prior on elements of $\bb$, with scale parameter inversely proportional to $\lambda$ (equivalently, this assumes that the model error follows this distribution); similarly, $L_2$ regularization implies a Gaussian prior, with standard deviation inversely proportional to $\lambda$ \cite{Zou2005}. Model fitting which includes this prior-derived term is called maximum a posteriori (MAP) estimation. The penalty can be appended to the objective function (\ref{eq:argmaxmle}), as in
+\subsection{Classic Regularization}\label{ss:meth-lambda}
+The separable classes challenge is well-known in regression problems, and a good solution is to penalize the magnitude of model parameters using the $L_p$-norm: $\lambda\norm{\bb}_p$ \cite{Zou2005}.
+It can be shown that $L_1$ regularization corresponds to a Laplacian prior on elements of $\bb$, with scale parameter inversely proportional to $\lambda$ (equivalently, this assumes that the model error follows this distribution).
+Similarly, $L_2$ regularization implies a Gaussian prior, with standard deviation inversely proportional to $\lambda$ \cite{Zou2005}.
+Model fitting which includes this prior-derived term is called maximum a posteriori (MAP) estimation, and the penalty can be appended to the objective function (\ref{eq:argmaxmle}), as in
 \begin{align}
 \bb^* &= \underset{\bb}{\arg\max}\en\J(\bb) \nonumber\\
 &=\underset{\bb}{\arg\max}\en\L(\bb) - \lambda\norm{\bb}_p \nonumber\\
 &= \underset{\bb}{\arg\max}\en\sum_{n=1}^{N} \Big[ c_n \bb^T\by_n - \log (1+e^{\et\bb^T\by_n}) \Big] - \lambda\norm{\bb}_p
 \label{eq:argmaxmap}
 \end{align}
-Due to its relatively large gradient near zero, $L_1$ regularization is typically used to encourage sparsity in the feature weights (i.e. $\b^k\rightarrow0$) \cite{Tibshirani1996}. This is not desirable in the current model, since the feature (FLAIR graylevel) is known to be discriminative. Moreover, the expansion of the $\norm{\bb}_1$ term in the gradient of the objective function is not straightforward, since it is non-differentiable at zero \cite{Tibshirani1996,Lee2006}. Conversely, $L_2$ regularization is more effective at limiting parameter magnitude -- which is the current aim -- and the first and second order gradients of (\ref{eq:argmaxmap}) derive easily \cite{Minka2003}. For these reasons, only $L_2$ regularization is considered, yielding the following change to the Newton update expression (\ref{eq:newtonmle}),
+Due to its relatively large gradient near zero, $L_1$ regularization is typically used to encourage sparsity in the feature weights (i.e. $\b^k\rightarrow0$) \cite{Tibshirani1996}.
+This is not desirable in the current model, since the feature (FLAIR graylevel) is known to be discriminative.
+Moreover, the expansion of the $\norm{\bb}_1$ term in the gradient of the objective function is not straightforward, since it is non-differentiable at zero \cite{Tibshirani1996,Lee2006}.
+Conversely, $L_2$ regularization is more effective at limiting parameter magnitude -- which is the current aim -- and the first and second order gradients of (\ref{eq:argmaxmap}) derive easily \cite{Minka2003}.
+For these reasons, only $L_2$ regularization is considered, yielding the following change to the Newton update expression (\ref{eq:newtonmle}),
 \begin{align}
 \Delta\bb &= -{\nabla^2_{\bb}\J}^{-1}\nabla_{\bb}\J \nonumber\\
 &= -{\left(\nabla^2_{\bb}\L-\lambda I\right)}^{-1}\left(\nabla_{\bb}\L-\lambda\bb\right)
 \label{eq:newtonmap}
 \end{align}
-What remains is to select an appropriate value of $\lambda$. This is explored experimentally in \S\ \ref{ss:toyreg} using a toy model.
+What remains is to select an appropriate value of $\lambda$.
+This is explored experimentally in \S\ \ref{ss:toyreg} using a toy model.
 % ==================================================================================================
-\subsection{Pseudo-Lesions}
-The sparsely observed lesion class challenge is less common, since discriminative models are rarely fit in the absence of one class altogether. This occurs here because all voxels are modelled independently. It is therefore tempting to simply sample features from the lesion class at other spatial locations in order to fit the logistic model in the healthy training voxels, similar to the approach by \citeauthor{Schmidt2017a}. However, as noted in \S\ \ref{ss:autochallenges} and \S\ \ref{s:modelconcept}, there may be spatially-correlated heterogeneity in the appearance of WMH \cite{Sled2004,Stevenson2000}, and some locations will likely never contain any WMH. Considering these facts, the use of deterministic synthetic lesion-class samples, or ``pseudo-lesions'', could instead provide more flexibility and consistency. These synthetic observations could be appended to the training data for each voxel so as to minimally balance the training classes, and act as a prior on the distribution of lesion-class features.
+\subsection{Pseudo-Lesions}\label{ss:meth-pseudo}
+The sparsely observed lesion class challenge is less common, since discriminative models are rarely fit in the absence of one class altogether.
+This occurs here because all voxels are modelled independently.
+It is therefore tempting to simply sample features from the lesion class at other spatial locations in order to fit the logistic model in the healthy training voxels, similar to the approach by \citeauthor{Schmidt2017a}.
+However, as noted in \S\ \ref{ss:autochallenges} and \S\ \ref{s:modelconcept}, WML are thought to have different intensities in different brain regions \cite{Sled2004,Stevenson2000}, and some locations will likely never contain any WMH.
+Considering these facts, the use of deterministic synthetic lesion-class samples, or ``pseudo-lesions'', could instead permit better use of prior knowledge about WMH.
+These synthetic observations could be appended to the training data for each voxel so as to minimally balance the training classes, and act as a prior on the distribution of lesion-class features.
 %This approach would not be subject to variations in the training data, and it would be feasible to consider the prior probability of healthy tissues (GM / WM / CSF) in the definition.
 \par
-If the same number of synthetic observations are appended to the training data for each voxel, this is equivalent to appending a number of synthetic images to the training set. The synthetic feature data are denoted
-$\bV(x) = \{\bm{\gamma}_{1}(x),\dots,\bm{\gamma}_{\V}(x)\}$. It is assumed that the labels of all synthetic data are ``lesion'', so the set of synthetic class images is simply denoted $\bm{1}(x)$. The updated training set is therefore $\bY_{\gamma}(x) = \{\bY(x),\bV(x)\}$, and $\bC_{\gamma}(x) = \{\bC(x),\bm{1}(x)\}$.
+If the same number of synthetic observations are appended to the training data for each voxel, this is equivalent to appending a number of synthetic images to the training set.
+The synthetic feature data are denoted
+$\bV(x) = \{\bm{\gamma}_{1}(x),\dots,\bm{\gamma}_{\V}(x)\}$.
+It is assumed that the labels of all synthetic data are ``lesion'', so the set of synthetic label images is simply denoted $\bm{1}(x)$.
+The updated training set is therefore $\bY_{\gamma}(x) = \{\bY(x),\bV(x)\}$, and $\bC_{\gamma}(x) = \{\bC(x),\bm{1}(x)\}$.
 \par
-Design of the synthetic image set $\bV(x)$ should be guided by prior knowledge. For the same reasons as described above, this knowledge should not derive from the training set. Unfortunately, few other sources of structured information are available. One reasonable approach could make use of healthy tissue prior probability images (Figure \ref{fig:tpm-3}), denoted $\rho(x)$. Specifically, the expected intensity for the lesion class in each tissue can be multiplied by the tissue probability image, and the results summed to give the overall synthetic image,
+Design of the synthetic image set $\bV(x)$ should be guided by prior knowledge.
+For the same reasons as described above, it is not possible to derive this knowledge from the training set.
+Unfortunately, few other sources of structured information are available.
+One reasonable approach could make use of healthy tissue prior probability images (Figure \ref{fig:tpm-3}), denoted $\rho(x)$.
+Specifically, the expected intensity for the lesion class in each tissue can be multiplied by the tissue probability image, and the results summed to give the overall synthetic image,
 \begin{equation}
 \gamma(x) = \gamma_{\gm}\cdot\rho_{\gm}(x) + \gamma_{\wm}\cdot\rho_{\wm}(x) + \gamma_{\csf}\cdot\rho_{\csf}(x)
 \end{equation}
-While WMH are not possible in either the GM or the CSF, it is necessary to select a graylevel -- perhaps the maximum possible intensity -- to complete this model. Additionally, such parameters will inevitably play a role for subjects with imperfect registration or outlier anatomy. The contributions of pseudo-lesions to model fitting are explored experimentally in \S\ \ref{ss:toyreg}.
+While WMH are not possible in either the GM or the CSF, it is necessary to select a FLAIR graylevel -- perhaps the maximum possible intensity -- to complete this model.
+Additionally, such parameters will inevitably play a role for subjects with imperfect registration or outlier anatomy.
+The contributions of pseudo-lesions to model fitting are explored experimentally in \S\ \ref{ss:toyreg}.
 %__JK__ should TPMs be introduced sooner?
 \begin{figure}[h]
   \centering
   \begin{subfigureside}{$\rho_{\gm}(x)$}\raggedleft\includegraphics[height=\sliceheight]{tpm-gm.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-1}\end{subfigureside}\\[0.5em]
   \begin{subfigureside}{$\rho_{\wm}(x)$}\raggedleft\includegraphics[height=\sliceheight]{tpm-wm.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-1}\end{subfigureside}\\[0.5em]
   \begin{subfigureside}{$\rho_{\csf}(x)$}\raggedleft\includegraphics[height=\sliceheight]{tpm-csf.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-1}\end{subfigureside}
-  \caption{Tissue prior probability images in MNI space. Derived from \cite{Mazziotta2001}.}
+  \caption{Tissue prior probability images in MNI space.
+Derived from \cite{Mazziotta2001}.}
   \label{fig:tpm-3}
 \end{figure}
 % ==================================================================================================
-\subsection{Parameter Image Smoothing}
-Finally, independent model fitting in every voxel risks yielding noisy parameter images. The simplest solution to this problem involves filtering the reconstructed parameter images after estimation. A wide range of possible filters for this task exist, and a selection of these are summarized in Table \ref{tab:filters}, including the tunable parameters requiring optimization.
+\subsection{Parameter Image Smoothing}\label{ss:meth-smooth}
+Finally, independent model fitting in every voxel risks yielding noisy parameter images.
+The simplest solution to this problem involves filtering the reconstructed parameter images after estimation.
+A wide range of possible filters for this task exist, and a selection of these are summarized in Table \ref{tab:filters}, including the mutable parameters for each.
 \begin{table} % __JK__ finish him!
   \centering
   \caption{Image filters considered for smoothing the estimated parameter images.}
@@ -276,30 +394,35 @@ Finally, independent model fitting in every voxel risks yielding noisy parameter
   \end{tabular}
 \end{table}
 \par
-An alternative solution might involve modelling the parameter images as a spatial function (e.g. band-limited discrete cosine / Fourier transform). However, there are two challenges with this approach.
+An alternative solution might involve modelling the parameter images as a spatial function (e.g. band-limited discrete cosine / Fourier transform).
+However, there are two challenges with this approach.
 First, deriving the update gradients for such a model would be challenging, and their computation could significantly increase training time.
 Second, such an encoding may introduce artifacts in the resulting parameter images.
 Moreover, it is well known that frequency domain band-limiting can be equivalently achieved by convolution (i.e. filtering) in the spatial domain \cite{Gonzalez2006}.
+Therefore, only conventional filtering is explored in this work (cf. \S\ \ref{})
+%__JK__ define this reference.
 %__JK__ address MRFs for smoothing here? Check back answer on Quora.
 %\citeauthor{Harmouche2015} \cite{Harmouche2015} also note that in smoothly varying models, small registration errors can be expected to have only a minor impact.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Bias Correction \& Registration}
-Two objectives of preprocessing 
-\par...\par
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Graylevel Standardization}
+\section{Pre-Processing}\label{s:meth-pre}
+
+% ==================================================================================================
+\subsection{Bias Correction \& Registration}\label{ss:meth-bias+reg}
+
+% ==================================================================================================
+\subsection{Graylevel Standardization}\label{ss:meth-ystd}
 \par...\par
 \clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Post-Processing}
+\section{Post-Processing}\label{s:meth-post}
 
 \clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Performance Metrics}
-\label{ss:metrics}
-Segmentation performance of the model is characterized in two respects: voxel-wise agreement and total lesion load (LL) volume agreement. 
-When comparing the estimated segmentation ($\hat{c}$) to the ground truth segmentation ($c$), each individual voxel can occupy one of four states (colours shown for future reference):
-\begin{itemize}[itemsep=0pt]
+\section{Performance Metrics}\label{ss:metrics}
+Quantifying the performance of a model is essential to optimizing its design.
+Typically, WMH segmentation performance is characterized in two respects: voxel-wise agreement and total lesion load (LL) volume agreement.
+When comparing the estimated segmentation $\hat{c}$ to the ground truth segmentation $c$, each individual voxel can occupy one of four states (colours shown for future reference):
+\begin{itemize}[itemsep=0pt,topsep=0pt]
   \item[\textcolor{green}{\scalebox{0.7}{$\blacksquare$}}] True Positive (TP): $c = 1$ and $\hat{c} = 1$, correctly predicted ``lesion''.
   \item[\textcolor{red}  {\scalebox{0.7}{$\blacksquare$}}] False Positive (FP): $c = 0$ and $\hat{c} = 1$, incorrectly predicted ``lesion''.
   \item[\textcolor{blue} {\scalebox{0.7}{$\blacksquare$}}] False Negative (FN): $c = 1$ and $\hat{c} = 0$, incorrectly predicted ``healthy''.
@@ -314,7 +437,8 @@ Summing the number of voxels in each state, voxel-wise agreement can then be qua
   \item \textbf{Recall (Re)} (\textsc{aka} Sensitivity, True Positive Rate)\\Fraction of true positives which are predicted positive.
   \begin{equation}Re = \dfrac{TP}{TP+FN}\end{equation}
 \end{itemize}
-Each measure is $\in [0,1]$, where higher is better. Note that typical performance metrics like accuracy and sensitivity are avoided, since they include the $TN$ count in the numerator, which is typically much larger than $TP + FP + FN$ combined (i.e. $c=1$ is a rare event).
+Each measure is $\in [0,1]$, where higher is better.
+Note that typical performance metrics like accuracy and sensitivity are avoided, since they include the $TN$ count in the numerator, which is typically much larger than $TP + FP + FN$ combined -- i.e. $c=1$ is a rare event.
 \par
 Overall volume agreement between segmentations is characterized using the 2-way mixed-effects single-rater absolute intraclass correlation coefficient (ICC)%
 \footnote{Option \texttt{`A-1'} in the Matlab function \texttt{ICC} from \hreftt{https://www.mathworks.com/matlabcentral/fileexchange/22099}}\ 
@@ -327,12 +451,16 @@ Overall volume agreement between segmentations is characterized using the 2-way 
 A summary of the model is shown in Figure \ref{fig:modelsum}.
 \begin{figure}
   \centering\scalebox{0.65}{\input{figs/tikz/algorithm/tikz-algorithm}}
-  \caption{Overview of the proposed algorithm. Typefaces -- upright Roman: images in native space; italic Roman: images in standard (MNI) space; calligraphic: a set of images from several patients; bold: a set of images corresponding to different features; Variables -- $C(x)$: manual segmentation; $Y(x)$: FLAIR image, $\beta(x)$: parameter image; $\hat{C}(x)$: estimated lesion segmentation.}
+  \caption{Overview of the proposed algorithm.
+    Typefaces -- upright Roman: images in native space; italic Roman: images in standard (MNI) space; calligraphic: a set of images from several patients; bold: a set of images corresponding to different features;
+    Variables -- $C(x)$: manual segmentation; $Y(x)$: FLAIR image, $\beta(x)$: parameter image; $\hat{C}(x)$: estimated lesion segmentation.}
   \label{fig:modelsum}
 \end{figure}
 % ==================================================================================================
 \subsection{Tunable Parameters}
-In order to achieve the best possible model performance, it is prudent to track tunable model parameters (\textsc{aka} hyperparameters) which are distinct from those fitted during each cross validation fold. Considering both the main VLR model and the pre- and post-processing aspects, the parameters of the proposed algorithm are summarized in Table \ref{tab:hyperparams} and also programmatically in \nameref{m:hypdef.m}. The optimization of these model components will be the subject of the next chapter. 
+In order to achieve the best possible model performance, it is prudent to track tunable model parameters (\textsc{aka} hyperparameters) which are distinct from those fitted during each cross validation fold.
+Considering both the main VLR model and the pre- and post-processing aspects, the parameters of the proposed algorithm are summarized in Table \ref{tab:hyperparams} and also programmatically in \nameref{m:hypdef.m}.
+The optimization of these model components will be the subject of the next chapter.
 \begin{table}
   \centering
   \caption{Model hyperparameters.}
