@@ -2,10 +2,17 @@
 % ==================================================================================================
 % --------------------------------------------------------------------------------------------------
 \chapter{Experiment \& Results}
-This section explores model validation. Performance of model components is characterized with respect to intermediate objectives, including graylevel standardization and regularization in toy scenarios. The segmentation performance of the full model is then presented under several cross validation frameworks, and compared to a similar algorithm.
+This section explores model validation.
+Performance of model components is characterized with respect to intermediate objectives, including graylevel standardization and regularization in toy scenarios.
+The segmentation performance of the full model is then presented under several cross validation frameworks, and compared to a similar algorithm.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Cross Validation Frameworks}\label{s:CVframeworks}
-Supervised segmentation models require the capacity to model complex relationships between the input image(s) and output label images. When models with large capacity are trained on a dataset which does not represent the full gamut of potential input data, they risk \textit{overfitting}: acquiring a bias towards the training data \cite{Hawkins2004}. The main problem associated with overfitting is decreased performance on new data (\textsc{aka} generalization performance) \cite{Hawkins2004}. Popular techniques for characterizing this expected decrease include cross validation (CV) procedures. These involve splitting the $N$ available examples into training ($t$) and testing ($e$) subsets, where the training data are used to fit the model parameters, and the test data are used to approximate the expected generalization performance; the data splits are usually repeated, randomly or exhaustively, to ensure robust results \cite{Arlot2010}. The most popular CV frameworks include:
+Supervised segmentation models require the capacity to model complex relationships between the input image(s) and output label images.
+When models with large capacity are trained on a dataset which does not represent the full gamut of potential input data, they risk \textit{overfitting}: acquiring a bias towards the training data \cite{Hawkins2004}.
+The main problem associated with overfitting is decreased performance on new data (\textsc{aka} generalization performance) \cite{Hawkins2004}.
+Popular techniques for characterizing this expected decrease include cross validation (CV) procedures.
+These involve splitting the $N$ available examples into training ($t$) and testing ($e$) subsets, where the training data are used to fit the model parameters, and the test data are used to approximate the expected generalization performance; the data splits are usually repeated, randomly or exhaustively, to ensure robust results \cite{Arlot2010}.
+The most popular CV frameworks include:
 \begin{itemize}
   \item \textbf{LOO -- Leave-One-Out:} Withhold one example from the training set, and use it as the test case ($N_t$ = $N-1$; $N_e = 1$); repeat $N$ times.
   \\\textit{Benefit:} Close approximation of the expected generalization performance
@@ -16,16 +23,26 @@ Supervised segmentation models require the capacity to model complex relationshi
 \end{itemize}
 % ==================================================================================================
 \subsection{Leave-One-Source-Out CV}
-The choice of cross validation framework can have significant impacts on the reported model performance (see \cite{Arlot2010} for an in-depth review), and there is at least one assumption of the above methods which is not always valid: that examples are independent and identically distributed (iid). This is not true for data originating from multiple sources with different underlying distributions (e.g. MRI with different scan-parameter combinations) \cite{Geras2013}. In fact, \citeauthor{Geras2013} show that in multi-source problems where the expected use case involves data from entirely new sources, random KFCV (and therefore also LOO, as a special case of KFCV with $B=1$) significantly overestimates the generalization performance. This is because random training fold selection allows the model to perceive source-specific characteristics of the test examples, which cannot be repeated for truly new examples. In such scenarios, the authors propose the following:
+The choice of cross validation framework can have significant impacts on the reported model performance (see \cite{Arlot2010} for an in-depth review), and there is at least one assumption of the above methods which is not always valid: that examples are independent and identically distributed (iid).
+This is not true for data originating from multiple sources with different underlying distributions (e.g. MRI with different scan-parameter combinations) \cite{Geras2013}
+In fact, \citeauthor{Geras2013} show that in multi-source problems where the expected use case involves data from entirely new sources, random KFCV (and therefore also LOO, as a special case of KFCV with $B=1$) significantly overestimates the generalization performance.
+This is because random training fold selection allows the model to perceive source-specific characteristics of the test examples, which cannot be repeated for truly new examples.
+In such scenarios, the authors propose the following:
 \begin{itemize}
   \item \textbf{LOSO -- Leave-One-Source-Out\footnote{Authors' original name was ``Multi-Source Cross Validation''}:} Withhold all examples from source $s\in 1\dots S$ from the training set, and use these as the test set ($N_t$ = $N-N_s$; $N_e = N_s$); repeat $S$ times.
   \\\textit{Benefit:} Best approximation of the expected generalization performance in multi-source problems
   \\\textit{Drawback:} Still only an approximation
 \end{itemize}
-As noted in the introduction (cf. \S\ \ref{ss:priorlimits}), there has been surprisingly limited use of data from multiple sources for validation of WMH segmentation algorithms. Moreover, CV frameworks vary widely among papers, and to the best of this author's knowledge, no WMH algorithm has yet been validated using LOSO CV. This represents a significant caveat to reported performances, since MRI have many sources of variability (cf. \S\ \ref{ss:autochallenges}), including scanner manufacturer, field strength, sequence parameters, resolution, anatomical and disease variability. As the aim of this work is to develop a segmentation algorithm which will perform well on any given FLAIR MRI, the LOSO framework was initially developed without knowledge of the work by \citeauthor{Geras2013}. However, this paper happily corroborates the importance of LOSO CV to the current work. In this case, one data source is defined as a unique scanner-parameter combination.
+As noted in the introduction (cf. \S\ \ref{ss:priorlimits}), there has been surprisingly limited use of data from multiple sources for validation of WMH segmentation algorithms.
+Moreover, CV frameworks vary widely among papers, and to the best of this author's knowledge, no WMH algorithm has yet been validated using LOSO CV.
+This represents a significant caveat to reported performances, since MRI have many sources of variability (cf. \S\ \ref{ss:autochallenges}), including scanner manufacturer, field strength, sequence parameters, resolution, anatomical and disease variability.
+As the aim of this work is to develop a segmentation algorithm which will perform well on any given FLAIR MRI, the LOSO framework was initially developed without knowledge of the work by \citeauthor{Geras2013}.
+However, this paper happily corroborates the importance of LOSO CV to the current work.
+In this case, one data source is defined as a unique scanner-parameter combination.
 % ==================================================================================================
 \subsection{Competition Frameworks}\label{ss:competitions}
-One notable exception to this trend in WMH algorithms have been segmentation competitions \cite{MSSEG2008,MSISBI2015,MSSEG2016,WMHSEG2017}. These generally provide both multi-source datasets and a robust validation framework.
+One notable exception to this trend in WMH algorithms have been segmentation competitions \cite{MSSEG2008,MSISBI2015,MSSEG2016,WMHSEG2017}.
+These generally provide both multi-source datasets and a robust validation framework.
 Table \ref{tab:datacomp}
 \begin{table}[h]
   \centering
@@ -44,8 +61,13 @@ Table \ref{tab:datacomp}
 
 % ==================================================================================================
 \subsection{Data}\label{ss:data}
-For the reasons outlined above, it was important to collect a large and diverse database of FLAIR images for model validation. We use 129 FLAIR images from 10 different scanners. The number of images and scan parameters are summarized in Table \ref{tab:database}. With the exception of the MS 2008\footnotemark and In-House datasets, all of the data are freely available as part of the segmentation competitions. Since direct comparison of results on equal datasets is important for establishing state-of-the-art, we present results using only these freely available data (``Dataset A'') in addition to all .
-\footnotetext{The manuals used with these data }
+For the reasons outlined above, it was important to collect a large and diverse database of FLAIR images for model validation.
+We use 129 FLAIR images from 10 different scanners.
+The number of images and scan parameters are summarized in Table \ref{tab:database}.
+With the exception of the MS 2008\footnotemark and In-House datasets, all of the data are freely available as part of the segmentation competitions.
+Since direct comparison of results on equal datasets is important for establishing state-of-the-art, we present results using only these freely available data (``Dataset A'') in addition to all .
+\footnotetext{The manual segmentations used in this dataset were generated in-house, as described in \S\ \ref{ss:m08-rev}.}
+\par
 \begin{table}[t]
   \centering
   \caption{Summary of experimental image database.}
@@ -68,9 +90,15 @@ For the reasons outlined above, it was important to collect a large and diverse 
   \tablepost{\ss{a}~Manuals were generated following the standards outlined in \cite{Caligiuri2015}, and were subsequently reviewed by a second rater, only WMH labels were included; \ss{b}~Manuals were fused using the LOP-STAPLE method \cite{Akhondi-Asl2014}; \ss{c}~Manuals were fused using logical `and'; \ss{d}~Manuals were generated in-house; \ss{e}~REVIEW; \ss{f}~REVIEW.}
   \label{tab:database}
 \end{table}
+Regarding simulated MRI data, none are used in this work.
+While such data (e.g. BrainWeb \cite{Collins1998}) are useful for evaluation of whole-brain segmentation methods, only three examples of WMH are currently available, and there is little documentation as to how these were generated%
+\footnote{Documentation found here: \hreftt{http://brainweb.bic.mni.mcgill.ca/brainweb/selection_ms.html}.}.
+Furthermore, several works \cite{Klauschen2009,Eggert2012} have noted significant discrepancies in estimated segmentation performance between BrainWeb and real data (ISBR \footnote{\hreftt{www.nitrc.org/projects/ibsr}}).
 %% ==================================================================================================
 %\subsection{Baseline Model Performance}
-%The remainder of this chapter explores model variants which hopefully yield performance improvements. For sake of comparison, we first present results from a minimal working algorithm. This version of the VLR model (``\texttt{base}'') is summarized in Table \ref{tab:hyperparams}.
+%The remainder of this chapter explores model variants which hopefully yield performance improvements.
+%For sake of comparison, we first present results from a minimal working algorithm.
+%This version of the VLR model (``\texttt{base}'') is summarized in Table \ref{tab:hyperparams}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Graylevel Standardization}
 
@@ -82,8 +110,9 @@ For the reasons outlined above, it was important to collect a large and diverse 
 
 % ==================================================================================================
 \subsection{Toy Model}\label{ss:toyreg}
-In order to investigate the effect of different regularization strategies, a toy model is used. The model represents a single voxel during training, with synthetic observations. Regularizations are then chosen by hand to maintain desired characteristics in the fitted functions. 
-
+In order to investigate the effect of different regularization strategies, a toy model is used.
+The model represents a single voxel during training, with synthetic observations.
+Regularizations are then chosen by hand to maintain desired characteristics in the fitted functions.
 \par
 It is also possible to plot the MAP objective function $\J(\bb)$ in the 2D plane composed of $\bb = [\b^0,\b^1]$.
 \begin{figure}
@@ -98,7 +127,9 @@ It is also possible to plot the MAP objective function $\J(\bb)$ in the 2D plane
 \section{Full Model}
 % ==================================================================================================
 \subsection{Convergence}
-The rate of convergence in each voxel will be unique. During parallel fitting, it is prudent to stop training after a reasonable number of iterations, rather than wait for all voxels to achieve a certain stopping criterion, in case a few aberrant voxels do not converge. In order to determine this number, the model was fitted using [X] selection(s) of the training data, and the value of the MAP objective 
+The rate of convergence in each voxel will be unique.
+During parallel fitting, it is prudent to stop training after a reasonable number of iterations, rather than wait for all voxels to achieve a certain stopping criterion, in case a few aberrant voxels do not converge.
+In order to determine this number, the model was fitted using [X] selection(s) of the training data, and the value of the MAP objective 
 %__JK__ not sure how to chose this: see which are faster / slower?
 
 
