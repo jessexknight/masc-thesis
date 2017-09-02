@@ -15,13 +15,13 @@ All computation in the current work was performed using the following workstatio
 \end{itemize}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Parallelization}
-Speed of model fitting is a significant factor during development, particularly considering optimization of so-called hyperparameters. Faster training yields more model iterations, which inevitably bear improvements. 
+Speed of model fitting is a significant factor during development, particularly considering optimization of hyperparameters. Faster training yields more model iterations, which inevitably bear improvements. 
 % ==================================================================================================
 \subsection{Model Estimation}\label{s:parallelfit}
 While the estimation procedure outlined in \S\ \ref{ss:modelfitting} must be repeated for all standardized voxels in the brain mask, it is possible to do this in parallel, since every estimation is independent. To do so, the training data must first be vectorized with respect to spatial location $x$, and matrix operations expanded explicitly to accommodate the new dimension.
 \par
 % __JK__ add some details about gpuArray in Matlab
-To begin, the standardized training data from all subjects -- features $\tilde{\bm{\Y}}_{\gamma}(x)$, with $\tilde{\Y}_{\bV}^{\et0}=1$, and labels $\C(x)$ -- are sampled from nonzero locations in the brain mask $M(x)$. These data are stored in two matrices $\vox{Y}$ and $\vox{C}$, with dimensions $[X,N,K+1]$ and $[X,N,1]$, respectively, where $X$ is the total number of nonzero voxels in the brain mask, $N$ is the number of subjects, and $K$ is the number of features. A similar matrix is constructed for the initial parameters $\bb^{(0)}(x)$, denoted $\vox{B}^{(0)}$, with dimensions $[X,1,K+1]$. Let $\vox{Y}_n^k$ denote the vector of data from all voxels for the $k$\ss{th} feature from the $n$\ss{th} subject, and so on for $\vox{C}$ and $\vox{B}$.
+To begin, the standardized training data from all subjects -- features $\tilde{\bm{\Y}}_{\gamma}(x)$, with $\tilde{\Y}_{\gamma}^{\et0}=1$, and labels $\C_{\gamma}(x)$ -- are sampled from nonzero locations in the brain mask $M(x)$. These data are stored in two matrices $\vox{Y}$ and $\vox{C}$, with dimensions $[X,N,K+1]$ and $[X,N,1]$, respectively, where $X$ is the total number of nonzero voxels in the brain mask, $N$ is the number of subjects, and $K$ is the number of features. A similar matrix is constructed for the initial parameters $\bb^{(0)}(x)$, denoted $\vox{B}^{(0)}$, with dimensions $[X,1,K+1]$. Let $\vox{Y}_n^k$ denote the vector of data from all voxels for the $k$\ss{th} feature from the $n$\ss{th} subject, and so on for $\vox{C}$ and $\vox{B}$.
 \par
 In order to simplify subsequent calculations, the feature data are rectified according to the class labels, before the first iteration, as in
 \begin{equation}
@@ -36,33 +36,34 @@ Regarding notation:
 1) the iteration index ${}^{(t)}$ is omitted for clarity,
 2) element-wise multiplication is denoted by $\circ$, and
 3) the variable $K$ is now defined as $1$, since this is essential to the simplification.
+\par
 \begin{align}
-\vox{S} &= \frac{1}{1+e^{\et\eta}},\qquad \eta = \vox{B}^0 + \left(\vox{B}^1\ep\vox{Y}^1\right)\\
+\vox{S} &= \frac{1}{1+e^{+\eta}},\qquad \eta = \vox{B}^0 + \left(\vox{B}^1\ep\vox{Y}^1\right)\\
 \vox{A} &= \vox{S}\ep\left(1-\vox{S}\right)\\
 \vox{G} &= \nabla_{\vox{B}}\L - \lambda\vox{B} \nonumber \\
 &= \left[\begin{array}{c}
-\vox{G}^1 \\ \vox{G}^2
+\vox{G}^0 \\ \vox{G}^1
 \end{array}\right] \nonumber \\
 &= \left[\begin{array}{c}
-\sum_{n=1}^{N}\left( \vox{Y}_n^1\ep\vox{S} \right) \\
-\sum_{n=1}^{N}\left( \vox{Y}_n^2\ep\vox{S} \right)
-\end{array}\right] - \lambda\left[\begin{array}{c} \vox{B}^1 \\ \vox{B}^2\end{array}\right]\\
-\vox{H} &= \nabla_{\vox{B}}^2\L -\lambda\vox{I} \nonumber \\
+\sum_{n=1}^{N}\left( \vox{Y}_n^0\ep\vox{S} \right) \\
+\sum_{n=1}^{N}\left( \vox{Y}_n^1\ep\vox{S} \right)
+\end{array}\right] - \lambda\left[\begin{array}{c} \vox{B}^0 \\ \vox{B}^1\end{array}\right]\\
+\vox{H} &= \nabla_{\vox{B}}^1\L -\lambda\vox{I} \nonumber \\
 &= \left[\begin{array}{cc}
-\vox{H}^{1,1} & \vox{H}^{1,2} \\ \vox{H}^{2,1} & \vox{H}^{2,2}
+\vox{H}^{0,0} & \vox{H}^{0,1} \\ \vox{H}^{1,0} & \vox{H}^{1,1}
 \end{array}\right] \nonumber \\
 &= \left[\begin{array}{cc}
-\sum_{n=1}^{N}\left( \vox{A}\ep\vox{Y}_n^1\ep\vox{Y}_n^1 \right) & 
-\sum_{n=1}^{N}\left( \vox{A}\ep\vox{Y}_n^2\ep\vox{Y}_n^1 \right) \\
-\sum_{n=1}^{N}\left( \vox{A}\ep\vox{Y}_n^1\ep\vox{Y}_n^2 \right) & 
-\sum_{n=1}^{N}\left( \vox{A}\ep\vox{Y}_n^2\ep\vox{Y}_n^2 \right)
+\sum_{n=1}^{N}\left( \vox{A}\ep\vox{Y}_n^0\ep\vox{Y}_n^0 \right) & 
+\sum_{n=1}^{N}\left( \vox{A}\ep\vox{Y}_n^1\ep\vox{Y}_n^0 \right) \\
+\sum_{n=1}^{N}\left( \vox{A}\ep\vox{Y}_n^0\ep\vox{Y}_n^1 \right) & 
+\sum_{n=1}^{N}\left( \vox{A}\ep\vox{Y}_n^1\ep\vox{Y}_n^1 \right)
 \end{array}\right] - \lambda\left[\begin{array}{cc} 1 & \\ & 1\end{array}\right]\\
 \vox{D} &= \det{\vox{H}} \nonumber \\
-&= \left(\vox{H}^{1,1}\ep\vox{H}^{2,2}\right) - \left(\vox{H}^{1,2}\ep\vox{H}^{2,1}\right) \\
+&= \left(\vox{H}^{0,0}\ep\vox{H}^{1,1}\right) - \left(\vox{H}^{0,1}\ep\vox{H}^{1,0}\right) \\
 \Delta\vox{B} &= -\vox{H}^{-1}\vox{G} \nonumber \\
 &= \dfrac{1}{\vox{D}} \left[\begin{array}{cc}
-\left(\vox{H}^{2,2}\ep\vox{G}^{1} - \vox{H}^{2,1}\ep\vox{G}^{2} \right) & 
-\left(\vox{H}^{1,2}\ep\vox{G}^{2} - \vox{H}^{1,1}\ep\vox{G}^{1} \right)
+\left(\vox{H}^{1,1}\ep\vox{G}^{0} - \vox{H}^{1,0}\ep\vox{G}^{1} \right) & 
+\left(\vox{H}^{0,1}\ep\vox{G}^{1} - \vox{H}^{0,0}\ep\vox{G}^{0} \right)
 \end{array}\right]^{T}
 \end{align}
 % ==================================================================================================
