@@ -2,36 +2,39 @@
 % ==================================================================================================
 % --------------------------------------------------------------------------------------------------
 \chapter{Maths}
-This section presents various mathematical results which are not crucial to the thesis.
+This section presents various mathematical results which are not essential to the thesis.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{FLAIR MRI Intensity Modelling}\label{s:simflair}
-While MR imaging is both complex and mutable, simulation of the expected signal intensities is possible using the relaxometry data in Table \ref{tab:t1t2tissues} and sequence signal equations -- e.g. (\ref{eq:MRI-SE}) and (\ref{eq:MRI-IR}). In the clinic, this simulation helps select appropriate acquisition parameters $TE/TR/TI$ for the desired contrast; however, these contrast characteristics can also be later considered as covariates in performance analysis of segmentation tools. To this end, the acquisition parameters of the FLAIR image database (Table \ref{tab:database}) were used with the data from Table \ref{tab:t1t2tissues} and Equation (\ref{eq:MRI-IR}) to calculate the expected tissue contrasts for these data. The contrast between two graylevels was defined as
+While MR imaging is both complex and mutable, simulation of the expected signal intensities is possible using the relaxometry data in Table \ref{tab:t1t2tissues} and sequence signal equations -- e.g. (\ref{eq:MRI-SE}) and (\ref{eq:MRI-IR}).
+In practice, this simulation helps select appropriate acquisition parameters $TE/TR/TI$ for the desired contrast;
+however, these characteristics can also be later considered as covariates in performance analysis of segmentation tools.
+To this end, Equation (\ref{eq:MRI-IR}) -- repeated here for reference,
 \begin{equation}
-2\left|\frac{y_1 - y_2}{y_1 + y_2}\right|.
+\Psi_{IR}(x) = \bigg[K \left[H(x)\right]\bigg]\bigg[e^{-\left(\frac{TE}{T2(x)}\right)}\bigg]\bigg[1 + e^{-\left(\frac{TR}{T1(x)}\right)} - 2e^{-\left(\frac{TI}{T1(x)}\right)}\bigg]
 \end{equation}
+-- was used with the acquisition parameters of the FLAIR image database (Table \ref{tab:database}) and the relaxometry data from Table \ref{tab:t1t2tissues} to calculate the expected tissue intensities and $WMH$ contrasts for the experimental data.
 These results are summarized in Table \ref{tab:simflair}, and an example image is generated for each parameter set using the tissue maps from the BrainWeb database \cite{Collins1998}%
 \footnote{\hreftt{http://brainweb.bic.mni.mcgill.ca/}}%
 , as shown in Figure \ref{fig:simflair}.
-\begin{table}[h]
+\begin{table}
   \centering
-  \caption{Simulated FLAIR tissue contrasts using scan parameters from the experimental database.}
+  \caption{Simulated FLAIR tissue intensities and WMH contrasts using scan parameters from the experimental database. Tissue intensities are normalized to the WM value.}
   \label{tab:simflair}
-  \begin{tabular}{rcccccc}
+  \begin{tabu} to 0.7\textwidth{rX[c]X[c]X[c]X[c]X[c]X[c]X[c]}
   	\hline
-  	Scanner      & \gm/\wm & \gm/\csf & \gm/\wmh & \wm/\csf & \wm/\wmh & \csf/\wmh \\ \hline
-  	WMH 2017 (1) & 0.19    & 1.28     & 0.32     & 1.16     & 0.50     & 1.45      \\
-  	WMH 2017 (2) & 0.10    & 1.83     & 0.14     & 1.81     & 0.25     & 1.85      \\
-  	WMH 2017 (3) & 0.13    & 1.95     & 0.27     & 1.94     & 0.39     & 1.96      \\
-  	MS  2016 (1) & 0.28    & 2.00     & 0.88     & 2.00     & 1.09     & 2.00      \\
-  	MS  2016 (2) & 0.25    & 2.00     & 0.82     & 2.00     & 1.01     & 2.00      \\
-  	MS  2016 (3) & 0.32    & 1.77     & 0.99     & 1.69     & 1.21     & 1.92      \\
-  	MS  2008 CHB & ---     & ---      & ---      & ---      & ---      & ---       \\
-  	MS  2008 UNC & 0.19    & 0.78     & 0.32     & 0.62     & 0.50     & 1.04      \\
-  	ISBI MS 2015 & 0.12    & 1.19     & 0.14     & 1.11     & 0.26     & 1.27      \\
-  	In-House     & 0.19    & 0.78     & 0.32     & 0.62     & 0.50     & 1.04      \\ \hline
-  \end{tabular}
+  	     Scanner & \gm  & \wm  & \csf & \wmh & $\frac{\wmh}{\gm}$ & $\frac{\wmh}{\wm}$ & $\frac{\wmh}{\csf}$ \\ \hline
+  	WMH 2017 (1) & 1.21 & 1.00 & 0.26 & 1.67 & 1.38               & 1.67               & 6.32                \\
+  	WMH 2017 (2) & 1.11 & 1.00 & 0.05 & 1.28 & 1.16               & 1.28               & 25.3                \\
+  	WMH 2017 (3) & 1.14 & 1.00 & 0.01 & 1.49 & 1.31               & 1.49               & 105                 \\
+  	MS  2016 (1) & 1.32 & 1.00 & 0.00 & 3.40 & 2.57               & 3.40               & $\infty$            \\
+  	MS  2016 (2) & 1.28 & 1.00 & 0.00 & 3.05 & 2.38               & 3.05               & $\infty$            \\
+  	MS  2016 (3) & 1.38 & 1.00 & 0.08 & 4.08 & 2.96               & 4.08               & 48.1                \\
+  	MS  2008 UNC & 1.21 & 1.00 & 0.53 & 1.67 & 1.38               & 1.67               & 3.17                \\
+  	ISBI MS 2015 & 1.13 & 1.00 & 0.29 & 1.30 & 1.15               & 1.30               & 4.51                \\
+  	    In-House & 1.21 & 1.00 & 0.53 & 1.67 & 1.38               & 1.67               & 3.17                \\ \hline
+  \end{tabu}
 \end{table}
-\begin{figure}[h]
+\begin{figure}
   \centering
   \begin{subfigure}{0.25\textwidth}\centering\includegraphics[height=\fullheight]{simflair-s=01.png}\caption{WMH 2017 (1)}\end{subfigure}
   \begin{subfigure}{0.25\textwidth}\centering\includegraphics[height=\fullheight]{simflair-s=02.png}\caption{WMH 2017 (2)}\end{subfigure}
@@ -46,12 +49,41 @@ These results are summarized in Table \ref{tab:simflair}, and an example image i
   \caption{Simulated FLAIR images using scan parameters from the experimental database. Colourmap is arbitrary but consistent.}
   \label{fig:simflair}
 \end{figure}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Histogram Equalization Properties}
-
-
-
+\section{Graylevel Standardization}
+% ==================================================================================================
+\subsection{Histogram Matching vs Histogram Equalization}\label{ss:hm-vs-he}
+In \S\ \ref{ss:meth-ystd} it was argued that histogram matching is equivalent to histogram equalization in terms of effectiveness at standardizing graylevels in heterogeneous input images.
+This is because the histogram matching operation is defined as the function composition of the histogram equalization transform of the input image, $F_{\sy}$, and the inverse equalization transform for the desired output histogram, ${F_{\tilde{\sy}}}^{-1}$,
+\begin{equation}
+  \uptau(y) = {F_{\tilde{\textsc{y}}}}^{-1}\big(F_{\sy}(y)\big)
+\end{equation}
+The second transformation in the cascade does not depend on $Y$, and so it is applied equally to images.
+Therefore the choice of target PMF is not important for the objective of graylevel standardization.
+This result is verified experimentally using synthetic images.
+Four $100\times100\times100$ images were generated to have the following density functions $f_{\sy}$,
+\begin{itemize}[itemsep=0pt,topsep=0pt]
+  \item \parbox{2cm}{Uniform:} $y\sim\mathcal{U}(y_{\min}=0,y_{\max}=1)$
+  \item \parbox{2cm}{Unimodal:} $y\sim\N(\mu=0.5,\sigma=0.08)$
+  \item \parbox{2cm}{Bimodal:} $y\sim\big(0.5\et\N(\mu=0.3,\sigma=0.05)+0.5\et\N(\mu=0.7,\sigma=0.05)\big)$
+  \item \parbox{2cm}{Trimodal:} $y\sim\big(0.3\et\N(\mu=0.25,\sigma=0.05)+0.4\et\N(\mu=0.5,\sigma=0.05)+0.3\et\N(\mu=0.75,\sigma=0.05)\big)$
+\end{itemize}
+All four images were then histogram-matched to each of the respective density functions, with the aim of increasing agreement of image intensities.
+This agreement can be approximated by the alignment of intensity quantiles, since this is the target of histogram matching operations.
+As shown in Figure \ref{fig:hm-vs-he}, the quantiles agree almost perfectly in every output image, regardless of the choice of output PMF.
+\begin{figure}
+  \centering
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{histmatch-q-original}\caption{Original}\end{subfigure}
+  \parbox[c]{\plotwidth}{\includegraphics[width=0.7\plotwidth]{histmatch-q-legend}}\\
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{histmatch-q-uniform} \caption{Uniform target} \end{subfigure}
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{histmatch-q-unimodal}\caption{Unimodal target}\end{subfigure}
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{histmatch-q-bimodal} \caption{Bimodal target} \end{subfigure}
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{histmatch-q-trimodal}\caption{Trimodal target}\end{subfigure}
+  \caption{Histogram matching of synthetic data to different target histograms. Quantiles show high agreement regardless of the target histogram.}
+  \label{fig:hm-vs-he}
+\end{figure}
+% ==================================================================================================
+\subsection{Nyul Approximation of Histogram Matching}\label{ss:nyul-approx}
 
 % --------------------------------------------------------------------------------------------------
 % ==================================================================================================
