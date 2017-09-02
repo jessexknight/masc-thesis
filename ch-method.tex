@@ -112,7 +112,7 @@ Third, model foundations in statistical theory allow probabilistic interpretatio
 The major drawback of logistic models for WMH segmentation is that standardization of graylevels is required.
 \par
 In the two class formulation, the lesion class is denoted $c=1$, and the healthy class $c=0$.
-The probability of the lesion class, given a set of features $\by = [1,y^1,\dots,y^\K]^T$ is modelled by a logistic function, parameterized by a vector of feature weights $\bb = [\b^0,\b^1,\dots,\b^\K]^T$,
+The probability of the lesion class, given a set of features $\by = [1,y^1,\dots,y^\sk]^T$ is modelled by a logistic function, parameterized by a vector of feature weights $\bb = [\b^0,\b^1,\dots,\b^\sk]^T$,
 \begin{equation}
   P(c=1\mid\by,\bb) = \frac{1}{1+e^{-\eta}},\qquad\eta = \bb^T\by.
   \label{eq:lrmodel}
@@ -148,7 +148,7 @@ Such ``parameter images'', as they will be called, are then readily interpretabl
 % ==================================================================================================
 \subsection{Model Fitting}\label{ss:modelfitting}
 Fitting the VLR model involves estimating $\bb$ for each voxel $x$.
-This requires some training data: feature vectors from a population of $N$ observations $\bY(x) = \{\bY_1(x),\dots,\bY_{\N}(x)\}$, and the corresponding labels $\C(x) = \{C_1(x),\dots,C_{\N}(x)\}$.
+This requires some training data: feature vectors from a population of $N$ observations $\bY(x) = \{\bY_1(x),\dots,\bY_{\sn}(x)\}$, and the corresponding labels $\C(x) = \{C_1(x),\dots,C_{\sn}(x)\}$.
 Typically, parameter estimation involves maximizing the likelihood of the model, given this data -- i.e. maximum likelihood estimation (MLE).
 \par
 Three major challenges emerge during model fitting.
@@ -244,12 +244,12 @@ Classic Newton updates gave a good balance between memory requirements and compu
 If the gradient $\nabla_{\bb}\L$ and Hessian matrix $\nabla^2_{\bb}\L$ are defined as
 \begin{align}
 \nabla_{\bb}\L &= \left[\begin{array}{c}
-\frac{\d L}{\d\b^1}\\\vdots\\\frac{\d L}{\d\b^\K}
+\frac{\d L}{\d\b^1}\\\vdots\\\frac{\d L}{\d\b^\sk}
 \end{array}\right],\label{eq:llgradient0}\\
 \nabla^2_{\bb}\L &= \left[\begin{array}{ccc}
-\frac{\d^2 L}{\d\b^1\d\b^1}&\cdots&\frac{\d^2 L}{\d\b^1\d\b^\K}\\
+\frac{\d^2 L}{\d\b^1\d\b^1}&\cdots&\frac{\d^2 L}{\d\b^1\d\b^\sk}\\
 \vdots&\ddots&\vdots\\
-\frac{\d^2 L}{\d\b^\K\d\b^1}&\cdots&\frac{\d^2 L}{\d\b^\K\d\b^\K}
+\frac{\d^2 L}{\d\b^\sk\d\b^1}&\cdots&\frac{\d^2 L}{\d\b^\sk\d\b^\sk}
 \end{array}\right]\label{eq:llhessian0},
 \end{align}
 then the Newton update is given by
@@ -353,7 +353,7 @@ These synthetic observations could be appended to the training data for each vox
 \par
 If the same number of synthetic observations are appended to the training data for each voxel, this is equivalent to appending a number of synthetic images to the training set.
 The synthetic feature data are denoted
-$\bV(x) = \{\bm{\gamma}_{1}(x),\dots,\bm{\gamma}_{\V}(x)\}$.
+$\bV(x) = \{\bm{\gamma}_{1}(x),\dots,\bm{\gamma}_{\sv}(x)\}$.
 It is assumed that the labels of all synthetic data are ``lesion'', so the set of synthetic label images is simply denoted $\bm{1}(x)$.
 The updated training set is therefore $\bY_{\gamma}(x) = \{\bY(x),\bV(x)\}$, and $\bC_{\gamma}(x) = \{\bC(x),\bm{1}(x)\}$.
 \par
@@ -430,18 +430,29 @@ These assumptions are that:
 3) images are consistently sized and voxels represent the same anatomical regions across different subjects.
 Solving these challenges must therefore be accomplished by one or more pre-processing steps.
 % ==================================================================================================
-\subsection{Registration \& Bias Correction}\label{ss:meth-reg+bias}
+\subsection{Registration}\label{ss:meth-reg}
 Image registration is the process of geometrically transforming a source image so that the image content is aligned per-voxel with a target image of the same subject.
-Such transformations are parameterized mathematically, and fitted by maximizing some measure of overlap between the images \cite{Sotiras2013}.
-Several similarity measures have been proposed which do not require the source and target images to be of the same modality, permitting multi-modal image registration (e.g. PET-CT or different MRI sequences) \cite{Maes1997,Klein2009,Sotiras2013}.
+This process facilitates voxel-wise analysis of MRI from different subjects including  ``voxel-based morphometry'' \cite{Ashburner2000a} and statistical analysis of functional MRI data \cite{Smith2004}%
+\footnote{Incidentally, investigation of these topics were the motivations for developing of the SPM and FSL software packages, respectively.}.
+Source images from multiple subjects are usually registered to the same target image; 
+in this context, it is useful to define a ``native space'' and a ``standardized space'', denoting the original, subject-specific geometry, and the standardized target geometry.
+By convention, the target brain space is usually either the Talairach space \cite{Talairach1988} or the Montreal Neurological Institute (MNI) space \cite{Evans1993}, though any target image could be used.
 \par
+Parameters defining registration transforms are fitted by maximizing some measure of overlap between the images \cite{Sotiras2013}.
 Simple registration methods employ only affine transformations, comprising a combination of translation, scaling, and shear transformations (e.g. the FLIRT tool \cite{Jenkinson2002} in FSL).
-The utility of these methods for neuroimage analysis is limited, since there are significant differences in brain anatomy between subjects.
+The utility of these methods for neuroimage analysis is limited, since there are often significant differences in brain anatomy between subjects.
 Rather, most tools parametrize a spatial warping model, permitting local nonlinear deformations to better match brain structures (e.g.
 cubic B-splines in FSL FNIRT \cite{Andersson2007},
 discrete cosine transform in SPM Normalize \cite{Ashburner1997,Ashburner2005},
 a general diffeomorphism in the SyN algorithm \cite{Avants2008}).
-While these models are more difficult to fit, several well-performing methods have emerged.
+While these models are more difficult to fit, several robust algorithms have been released for general use, with widespread acceptance (e.g. the toolboxes mentioned above).
+A \citeyear{Klein2009} comparison of 14 different methods is a good resource \cite{Klein2009},
+
+\cite{Kazemi2014}.
+\par
+In the current work, estimation of the model parameters $\bb(x)$ during training requires registration of the training data to a standardized brain space.
+At test time (or during subsequent use), these parameter images can be transformed in the opposite direction to a given native space for inference.
+
 
 
 %N3/4 \citeauthor{Tustison2010} \cite{Tustison2010}
@@ -452,12 +463,23 @@ While these models are more difficult to fit, several well-performing methods ha
 %BUT: SPM is one of only a few which can do multi-modal image registration, which is helpful, since 
 %still: a FLAIR template does exist \cite{Winkler2012}
 
+
+% ==================================================================================================
+\subsection{Bias Correction}\label{ss:meth-bias}
 % ==================================================================================================
 \subsection{Graylevel Standardization}\label{ss:meth-ystd}
 \par...\par
 \clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Post-Processing}\label{s:meth-post}
+The 
+
+Following pre-processing and classification by the VLR model, 
+
+In principle, post-processing aims to incorporate any additional knowledge of the problem which has not been considered in upstream elements. 
+
+
+
 
 \clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -473,11 +495,17 @@ When comparing the estimated segmentation $\hat{c}$ to the ground truth segmenta
 \end{itemize}
 Summing the number of voxels in each state, voxel-wise agreement can then be quantified using the following measures:
 \begin{itemize}
-  \item \textbf{Similarity Index (SI)} (\textsc{aka} Dice Similarity Coefficient, F1-Score)\\Measures overall segmentation performance.
+  \item \textbf{Similarity Index (SI)}
+  (\textsc{aka} Dice Similarity Coefficient, F1-Score)\\
+  Measures overall segmentation performance.
   \begin{equation}SI = \dfrac{2TP}{2TP + FP + FN}\end{equation}
-  \item \textbf{Precision (Pr)} (\textsc{aka} Overlap Fraction, Positive Predictive Value)\\Fraction of predicted predicted positives which are true positives.
+  \item \textbf{Precision (Pr)}
+  (\textsc{aka} Overlap Fraction, Positive Predictive Value)\\
+  Fraction of predicted predicted positives which are true positives.
   \begin{equation}Pr = \dfrac{TP}{TP+FP}\end{equation}
-  \item \textbf{Recall (Re)} (\textsc{aka} Sensitivity, True Positive Rate)\\Fraction of true positives which are predicted positive.
+  \item \textbf{Recall (Re)}
+  (\textsc{aka} Sensitivity, True Positive Rate)\\
+  Fraction of true positives which are predicted positive.
   \begin{equation}Re = \dfrac{TP}{TP+FN}\end{equation}
 \end{itemize}
 Each measure is $\in [0,1]$, where higher is better.

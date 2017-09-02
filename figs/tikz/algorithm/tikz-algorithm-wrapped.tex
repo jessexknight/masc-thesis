@@ -1,20 +1,19 @@
-\documentclass{article}
-\usepackage[margin=1cm]{geometry}
-\usepackage{pdflscape}
-\usepackage{mathtools}
-\usepackage{upgreek}
-\usepackage{tikz}
-\usepackage{calc}
-\usepackage{bm}
+%\documentclass{article}
+%\usepackage[margin=1cm]{geometry}
+\documentclass{standalone}
+\usepackage{pdflscape,mathtools,upgreek,tikz,calc,bm}
 \usetikzlibrary{shapes,arrows.meta,calc}
-\setlength{\parskip}{0pt}
+%\setlength{\parskip}{0pt}
 \begin{document}
-%  \begin{landscape}
-    \begin{figure}
-      \centering
-      \scalebox{0.5}{\input{tikz-algorithm}}
-      \caption{Overview of the proposed algorithm. Typefaces -- upright Roman: images in native space; italic Roman: images in standard (MNI) space; calligraphic: a set of images from several patients; bold: a set of images corresponding to different features; Variables -- $C(x)$: manual segmentation; $Y(x)$: FLAIR image, $\beta(x)$: parameter image; $\hat{C}(x)$: estimated lesion segmentation.}
-    \end{figure}
-%  \end{landscape}
+\input{tikz-algorithm}
+%%  \begin{landscape}
+%    \begin{figure}
+%      \centering
+%
+%      \scalebox{0.5}{\input{tikz-algorithm}}
+%      \caption{Overview of the proposed algorithm. Typefaces -- upright Roman: images in native space; italic Roman: images in standard (MNI) space; calligraphic: a set of images from several patients; bold: a set of images corresponding to different features; Variables -- $C(x)$: manual segmentation; $Y(x)$: FLAIR image, $\beta(x)$: parameter image; $\hat{C}(x)$: estimated lesion segmentation.}
+%    \end{figure}
+%%  \end{landscape}
 \end{document}
+
 
