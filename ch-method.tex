@@ -374,8 +374,7 @@ The contributions of pseudo-lesions to model fitting are explored experimentally
   \begin{subfigureside}{$\rho_{\gm}(x)$}\raggedleft\includegraphics[height=\sliceheight]{tpm-gm.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-1}\end{subfigureside}\\[0.5em]
   \begin{subfigureside}{$\rho_{\wm}(x)$}\raggedleft\includegraphics[height=\sliceheight]{tpm-wm.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-1}\end{subfigureside}\\[0.5em]
   \begin{subfigureside}{$\rho_{\csf}(x)$}\raggedleft\includegraphics[height=\sliceheight]{tpm-csf.png} \includegraphics[height=\sliceheight]{cbar-NIH3-0-1}\end{subfigureside}
-  \caption{Tissue prior probability images in MNI space.
-Derived from \cite{Mazziotta2001}.}
+  \caption{Tissue prior probability images in MNI space. Derived from \cite{Mazziotta2001}.}
   \label{fig:tpm-3}
 \end{figure}
 % ==================================================================================================
@@ -419,11 +418,11 @@ Therefore, only conventional filtering is explored in this work (cf. \S\ \ref{})
 The proposed VLR classification model addresses several of the challenges outlined in \S\ \ref{ss:autochallenges}.
 The problem of overlapping tissue graylevel distributions is mostly solved through expansion of the feature space to include spatial features.
 CSF flow-through artifacts, which appear in roughly consistent locations, are similarly managed.
-Spatial heterogeneity in the appearance of lesions is also considered by the spatial parametrization of logistic parameters.
+Heterogeneity in the appearance of lesions is also considered by the spatial parametrization of logistic parameters.
 Finally, ambiguity regarding moderately hyperintense DAWM, and voxels affected by partial volume effect, is captured in the probabilistic output.
 \par
 Several challenges, however, still remain.
-In particular, a number of assumptions were made about the input data for the VLR model which are likely invalid for raw data.
+In particular, a number of assumptions were made about the input data for the VLR model which are likely invalid for raw images.
 These assumptions are that:
 1) input MRI images are free of bias field artifact;
 2) feature intensities are consistent across different subjects;
@@ -432,11 +431,11 @@ Solving these challenges must therefore be accomplished by one or more pre-proce
 % ==================================================================================================
 \subsection{Registration}\label{ss:meth-reg}
 Image registration is the process of geometrically transforming a source image so that the image content is aligned per-voxel with a target image of the same subject.
-This process facilitates voxel-wise analysis of MRI from different subjects including  ``voxel-based morphometry'' \cite{Ashburner2000a} and statistical analysis of functional MRI data \cite{Smith2004}%
+This process facilitates voxel-wise analysis of MRI from different subjects, such as  ``voxel-based morphometry'' \cite{Ashburner2000a} and analysis of functional MRI data \cite{Smith2004}%
 \footnote{Incidentally, investigation of these topics were the motivations for developing of the SPM and FSL software packages, respectively.}.
 Source images from multiple subjects are usually registered to the same target image; 
 in this context, it is useful to define a ``native space'' and a ``standardized space'', denoting the original, subject-specific geometry, and the standardized target geometry.
-By convention, the target brain space is usually either the Talairach space \cite{Talairach1988} or the Montreal Neurological Institute (MNI) space \cite{Evans1993}, though any target image could be used.
+By convention, the target brain space is usually either the Talairach space \cite{Talairach1988} or the Montreal Neurological Institute (MNI) space \cite{Evans1993}, though any reasonable target image could be used.
 \par
 Parameters defining registration transforms are fitted by maximizing some measure of overlap between the images \cite{Sotiras2013}.
 Simple registration methods employ only affine transformations, comprising a combination of translation, scaling, and shear transformations (e.g. the FLIRT tool \cite{Jenkinson2002} in FSL).
@@ -446,15 +445,13 @@ cubic B-splines in FSL FNIRT \cite{Andersson2007},
 discrete cosine transform in SPM Normalize \cite{Ashburner1997,Ashburner2005},
 a general diffeomorphism in the SyN algorithm \cite{Avants2008}).
 While these models are more difficult to fit, several robust algorithms have been released for general use, with widespread acceptance (e.g. the toolboxes mentioned above).
-A \citeyear{Klein2009} comparison of 14 different methods is a good resource \cite{Klein2009},
-
-\cite{Kazemi2014}.
+A \citeyear{Klein2009} comparison of 14 different methods is a good resource on the subject \cite{Klein2009}, while a more recent (\citeyear{Kazemi2014}) study ranks the popular toolboxes SPM, FSL, and Brainsuite \cite{Kazemi2014}.
 \par
-In the current work, estimation of the model parameters $\bb(x)$ during training requires registration of the training data to a standardized brain space.
-At test time (or during subsequent use), these parameter images can be transformed in the opposite direction to a given native space for inference.
+In the current work, registration is required during both training at testing.
+During training, the model parameters $\bb(x)$ are estimated using mutually aligned segmentation examples $\{\bY,\C\}$.
+At test time (or for actual use), these parameter images are transformed in the opposite direction to the native space of the current subject.
 
-
-
+%\cite{Rueckert1999}
 %N3/4 \citeauthor{Tustison2010} \cite{Tustison2010}
 %SPM New Segment \citeauthor{Ashburner2005} \cite{Ashburner2005}
 %FSL FLIRT \citeauthor{Jenkinson2002} \cite{Jenkinson2002}
@@ -462,14 +459,133 @@ At test time (or during subsequent use), these parameter images can be transform
 %ans SPM is definitely not the best...
 %BUT: SPM is one of only a few which can do multi-modal image registration, which is helpful, since 
 %still: a FLAIR template does exist \cite{Winkler2012}
-
+\footnote{Full disclosure: this topic was not investigated, except for visual inspection of the MNI-space images produced by SPM. Since these appeared acceptable, no other tools were explored.}
 
 % ==================================================================================================
 \subsection{Bias Correction}\label{ss:meth-bias}
 % ==================================================================================================
-\subsection{Graylevel Standardization}\label{ss:meth-ystd}
-\par...\par
 \clearpage
+\subsection{Graylevel Standardization}\label{ss:meth-ystd}
+The flexibility of image contrast in MRI is a double-edged sword.
+This feature, in addition to properties of spatial encoding during acquisition, preclude direct interpretation of image graylevels as a tissue property.
+As a result, the same brain region in the same subject may be assigned a different graylevel depending on the MRI sequence time constants, scanner, and spatial acquisition protocol.
+For automated analysis of MRI images, therefore, standardization of image graylevels is required.
+\par
+Graylevel standardization can be achieved using a univariate transformation $\uptau:y\mapsto\tilde{y}$, defined as
+\begin{equation}
+\tilde{y} = \uptau(y),
+\end{equation}
+where $\uptau$ is monotonic, and considers characteristics of the input image graylevel histogram.
+The histogram of an image represents the number of occurrences of each graylevel in the image.
+Normalizing the histogram by the total number of voxels $X$ yields the the probability mass function (PMF) $f_{\sy}(y)$,
+\begin{align}
+f_{\sy}(y) &= \frac{1}{X}h_{\sy}(y)\nonumber\\
+&= \frac{1}{X}\sum_{i=1}^{X}
+\begin{cases}
+1&Y(x_i) = y\\
+0&Y(x_i) \ne y\\
+\end{cases}
+\end{align}
+The cumulative density function (CDF) $F_{\sy}(y)$ is the cumulative sum of $f_{\sy}(y)$,
+\begin{equation}
+F_{\sy}(y) = \sum_{\gamma=y_{\min}}^{y} f_{\sy}(\gamma)
+\end{equation}
+The PMF of an MRI can be decomposed into the contributions of each constituent tissue, as shown in Figure \ref{fig:simflairplot}.
+This is the fundamental principle underlying mixture models (cf. \S\ \ref{ss:priorproposed}).
+The goal of standardization is therefore to align these sub-distributions as closely as possible.
+\par
+Previously proposed methods of standardizing MRI intensities include the following:%
+\footnote{This section considers only univariate standardization methods, since only FLAIR intensities are used in this work.}
+\begin{itemize}
+  \item \textbf{Range Matching:}
+  The simplest approach to standardization involves rescaling the data using the minimum and maximum intensities,
+  \begin{equation}\uptau(y) = \frac{y-y_{\min}}{y_{\max}-y_{\min}}.\end{equation}
+  Naively, this method is very susceptible to corruption by outliers.
+  For more robustness, $y_{\min}$ and $y_{\max}$ can be defined using intensity quantiles -- e.g. $[\epsilon_1,1-\epsilon_2]$.
+  However, selection of an appropriate $\epsilon_2$ for WMH segmentation is difficult, since WMH typically constitute only the top 1\% of the total brain volume.
+  Furthermore, differences in image contrasts are not considered by this approach.
+  \item \textbf{Statistical standardization:}
+  Another simple but popular approach uses the first and second order moments of the PMF,
+  \begin{equation}\uptau(y) = \frac{y-\mu_{\sy}}{\sigma_{\sy}}.\end{equation}
+  As with range matching, variable image contrasts are not well modelled by this method.
+  \item \textbf{Histogram equalization:}
+  Histogram equalization transforms the image PMF to a uniform distribution, thereby distributing image intensities equally across the available range.
+  The desired transform  is defined as the CDF of the input image (cf. \cite{Gonzalez2006} for derivation),
+  \begin{equation}\uptau(y) = F_{\sy}(y).\end{equation}
+  The chief assumption of histogram equalization for standardization is that input images contain consistent amounts of each tissue class.
+  In MRI with WMH, this assumption may not be valid; however, this technique may still have value.
+  \item \textbf{Histogram matching:}
+  Histogram matching is similar to histogram equalization, except that the output PMF is not uniform, but some other specified distribution, $f_{\tilde{\sy}}$.
+  This transform is defined as the function composition of the input CDF and the inverse target CDF,
+  \begin{equation}\uptau(y) = {F_{\tilde{\sy}}}^{-1}\big(F_{\sy}(y)\big)\end{equation}
+  Histogram matching 
+  (cf. \ref{ss:hm-vs-he} for an illustration and experimental evidence.)
+  \item \textbf{Nyul standardization:}
+  In \cite{Nyul1999,Nyul2000}, \citeauthor{Nyul1999} proposed a method for intensity standardization which has subsequently been used in other works.
+  This method defines $\uptau$ with piecewise linear segments connecting the $Q$ quantiles of the input PMF $q$, with quantiles of a target PMF $r$,
+  \begin{equation}\uptau(y) = r_i + \left(y-q_i\right)\left(\frac{r_{i+1}-r_i}{q_{i+1}-q_i}\right),\quad y\in[q_i,q_{i+1}]\end{equation}
+  However, it can be shown that this transformation is a non-uniform trapezoidal Riemann approximation of true histogram matching, which performs worse in terms of intensity standardization.%
+  \footnote{This result is presented and supported with experiments in \cite{Knight2017}.}
+  \item \textbf{Regional characteristics}
+  Decorrelating variation in intensities from variability in anatomical content is a central challenge in intensity standardization.
+  One solution is to define the image-specific transformation using characteristics from a more anatomically consistent brain region.
+  This is the approach employed by \citeauthor{Shinohara2014} in the so-called white stripe method \cite{Shinohara2014}.
+  In the current work, this region, denoted $\x_{\uptau}$, can be defined in MNI space using tissue priors (Figure \ref{fig:tpm-3}), anatomical label maps, or any other method of selecting a subset of voxels.
+\end{itemize}
+% --------------------------------------------------------------------------------------------------
+\subsubsection{Quantifying Standardization}
+While the major advantages and challenges to several graylevel standardization methods have been briefly noted, it remains to explore the utility of each experimentally.
+In the current work, the goal of this step is to maximize the separation of the two classes.
+This can even be maximized voxel-wise, due to the characteristics of the VLR model.
+Therefore, an intermediate objective function $\Z$ should be defined which quantifies the degree of separation of the two classes.%
+\footnote{Alternatively, the entire pipeline can be executed under cross validation and overall performance compared between standardization methods.
+However this does not consider potential interactions between the standardization method and tunable downstream parameters.}
+This objective function can then be used to optimize any tunable parameters in each of the transforms -- e.g. $\bm{\epsilon}$, $Q$, $\x_{\uptau}$ --
+and also to select the best overall method.
+\par
+Two such functions are proposed.
+The first is discrete, and inspired by the Zero-Crossing Rate \cite{Kedem1986}.
+It measures the number of class transitions in the sorted feature data $\Y_s$, as shown in Figures \ref{fig:jsep-diff-1} and \ref{fig:jsep-diff-2}.
+With $\C_s$ as the class labels after sorting by the feature $\Y$, the objective function $\Z_{\Delta}$ is defined as
+\begin{equation}
+\Z_{\Delta} = \sum_{n=1}^{N-1}\begin{cases}
+1&\C_s^{n} \ne \C_s^{n+1}\\
+0&\C_s^{n}  =  \C_s^{n+1}
+\end{cases}.
+\end{equation}
+This function is discrete and bounded, as in $\Z_{\Delta}\in\mathbb{Z}\left[1,\lfloor\frac{N}{2}\rfloor\right]$%
+\footnote{The lower bound can be zero if one class is not observed.}
+and the lower bound is optimal -- i.e. $\Z_{\Delta}$ should be minimized.
+\par
+The second function is continuous, and inspired by probability theory.
+It measures the relative overlap of class distributions, estimated using kernel smoothing, as shown in Figures \ref{fig:jsep-conv-1} and \ref{fig:jsep-conv-2}.
+This objective function $\Z_{\star}$ can be defined as
+\begin{equation}
+\Z_{\star} = \int_{y_{\min}}^{y_{\max}}\frac%
+{\min\{p_{{}_{c=1}}(\gamma), p_{{}_{c=0}}(\gamma)\}}%
+{\max\{p_{{}_{c=1}}(\gamma), p_{{}_{c=0}}(\gamma)\}}\d\gamma,
+\qquad p_{{}_{c}} \approx \delta(\gamma-\Y_{{}_{c}}) \star G_{\sigma}
+\end{equation}
+where $G_{\sigma}$ is a Gaussian convolution kernel with width $\sigma$.
+This function is continuous and bounded, as in $\Z_{\Delta}\in\left[0,1\right]$, and the lower bound is again optimal.
+\par
+\begin{figure}
+  \centering
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{jsep-diff-1}\caption{$\Z_{\Delta}$ with overlapping classes}\label{fig:jsep-diff-1}\end{subfigure}
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{jsep-conv-1}\caption{$\Z_{\star}$ with overlapping classes}\label{fig:jsep-conv-1}\end{subfigure}\\[1em]
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{jsep-diff-2}\caption{$\Z_{\Delta}$ with separable classes}\label{fig:jsep-diff-2}\end{subfigure}
+  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{jsep-conv-2}\caption{$\Z_{\star}$ with separable classes}\label{fig:jsep-conv-2}\end{subfigure}
+  \caption{Illustration of potential separability objective functions.}
+  \label{fig:jsep}
+\end{figure}
+% --------------------------------------------------------------------------------------------------
+\subsubsection{Supervised Standardization}
+At this point, it is not hard to see that it should be possible to estimate an optimal graylevel standardization transform using the training data.
+That is, a \textit{supervised graylevel standardization}.%
+\footnote{To the best of this author's knowledge, such a technique has never been proposed.}
+If $\Z$ is differentiable, then this optimization can be performed using gradient descent, or similar methods.
+Unfortunately, neither of the above objective functions $\Z$ were reasonably differentiable, but many other optimization paradigms which do not require gradients exist.
+% some examples? is this genetic algorithms?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Post-Processing}\label{s:meth-post}
 The 
