@@ -402,19 +402,10 @@ First, deriving the update gradients for such a model would be challenging, and 
 Second, such an encoding may introduce artifacts in the resulting parameter images.
 Moreover, it is well known that frequency domain band-limiting can be equivalently achieved by convolution (i.e. filtering) in the spatial domain \cite{Gonzalez2006}.
 Therefore, only conventional filtering is explored in this work (cf. \S\ \ref{})
-%__JK__ define this reference.
+%__JK__ define this reference in ch-exp
 %__JK__ address MRFs for smoothing here? Check back answer on Quora.
-%\citeauthor{Harmouche2015} \cite{Harmouche2015} also note that in smoothly varying models, small registration errors can be expected to have only a minor impact.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Pre-Processing}\label{s:meth-pre}
-% [x] Overlapping distributions
-% [ ] Bias field
-% [x] DAWM
-% [x] Partial volume effect
-% [-] Artifacts
-% [-] Image variability
-% [ ] (registration)
-% [ ] (standardization)
 The proposed VLR classification model addresses several of the challenges outlined in \S\ \ref{ss:autochallenges}.
 The problem of overlapping tissue graylevel distributions is mostly solved through expansion of the feature space to include spatial features.
 CSF flow-through artifacts, which appear in roughly consistent locations, are similarly managed.
@@ -448,23 +439,43 @@ While these models are more difficult to fit, several robust algorithms have bee
 A \citeyear{Klein2009} comparison of 14 different methods is a good resource on the subject \cite{Klein2009}, while a more recent (\citeyear{Kazemi2014}) study ranks the popular toolboxes SPM, FSL, and Brainsuite \cite{Kazemi2014}.
 \par
 In the current work, registration is required during both training at testing.
-During training, the model parameters $\bb(x)$ are estimated using mutually aligned segmentation examples $\{\bY,\C\}$.
-At test time (or for actual use), these parameter images are transformed in the opposite direction to the native space of the current subject.
-
-%\cite{Rueckert1999}
-%N3/4 \citeauthor{Tustison2010} \cite{Tustison2010}
-%SPM New Segment \citeauthor{Ashburner2005} \cite{Ashburner2005}
-%FSL FLIRT \citeauthor{Jenkinson2002} \cite{Jenkinson2002}
-%THERE ARE SO MANY \citeauthor{Klein2009} \cite{Klein2009}...
-%ans SPM is definitely not the best...
-%BUT: SPM is one of only a few which can do multi-modal image registration, which is helpful, since 
-%still: a FLAIR template does exist \cite{Winkler2012}
-\footnote{Full disclosure: this topic was not investigated, except for visual inspection of the MNI-space images produced by SPM. Since these appeared acceptable, no other tools were explored.}
-
+During training, the model parameters $\bb(x)$ are estimated using mutually aligned segmentation examples $\{\bY,\C\}$ in a standard brain space.
+At test time (or for actual use), these parameter images are transformed in the opposite direction from the standard space to the native space of the current subject.
+Since registration transforms are typically bijections -- i.e. invertible -- the second registration case can be estimated using the same method as the first, minimizing bias.
+\par
+Unlike other applications, it is not essential that perfect image registration is achieved here.
+As noted by \citeauthor{Harmouche2015} \cite{Harmouche2015}, in smoothly varying models, small registration errors can be expected to have a negligible impact.
+Therefore, registration was not a primary focus of optimization in this work.
+\par
+While the registration component of the SPM8 ``Segment'' feature was not among the top performing in the \citeyear{Klein2009} study \cite{Klein2009}, subsequent implementation revisions in SPM12%
+\footnote{\hreftt{http://www.fil.ion.ucl.ac.uk/spm/software/spm12/SPM12_Release_Notes.pdf}}
+called ``New Segment'' have apparently improved results.
+In the \citeyear{Kazemi2014} study \cite{Kazemi2014}, the SPM12 New Segment method achieved the highest Similarity Index of all methods on real (IBSR \cite{IBSR}) data.
+\par
+Furthermore, the SPM module has several other features amenable to this work.
+First, unlike many other registration algorithms, the objective function does not require source and target images to have the same contrast.
+This is helpful, since no suitable FLAIR template image is available for use as a target.%
+\footnote{One FLAIR template is available in \cite{Winkler2012}; however, this was generated using SPM5, so using it would compound any registration biases associated with the older method.}
+Second, it is simple to invoke the SPM modules via the command line or Matlab scripts;
+this facilitates smooth integration of this tool in the pipeline.
+Third, it is possible to save previously estimated registration transformations, and apply them in the forward or reverse directions efficiently.
+This can save significant time during cross validation, since the estimated parameter images $\bm{\b}(x)$ must eventually be transformed to the native space of every subject.
+Finally, the SPM ``New Segment'' model additionally estimates the bias field during execution with high accuracy, saving an additional step (cf. \S\ \ref{ss:meth-bias}, below). 
+For all these reasons, the registration performed by SPM New Segment was used throughout this work.
+After satisfactory visual inspection of all training set images, no other registration tools were investigated.
 % ==================================================================================================
 \subsection{Bias Correction}\label{ss:meth-bias}
+As noted in \S\ \ref{ss:autochallenges}, bias field (\textsc{aka} intensity inhomogeneity), is a smoothly varying intensity variation artifact common in MRI.
+The sources of bias field artifact include inhomogeneities in the magnetic field and RF coils used for pulse transmission and signal sensing, as well as non-ideal magnetic properties of the imaged object \cite{Vovk2007}.
+The field and coil related sources are more significant at clinical field strengths.
+These can be corrected prospectively, though techniques for doing so are limited, and often a small bias field continues to corrupt acquired images \cite{Vovk2007}.
+Therefore, retrospective correction has been the subject of much research \cite{Vovk2007}.
+% could use another couple references here...
+\par
+Similar to image registration, several widely accepted algorithms for estimating and correcting bias field have emerged.
+%N3/4
+\par...\par
 % ==================================================================================================
-\clearpage
 \subsection{Graylevel Standardization}\label{ss:meth-ystd}
 The flexibility of image contrast in MRI is a double-edged sword.
 This feature, in addition to properties of spatial encoding during acquisition, preclude direct interpretation of image graylevels as a tissue property.
@@ -545,8 +556,8 @@ and also to select the best overall method.
 \par
 Two such functions are proposed.
 The first is discrete, and inspired by the Zero-Crossing Rate \cite{Kedem1986}.
-It measures the number of class transitions in the sorted feature data $\Y_s$, as shown in Figures \ref{fig:jsep-diff-1} and \ref{fig:jsep-diff-2}.
-With $\C_s$ as the class labels after sorting by the feature $\Y$, the objective function $\Z_{\Delta}$ is defined as
+It measures the number of class transitions in the sorted feature data $\tilde{\Y}_s$, as shown in Figures \ref{fig:jsep-diff-1} and \ref{fig:jsep-diff-2}.
+With $\C_s$ as the class labels after sorting by the feature $\tilde{\Y} = \uptau(\Y)$, the objective function $\Z_{\Delta}$ is defined as
 \begin{equation}
 \Z_{\Delta} = \sum_{n=1}^{N-1}\begin{cases}
 1&\C_s^{n} \ne \C_s^{n+1}\\
@@ -558,15 +569,15 @@ This function is discrete and bounded, as in $\Z_{\Delta}\in\mathbb{Z}\left[1,\l
 and the lower bound is optimal -- i.e. $\Z_{\Delta}$ should be minimized.
 \par
 The second function is continuous, and inspired by probability theory.
-It measures the relative overlap of class distributions, estimated using kernel smoothing, as shown in Figures \ref{fig:jsep-conv-1} and \ref{fig:jsep-conv-2}.
+It measures the relative overlap of class distributions, $p(\tilde{y}\mid c=1)$ and $p(\tilde{y}\mid c=0)$, estimated using kernel smoothing, as shown in Figures \ref{fig:jsep-conv-1} and \ref{fig:jsep-conv-2}.
 This objective function $\Z_{\star}$ can be defined as
 \begin{equation}
-\Z_{\star} = \int_{y_{\min}}^{y_{\max}}\frac%
-{\min\{p_{{}_{c=1}}(\gamma), p_{{}_{c=0}}(\gamma)\}}%
-{\max\{p_{{}_{c=1}}(\gamma), p_{{}_{c=0}}(\gamma)\}}\d\gamma,
-\qquad p_{{}_{c}} \approx \delta(\gamma-\Y_{{}_{c}}) \star G_{\sigma}
+\Z_{\star} = \int_{\tilde{y}_{\min}}^{\tilde{y}_{\max}}
+\frac{\min\{p(\gamma \mid c=1), p(\gamma \mid c=0)\}}
+     {\max\{p(\gamma \mid c=1), p(\gamma \mid c=0)\}}\d\gamma,
+\qquad p(\gamma \mid c) \approx \sum_{\tilde{y}\in\{\tilde{\Y}\mid c\}}\delta(\gamma-\tilde{y}) \star G_{\sigma}(\gamma)
 \end{equation}
-where $G_{\sigma}$ is a Gaussian convolution kernel with width $\sigma$.
+where $G_{\sigma}(\gamma)$ is a Gaussian convolution kernel with width $\sigma$.
 This function is continuous and bounded, as in $\Z_{\Delta}\in\left[0,1\right]$, and the lower bound is again optimal.
 \par
 \begin{figure}
@@ -584,14 +595,14 @@ At this point, it is not hard to see that it should be possible to estimate an o
 That is, a \textit{supervised graylevel standardization}.%
 \footnote{To the best of this author's knowledge, such a technique has never been proposed.}
 If $\Z$ is differentiable, then this optimization can be performed using gradient descent, or similar methods.
-Unfortunately, neither of the above objective functions $\Z$ were reasonably differentiable, but many other optimization paradigms which do not require gradients exist.
+Unfortunately, neither of the above objective functions $\Z$ were reasonably differentiable, but many other optimization paradigms which do not require gradients could be used.
 % some examples? is this genetic algorithms?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Post-Processing}\label{s:meth-post}
 The 
 
 Following pre-processing and classification by the VLR model, 
-
+  
 In principle, post-processing aims to incorporate any additional knowledge of the problem which has not been considered in upstream elements. 
 
 
@@ -599,17 +610,17 @@ In principle, post-processing aims to incorporate any additional knowledge of th
 
 \clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Performance Metrics}\label{ss:metrics}
+\section{Segmentation Performance Metrics}\label{ss:metrics}
 Quantifying the performance of a model is essential to optimizing its design.
 Typically, WMH segmentation performance is characterized in two respects: voxel-wise agreement and total lesion load (LL) volume agreement.
-When comparing the estimated segmentation $\hat{c}$ to the ground truth segmentation $c$, each individual voxel can occupy one of four states (colours shown for future reference):
+When comparing the estimated class $\hat{c}$ to the ground truth class $c$, each individual voxel can occupy one of four states (colours shown for future reference):
 \begin{itemize}[itemsep=0pt,topsep=0pt]
   \item[\textcolor{green}{\scalebox{0.7}{$\blacksquare$}}] True Positive (TP): $c = 1$ and $\hat{c} = 1$, correctly predicted ``lesion''.
   \item[\textcolor{red}  {\scalebox{0.7}{$\blacksquare$}}] False Positive (FP): $c = 0$ and $\hat{c} = 1$, incorrectly predicted ``lesion''.
   \item[\textcolor{blue} {\scalebox{0.7}{$\blacksquare$}}] False Negative (FN): $c = 1$ and $\hat{c} = 0$, incorrectly predicted ``healthy''.
   \item[\textcolor{black}{\scalebox{0.7}{$\blacksquare$}}] True Negative (TN): $c = 0$ and $\hat{c} = 0$, correctly predicted ``healthy''.
 \end{itemize}
-Summing the number of voxels in each state, voxel-wise agreement can then be quantified using the following measures:
+Summing the number of voxels in each state over an entire image volume, voxel-wise agreement can then be quantified using the following measures:
 \begin{itemize}
   \item \textbf{Similarity Index (SI)}
   (\textsc{aka} Dice Similarity Coefficient, F1-Score)\\
@@ -656,7 +667,7 @@ The optimization of these model components will be the subject of the next chapt
   	\hline
   	Stage                            & Parameter            & Notation                    & Type                                              & Default                   \\ \hline
   	\multirow{4}{*}{Pre-Processing}  & Reflect Augmentation & $A_R$                       & $\mathbb{B}$                                      & $0$                       \\
-  	                                 & Shift Augmentation   & $A_S$                       & $\mathcal{N}_p$                                   & $\mathcal{N}_0$           \\
+  	                                 & Shift Augmentation   & $A_S$                       & $\mathbf{N}_p$                                    & $\mathbf{N}_0$            \\
   	                                 & Graylevel Transform  & $T_y$                       & $f: y\mapsto \tilde{y}$                           & $f_{he}$                  \\
   	                                 & Transform Mask       & $M_{T}(x)$                  & $\mathbb{B}(x)$                                   & $M_{\text{brain}}$        \\ \hline
   	\multirow{6}{*}{VLR Fitting}     & Iterations           & $N_{t}^{\lr}$               & $\mathbb{Z}$                                      & $30$                      \\
@@ -664,12 +675,12 @@ The optimization of these model components will be the subject of the next chapt
   	                                 & Learning Rate        & $\alpha$                    & $\Re$                                             & $1$                       \\
   	                                 & Regularization       & $\lambda$                   & $\Re$                                             & $0$                       \\
   	                                 & Pseudo-Lesions       & $\{\bY_{\rho},\bC_{\rho}\}$ & $\{\{\et\cdot\in\Re\},\{\et\cdot\in[0,1]\}\}$     & $\{\{\},\{\}\}$           \\
-  	                                 & $\bb$ Filter         & $F_{\bb}$                   & $f: \bb(\mathcal{N}_p(x)) \mapsto \tilde{\bb}(x)$ & $\tilde{\bb}(x) = \bb(x)$ \\ \hline
+  	                                 & $\bb$ Filter         & $F_{\bb}$                   & $f: \bb(\mathbf{N}_p(x)) \mapsto \tilde{\bb}(x)$  & $\tilde{\bb}(x) = \bb(x)$ \\ \hline
   	\multirow{3}{*}{Post-Processing} & Min Lesion  Size     & $\mathrm{x}_{\min}^{c}$     & $\Re\en(\text{mm}^{3})$                           & $0$                       \\
   	                                 & MRF Iterations       & $N_{t}^{\mrf}$              & $\mathbb{Z}$                                      & $0$                       \\
   	                                 & MRF Weights          & $W_{\mrf}$                  & $\{w_{\Delta},w_{F},w_y\}$                        & $\{1,1,1\}$               \\ \hline
   \end{tabular}
-  \tablepost{Notation. $\mathbb{B}$: boolean value; $\mathbb{Z}$: integer value; $\mathbb{R}^n$: real value ($n=1$) or vector ($n > 1$); $\mathcal{N}_p$: nearest $p$ voxel neighbourhood.}
+  \tablepost{Notation. $\mathbb{B}$: boolean value; $\mathbb{Z}$: integer value; $\mathbb{R}^n$: real value ($n=1$) or vector ($n > 1$); $\mathbf{N}_p$: nearest $p$ voxel neighbourhood.}
 \end{table}
 % --------------------------------------------------------------------------------------------------
 % ==================================================================================================
