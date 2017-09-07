@@ -314,6 +314,15 @@ The specific methods proposed for WMH segmentation are now reviewed.%
 % --------------------------------------------------------------------------------------------------
 \newcommand{\priorworksub}[1]{\subsubsection{#1}}
 \input{priorwork}
+% --------------------------------------------------------------------------------------------------
+% \subsubsection{WMH Segmentation Toolboxes}
+% should list here the freely available methods, like in paper. Paper text:
+%We commend the authors of several freely available WMH segmentation tools for deploying their algorithms in usable form, and for accepting their inevitable role of as the butt of comparisons with other methods.
+%Of the available tools 
+%\cite{VanLeemput2001,Souplet2008,Shiee2010,Garcia-Lorenzo2011,Schmidt2012,Sweeney2013,Schmidt2015}, 
+%only the method by \citeauthor{Schmidt2015} (\citeyear{Schmidt2015}) \cite{Schmidt2015} is designed for FLAIR-only segmentation. The older method by \citeauthor{Schmidt2012} (\citeyear{Schmidt2012}) \cite{Schmidt2012} requires a T1 sequence, and the method by \citeauthor{Sweeney2013} \cite{Sweeney2013} requires T1, T2, FLAIR, and PD modalities. The methods by \citeauthor{VanLeemput2001} \cite{VanLeemput2001}, \citeauthor{Souplet2008} \cite{Souplet2008}, \citeauthor{Shiee2010} \cite{Shiee2010}, and \citeauthor{Garcia-Lorenzo2011} \cite{Garcia-Lorenzo2011} were designed for some combination of T1, T2, FLAIR, and PD, and are flexible to the selected inputs; however they were not designed for FLAIR-only use, and it is unclear how they will perform under such conditions. Therefore, we compare only with the LPA method by \citeauthor{Schmidt2015}.
+%\par
+%The LPA algorithm produces probabilistic lesion segmentations. For a fair comparison, we optimize the threshold for binarization of these images using the same LOSO-CV folds, similar to the postprocessing optimization of our method.
 % ==================================================================================================
 \subsection{Limitations}\label{ss:priorlimits}
 Despite over 50 proposed algorithms and several competitions, no WMH segmentation algorithm has clearly emerged the superior method, nor has any been taken up for use in the wider research community.
