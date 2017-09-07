@@ -15,7 +15,7 @@ For example, tissue classifying modules typically assume that the bias field is 
 \par
 The second paradigm, a unified generative model, aims to solve this chicken-egg problem.
 The segmentation is parameterized in one integrated probabilistic model, which often combines the input images with tissue prior probability images, a bias field model, and smoothness terms.
-Parameters of each sub-model are estimated using several expectation maximization iterations before the final segmentation is inferred.
+Parameters of each sub-model are estimated using several expectation maximization (EM) iterations before the final segmentation is inferred.
 The challenges to this approach include balancing model complexity with estimability, robust convergence issues, and reduced ability to include external tools.
 \par
 The final paradigm, deep learning, uses error back-propagation to update thousands of parameters in a large, relatively unstructured model mapping the input MRI to the output segmentation image.
@@ -447,7 +447,7 @@ Unlike other applications, it is not essential that perfect image registration i
 As noted by \citeauthor{Harmouche2015} \cite{Harmouche2015}, in smoothly varying models, small registration errors can be expected to have a negligible impact.
 Therefore, registration was not a primary focus of optimization in this work.
 \par
-While the registration component of the SPM8 ``Segment'' feature was not among the top performing in the \citeyear{Klein2009} study \cite{Klein2009}, subsequent implementation revisions in SPM12%
+While the registration component of the SPM8 ``Segment'' feature \cite{Ashburner2005} was not among the top performing in the \citeyear{Klein2009} study \cite{Klein2009}, subsequent implementation revisions in SPM12%
 \footnote{\hreftt{http://www.fil.ion.ucl.ac.uk/spm/software/spm12/SPM12_Release_Notes.pdf}}
 called ``New Segment'' have apparently improved results.
 In the \citeyear{Kazemi2014} study \cite{Kazemi2014}, the SPM12 New Segment method achieved the highest Similarity Index of all methods on real (IBSR \cite{IBSR}) data.
@@ -469,12 +469,27 @@ As noted in \S\ \ref{ss:autochallenges}, bias field (\textsc{aka} intensity inho
 The sources of bias field artifact include inhomogeneities in the magnetic field and RF coils used for pulse transmission and signal sensing, as well as non-ideal magnetic properties of the imaged object \cite{Vovk2007}.
 The field and coil related sources are more significant at clinical field strengths.
 These can be corrected prospectively, though techniques for doing so are limited, and often a small bias field continues to corrupt acquired images \cite{Vovk2007}.
-Therefore, retrospective correction has been the subject of much research \cite{Vovk2007}.
+Therefore, retrospective correction has been the subject of much research.
 % could use another couple references here...
 \par
 Similar to image registration, several widely accepted algorithms for estimating and correcting bias field have emerged.
-%N3/4
-\par...\par
+The N3 algorithm \cite{Sled1998}, subsequently updated to N4(ITK) \cite{Tustison2010} and integrated in the FreeSurfer toolbox%
+\footnote{\hreftt{https://surfer.nmr.mgh.harvard.edu/}}
+is perhaps the most popular, it makes minimal assumptions about the image.
+This method aims to sharpen the image histogram by dividing the image by an estimated bias field, parameterized by B-splines for smoothness.
+As noted above, the SPM Segment model \cite{Ashburner2005} includes integrated bias field estimation and correction.
+The bias field model in this work is parameterized by the discrete cosine transform, as described in in a previous work by \citeauthor{Ashburner2005} \cite{Ashburner1999}.
+The FSL Segment feature also estimates bias field in a similar overall model to SPM Segment, except the tissue prior probability maps in SPM are replaced with a Hidden Markov Random Field Model, as described in \cite{Zhang2001}.
+Again, two reviews with quantitative performance comparisons provide a good reference of other proposed algorithms, including a comprehensive review in \citeyear{Belaroussi2006} \cite{Belaroussi2006} and a comparison of mainly popular methods in \citeyear{Ganzetti2016} \cite{Ganzetti2016}.
+\par
+In the \citeyear{Ganzetti2016} comparison \cite{Ganzetti2016}, the authors note that the SPM and FSL models -- which include segmentation -- outperformed the N3 algorithm \cite{Sled1998} and another non-segmenting method \cite{Dawant1993}.
+These results are consistent with the advantages of unified generative models described in \S\ \ref{s:modelconcept} and discussed in \citetitle{Ashburner2005} \cite{Ashburner2005}.
+Specifically, the estimation of both bias field and tissue segmentation could each be improved if the other was already known.
+Rolling these tasks into a single EM-fitted model allows alternating conditional estimates to converge on better results overall.
+\par
+Bias field estimation was not a primary focus of this work.
+Therefore, due to the better performance over N3/4, and the advantages already afforded by SPM Segment for registration noted above, this model was employed for bias correction throughout this work.
+No other bias field correction tools were investigated.
 % ==================================================================================================
 \subsection{Graylevel Standardization}\label{ss:meth-ystd}
 The flexibility of image contrast in MRI is a double-edged sword.
@@ -486,7 +501,7 @@ Graylevel standardization can be achieved using a univariate transformation $\up
 \begin{equation}
 \tilde{y} = \uptau(y),
 \end{equation}
-where $\uptau$ is monotonic, and considers characteristics of the input image graylevel histogram.
+where $\uptau$ is monotonic, and considers characteristics of the input image, such as basic graylevel statistics or the histogram.
 The histogram of an image represents the number of occurrences of each graylevel in the image.
 Normalizing the histogram by the total number of voxels $X$ yields the the probability mass function (PMF) $f_{\sy}(y)$,
 \begin{align}
@@ -551,8 +566,7 @@ This can even be maximized voxel-wise, due to the characteristics of the VLR mod
 Therefore, an intermediate objective function $\Z$ should be defined which quantifies the degree of separation of the two classes.%
 \footnote{Alternatively, the entire pipeline can be executed under cross validation and overall performance compared between standardization methods.
 However this does not consider potential interactions between the standardization method and tunable downstream parameters.}
-This objective function can then be used to optimize any tunable parameters in each of the transforms -- e.g. $\bm{\epsilon}$, $Q$, $\x_{\uptau}$ --
-and also to select the best overall method.
+This objective function can then be used to optimize any tunable parameters in each of the transforms -- e.g. $\bm{\epsilon}$, $Q$, $\x_{\uptau}$ -- and also to select the best overall method.
 \par
 Two such functions are proposed.
 The first is discrete, and inspired by the Zero-Crossing Rate \cite{Kedem1986}.
