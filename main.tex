@@ -27,13 +27,14 @@
 \usepackage[hang, flushmargin]{footmisc}
 \usepackage[colorlinks]{hyperref}
 \usetikzlibrary{shapes,arrows.meta,calc}
-\usepackage[backend=biber, style=numeric, maxcitenames=1, sorting=none, url=false, isbn=false, doi=true, eprint=false]{biblatex}
+\usepackage[backend=biber, style=numeric, maxcitenames=2, sorting=none, url=false, isbn=false, doi=true, eprint=false]{biblatex}
 \hypersetup{citecolor={purple},linkcolor={blue}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % resources
 \addbibresource{C:/Users/Jesse/Documents/tex/src/tex/latex/library.bib}
 \graphicspath{{figs/}{figs/tikz/}{figs/tikz/algorithm/}}
 \newcommand{\matlabdir}{C:/Users/Jesse/Documents/m/Research/wmlseg/workspace/}
+\makeatletter\newcommand{\setmaxcitenames}[1]{\numdef\blx@maxcitenames{#1}}\makeatother
 % layout
 \geometry{margin=2cm}
 \setlength{\parindent}{0pt}
