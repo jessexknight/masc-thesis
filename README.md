@@ -25,7 +25,7 @@
 
 #### To Done
 - [x] src: all sentences on their own line for git diff.
-- [ ] Add: what is image registration, MNI space, etc.?
+- [x] Add: what is image registration, MNI space, etc.?
 - [x] Add: methods parameter image smoothing
 - [x] Add: motivate, introduce, and selling the VLR model
 - [x] Add: support claim of spatial heterogeneity of lesion graylevels
