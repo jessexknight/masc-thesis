@@ -403,7 +403,7 @@ Second, such an encoding may introduce artifacts in the resulting parameter imag
 Moreover, it is well known that frequency domain band-limiting can be equivalently achieved by convolution (i.e. filtering) in the spatial domain \cite{Gonzalez2006}.
 Therefore, only conventional filtering is explored in this work (cf. \S\ \ref{})
 %__JK__ define this reference in ch-exp
-%__JK__ address MRFs for smoothing here? Check back answer on Quora.
+%__JK__ address MRFs for smoothing here?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Pre-Processing}\label{s:meth-pre}
 The proposed VLR classification model addresses several of the challenges outlined in \S\ \ref{ss:autochallenges}.
@@ -463,6 +463,7 @@ This can save significant time during cross validation, since the estimated para
 Finally, the SPM ``New Segment'' model additionally estimates the bias field during execution with high accuracy, saving an additional step (cf. \S\ \ref{ss:meth-bias}, below). 
 For all these reasons, the registration performed by SPM New Segment was used throughout this work.
 After satisfactory visual inspection of all training set images, no other registration tools were investigated.
+The default brain space of this module is MNI.
 % ==================================================================================================
 \subsection{Bias Correction}\label{ss:meth-bias}
 As noted in \S\ \ref{ss:autochallenges}, bias field (\textsc{aka} intensity inhomogeneity), is a smoothly varying intensity variation artifact common in MRI.
@@ -552,7 +553,7 @@ Previously proposed methods of standardizing MRI intensities include the followi
   \begin{equation}\uptau(y) = r_i + \left(y-q_i\right)\left(\frac{r_{i+1}-r_i}{q_{i+1}-q_i}\right),\quad y\in[q_i,q_{i+1}]\end{equation}
   However, it can be shown that this transformation is a non-uniform trapezoidal Riemann approximation of true histogram matching, which performs worse in terms of intensity standardization.%
   \footnote{This result is presented and supported with experiments in \cite{Knight2017}.}
-  \item \textbf{Regional characteristics}
+  \item \textbf{Regional characteristics:}
   Decorrelating variation in intensities from variability in anatomical content is a central challenge in intensity standardization.
   One solution is to define the image-specific transformation using characteristics from a more anatomically consistent brain region.
   This is the approach employed by \citeauthor{Shinohara2014} in the so-called white stripe method \cite{Shinohara2014}.
@@ -587,11 +588,11 @@ It measures the relative overlap of class distributions, $p(\tilde{y}\mid c=1)$ 
 This objective function $\Z_{\star}$ can be defined as
 \begin{equation}
 \Z_{\star} = \int_{\tilde{y}_{\min}}^{\tilde{y}_{\max}}
-\frac{\min\{p(\gamma \mid c=1), p(\gamma \mid c=0)\}}
-     {\max\{p(\gamma \mid c=1), p(\gamma \mid c=0)\}}\d\gamma,
-\qquad p(\gamma \mid c) \approx \sum_{\tilde{y}\in\{\tilde{\Y}\mid c\}}\delta(\gamma-\tilde{y}) \star G_{\sigma}(\gamma)
+\frac{\min\{p(\zeta \mid c=1), p(\zeta \mid c=0)\}}
+     {\max\{p(\zeta \mid c=1), p(\zeta \mid c=0)\}}\d\zeta,
+\qquad p(\zeta \mid c) \approx \sum_{\tilde{y}\in\{\tilde{\Y}\mid c\}}\delta(\zeta-\tilde{y}) \star G_{\sigma}(\zeta)
 \end{equation}
-where $G_{\sigma}(\gamma)$ is a Gaussian convolution kernel with width $\sigma$.
+where $G_{\sigma}(\zeta)$ is a Gaussian convolution kernel with width $\sigma$.
 This function is continuous and bounded, as in $\Z_{\Delta}\in\left[0,1\right]$, and the lower bound is again optimal.
 \par
 \begin{figure}
@@ -605,7 +606,7 @@ This function is continuous and bounded, as in $\Z_{\Delta}\in\left[0,1\right]$,
 \end{figure}
 % --------------------------------------------------------------------------------------------------
 \subsubsection{Supervised Standardization}
-At this point, it is not hard to see that it should be possible to estimate an optimal graylevel standardization transform using the training data.
+It is not hard to see that it should be possible to estimate an optimal graylevel standardization transform using the training data.
 That is, a \textit{supervised graylevel standardization}.%
 \footnote{To the best of this author's knowledge, such a technique has never been proposed.}
 If $\Z$ is differentiable, then this optimization can be performed using gradient descent, or similar methods.
@@ -613,18 +614,53 @@ Unfortunately, neither of the above objective functions $\Z$ were reasonably dif
 % some examples? is this genetic algorithms?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Post-Processing}\label{s:meth-post}
-The 
-
-Following pre-processing and classification by the VLR model, 
-  
-In principle, post-processing aims to incorporate any additional knowledge of the problem which has not been considered in upstream elements. 
-
-
-
-
-\clearpage
+At this point, the motivation and details of the proposed VLR model have been presented, in addition to the preprocessing steps required to satisfy its assumptions.
+The last component of a segmentation pipeline typically includes post-processing. 
+In principle, this step aims to incorporate any additional knowledge of the problem which has not been considered in upstream elements.
+Here, these include the connected morphology of WML, and the minimum lesion size.
+Discussions of these topics, however, would assume that the label image is already binary, whereas the output from the VLR model is probabilistic.
+Therefore, the first post-processing step thresholds the WMH class probability to give a ``hard'' classification: $\hat{c}\rightarrow \hat{c}^{\circ}$
+This also facilitates comparison with manual segmentation masks, which are usually binary.
+%__JK__ better notation for this hard label: \hat{c}^{\circ}? 
+% ==================================================================================================
+\subsection{Thresholding}\label{ss:meth-thr}
+If the assumptions of any probabilistic model are valid, then the ``hard'' classification is straightforward:
+\begin{equation}
+  \hat{c}^{\circ} = \underset{\omega}{\arg\max}\en p(\omega\mid\by,\bb)\quad\forall \omega.
+\end{equation}
+In a 2-class logistic regression model, this simplifies to thresholding:
+\begin{equation}
+  \hat{c}^{\circ} = \begin{cases} 0 & \hat{c} < \pi_c \\ 1 & \hat{c} \ge \pi_c \end{cases},
+\end{equation}
+with $\pi_c = 0.5$.
+However, since these assumptions are often only partially true, most models are able to achieve better agreement with manual segmentations using a different threshold $\pi_c$ for the WMH class.
+In fact several of the freely available toolboxes (cf. \S\ \ref{sss:wmhsegtoolboxes}) permit a user-specified threshold which can be optimized for the user's data.
+During model validation, this parameter should be optimized using the training data for each cross validation fold.
+It is also prudent to illustrate the sensitivity of the model to this parameter, using either a plot of performance versus threshold \cite{Steenwijk2013}, or a precision-recall (PR) curve \cite{Arbelaez2011}.
+In the current work, both these techniques are employed: $\pi_c$ is optimized on the fly, and a PR curve is given after.
+% ==================================================================================================
+\subsection{Minimum Lesion Size}\label{ss:meth-minx}
+With finite image resolution and appreciable noise in MRI, lesions appearing as only a few connected voxels are indistinguishable from image noise, even by human experts.
+Such potential lesions are therefore not included in radiologists assessment of WML.
+Accordingly, most WMH segmentation algorithms employ a minimum-connected-voxels exclusion criterion during post-processing.
+Connectedness can be defined in 2D or 3D, and consider only direct adjacency or diagonal connections too.
+Most works employ the most liberal definition: 26-connectedness, which considers all $3\times3\times3-1=26$ candidates surrounding a given voxel in 3D.
+Ideally, the number of required connected voxels will adapt to the image resolution, and correspond to a minimum lesion volume.
+Typical volumes range from about $\mathrm{x}_{\min}^{c} = 3.5$ mm\textsuperscript{3} in \cite{Steenwijk2013,Fartaria2015}, to $9.0$ mm\textsuperscript{3} in \cite{Yoo2014,Elliott2013}.
+\par
+In the current work, the inclusion of a minimum lesion size rule is explored.
+The optimal value for $\mathrm{x}_{\min}^{c}$ is resolved experimentally during each cross validation fold, and the resulting values compared with the above conventions.
+Additionally, the gains in performance afforded by this step are quantified.
+% __JK__ I was going to include the MRF in this section too, but since I really didn't investigate these in any great detail,
+% I was hoping to omit this overall. I would save a lot of time running experiments, and also they never seemed to improve performance
+% (in fact, the opposite). It would require a lot more tinkering to get some good results,and I don't think I'm really in that position right now.
+% __JK__
+%\subsection{Connected Morphology of WML}
+%\par...\par
+%Preliminary qualitative investigations into lesions with these characteristics suggested that errors in this area were not a significant problem for the model.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Segmentation Performance Metrics}\label{ss:metrics}
+% __JK__ what to do about this ugly \hat{c}^{\circ} notation from above? Keep for all references to the hard labelled images? :(
 Quantifying the performance of a model is essential to optimizing its design.
 Typically, WMH segmentation performance is characterized in two respects: voxel-wise agreement and total lesion load (LL) volume agreement.
 When comparing the estimated class $\hat{c}$ to the ground truth class $c$, each individual voxel can occupy one of four states (colours shown for future reference):
@@ -650,17 +686,29 @@ Summing the number of voxels in each state over an entire image volume, voxel-wi
   \begin{equation}Re = \dfrac{TP}{TP+FN}\end{equation}
 \end{itemize}
 Each measure is $\in [0,1]$, where higher is better.
-Note that typical performance metrics like accuracy and sensitivity are avoided, since they include the $TN$ count in the numerator, which is typically much larger than $TP + FP + FN$ combined -- i.e. $c=1$ is a rare event.
+Note that typical performance metrics like accuracy and specificity are avoided, since they include the $TN$ count in the numerator, which is typically much larger than $TP + FP + FN$ combined -- i.e. $c=1$ is a rare event.
 \par
 Overall volume agreement between segmentations is characterized using the 2-way mixed-effects single-rater absolute intraclass correlation coefficient (ICC)%
 \footnote{Option \texttt{`A-1'} in the Matlab function \texttt{ICC} from \hreftt{https://www.mathworks.com/matlabcentral/fileexchange/22099}}\ 
 \cite{Koo2016}, while trends in over/undersegmentation with lesion load are illustrated using Blant-Altman plots \cite{Altman1983}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Model Summary}
-
-
-
-A summary of the model is shown in Figure \ref{fig:modelsum}.
+In summary, the proposed algorithm uses graylevel features to train a logistic regression model for each voxel independently -- Voxel-Wise Logistic Regression.
+In order to train the VLR model, a set of labelled training images must first be registered to a standard brain space (MNI).
+This is achieved using the SPM Segment tool, which also produces bias corrected images.
+Next, image intensities are standardized using a graylevel transformation, to be determined in the next section.
+The parameter images $\bb(x)$ are then computed using iterative MAP estimation, with Newton updates and an augmented dataset.
+These images are smoothed to reflect prior knowledge.
+Finally, the optimal probability threshold $\pi_c$ and and minimum lesion size $\mathrm{x}_{\min}^{c}$ are estimated using the training data.
+This completes the training phase.
+\par
+At test time, SPM Segment is used again to correct the bias field and estimate the registration to MNI space for a given input image.
+However, the inverse transform is now used to warp the parameter images $\bb(x)$ from MNI space to the native space.
+This transformation of the smooth parameter images prior to inference is preferable to transforming the detailed label image afterwards.
+The probability of the WMH class is computed by evaluating the independent logistic models at every voxel.
+This initial estimate $\hat{C}(x)$ is then thresholded using $\pi_c$, and binary objects smaller than $\mathrm{x}_{\min}^{c}$ are removed.
+The resulting label image is the final output.
+These training and testing phases are illustrated in Figure \ref{fig:modelsum}.
 \begin{figure}
   \centering\scalebox{0.65}{\input{figs/tikz/algorithm/tikz-algorithm}}
   \caption{Overview of the proposed algorithm.
@@ -670,31 +718,31 @@ A summary of the model is shown in Figure \ref{fig:modelsum}.
 \end{figure}
 % ==================================================================================================
 \subsection{Tunable Parameters}
-In order to achieve the best possible model performance, it is prudent to track tunable model parameters (\textsc{aka} hyperparameters) which are distinct from those fitted during each cross validation fold.
+In order to achieve the best possible model performance, it is prudent to track tunable model parameters (\textsc{aka} hyperparameters) which are distinct from those fitted during each cross validation fold -- i.e. $\bb(x)$ and $\pi_c$.
 Considering both the main VLR model and the pre- and post-processing aspects, the parameters of the proposed algorithm are summarized in Table \ref{tab:hyperparams} and also programmatically in \nameref{m:hypdef.m}.
 The optimization of these model components will be the subject of the next chapter.
 \begin{table}
   \centering
   \caption{Model hyperparameters.}
   \label{tab:hyperparams}
-  \begin{tabular}{lllll}
+  \begin{tabular}{llccc}
   	\hline
-  	Stage                            & Parameter            & Notation                    & Type                                              & Default                   \\ \hline
-  	\multirow{4}{*}{Pre-Processing}  & Reflect Augmentation & $A_R$                       & $\mathbb{B}$                                      & $0$                       \\
-  	                                 & Shift Augmentation   & $A_S$                       & $\mathbf{N}_p$                                    & $\mathbf{N}_0$            \\
-  	                                 & Graylevel Transform  & $T_y$                       & $f: y\mapsto \tilde{y}$                           & $f_{he}$                  \\
-  	                                 & Transform Mask       & $M_{T}(x)$                  & $\mathbb{B}(x)$                                   & $M_{\text{brain}}$        \\ \hline
-  	\multirow{6}{*}{VLR Fitting}     & Iterations           & $N_{t}^{\lr}$               & $\mathbb{Z}$                                      & $30$                      \\
-  	                                 & Initial $\bb$        & $\bb^{(0)}$                 & $\Re^2$                                           & $[0,0]$                   \\
-  	                                 & Learning Rate        & $\alpha$                    & $\Re$                                             & $1$                       \\
-  	                                 & Regularization       & $\lambda$                   & $\Re$                                             & $0$                       \\
-  	                                 & Pseudo-Lesions       & $\{\bY_{\rho},\bC_{\rho}\}$ & $\{\{\et\cdot\in\Re\},\{\et\cdot\in[0,1]\}\}$     & $\{\{\},\{\}\}$           \\
-  	                                 & $\bb$ Filter         & $F_{\bb}$                   & $f: \bb(\mathbf{N}_p(x)) \mapsto \tilde{\bb}(x)$  & $\tilde{\bb}(x) = \bb(x)$ \\ \hline
-  	\multirow{3}{*}{Post-Processing} & Min Lesion  Size     & $\mathrm{x}_{\min}^{c}$     & $\Re\en(\text{mm}^{3})$                           & $0$                       \\
-  	                                 & MRF Iterations       & $N_{t}^{\mrf}$              & $\mathbb{Z}$                                      & $0$                       \\
-  	                                 & MRF Weights          & $W_{\mrf}$                  & $\{w_{\Delta},w_{F},w_y\}$                        & $\{1,1,1\}$               \\ \hline
+  	Stage                            & Parameter            &         Notation          &            Type            &       Naive Default       \\ \hline
+  	\multirow{4}{*}{Pre-Processing}  & Reflect Augmentation & $\mathrm{a}_{\textsc{r}}$ &        $\mathbb{B}$        &            $0$            \\
+  	                                 & Shift Augmentation   & $\mathrm{a}_{\textsc{s}}$ &       $\mathbf{N}_p$       &      $\mathbf{N}_0$       \\
+  	                                 & Graylevel Transform  &        $\uptau_y$         &     $f: \Re\mapsto\Re$     &       $\uptau_{he}$       \\
+  	                                 & Transform Mask       &       $\x_{\uptau}$       &      $\mathbb{B}(x)$       &    $\x_{\text{brain}}$    \\ \hline
+  	\multirow{6}{*}{VLR Fitting}     & Iterations           &            $T$            &        $\mathbb{Z}$        &           $30$            \\
+  	                                 & Initial $\bb$        &        $\bb^{(0)}$        &          $\Re^2$           &          $[0,0]$          \\
+  	                                 & Learning Rate        &         $\alpha$          &           $\Re$            &            $1$            \\
+  	                                 & Regularization       &         $\lambda$         &           $\Re$            &            $0$            \\
+  	                                 & Pseudo-Lesions       &         $\bV(x)$          &    $\{\et\cdot\in\Re\}$    &          $\{\}$           \\
+  	                                 & $\bb$ Filter         &         $F_{\bb}$         & $f: \Re(x) \mapsto \Re(x)$ & $\tilde{\bb}(x) = \bb(x)$ \\ \hline
+  	\multirow{1}{*}{Post-Processing} & Min Lesion  Size     &  $\mathrm{x}_{\min}^{c}$  &  $\Re\en(\text{mm}^{3})$   &            $0$            \\ \hline
+  	%                                & MRF Iterations       &      $N_{t}^{\mrf}$       &        $\mathbb{Z}$        &            $0$            \\
+  	%                                & MRF Weights          &        $W_{\mrf}$         & $\{w_{\Delta},w_{F},w_y\}$ &        $\{1,1,1\}$
   \end{tabular}
-  \tablepost{Notation. $\mathbb{B}$: boolean value; $\mathbb{Z}$: integer value; $\mathbb{R}^n$: real value ($n=1$) or vector ($n > 1$); $\mathbf{N}_p$: nearest $p$ voxel neighbourhood.}
+  \tablepost{Notation. $\mathbb{B}$: boolean value; $\mathbb{Z}$: integer value; $\Re$: real value; $\Re^n$: vector; $\Re(x)$: image; $\mathbf{N}_p$: nearest $p$ voxel neighbourhood.}
 \end{table}
 % --------------------------------------------------------------------------------------------------
 % ==================================================================================================
