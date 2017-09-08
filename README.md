@@ -13,11 +13,8 @@
 
 
 #### To Do
-- [ ] src: all sentences on their own line for git diff.
 - [ ] Add: some details about gpuArray in Matlab
 - [ ] Add: (?) mean lesion intensity (standardized/relaxometry?) by anatomical region
-- [ ] Add: what is image registration, MNI space, etc.?
-- [ ] Add: methods parameter image smoothing
 - [ ] Add: more potential filters
 - [ ] Add: introduction to manual segmentations & use as "silver standard" for supervision
 - [ ] Check: scanner notation - colours, ordering (.m vs .tex too)
@@ -27,6 +24,9 @@
 - [ ] Decide: introduce TPMs sooner?
 
 #### To Done
+- [x] src: all sentences on their own line for git diff.
+- [ ] Add: what is image registration, MNI space, etc.?
+- [x] Add: methods parameter image smoothing
 - [x] Add: motivate, introduce, and selling the VLR model
 - [x] Add: support claim of spatial heterogeneity of lesion graylevels
 - [x] Add: FLAIR contrast simulation (ap-math)
@@ -38,3 +38,5 @@
 - [x] Decide: when to introduce lambda regularization / implementation (methods or ap-impl)
 - [x] Decide: where to put reparameterization of the sigmoid \beta to \tau and s
 - [x] Resolve: double symbol use - J for objective & gradient (parallel impl)
+
+
