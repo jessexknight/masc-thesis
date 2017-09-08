@@ -2,25 +2,40 @@
 % ==================================================================================================
 % --------------------------------------------------------------------------------------------------
 \chapter{Introduction}
-Digitization of medical imaging has facilitated innumerable advances in disease understanding and treatment.
-From multi-modal image fusion to image guided therapy, software tools now underpin research and clinical workflows in almost every domain of medical imaging.
+Digitization of medical imaging has facilitated
+innumerable advances in disease understanding and treatment.
+From multi-modal image fusion to image guided therapy, software tools now underpin
+research and clinical workflows in almost every domain of medical imaging.
 \par
-This work concerns an unsolved segmentation problem in 3D brain magnetic resonance imaging (MRI), in which the objective is to automatically predict the class, or label, of every voxel (``volume pixel'') in the image.
-The objects of interest are white matter hyperintensities (WMH), non-cancerous brain lesions which are correlated with several neurodegenerative diseases.
-This chapter presents the motivation for automated WMH segmentation, gives a problem definition, and explores the previously proposed solutions.
+This work concerns an unsolved segmentation problem in 3D brain magnetic resonance imaging (MRI),
+in which the objective is to automatically predict the
+class, or label, of every voxel (``volume pixel'') in the image.
+The objects of interest are white matter hyperintensities (WMH),
+non-cancerous brain lesions which are correlated with several neurodegenerative diseases.
+This chapter presents the motivation for automated WMH segmentation
+gives a problem definition, and explores the previously proposed solutions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Background}
-The brain is composed of three major classes of tissue: grey matter (GM), white matter (GM), and cerebrospinal fluid (CSF).
-Grey matter constitutes the peripheral surface of the brain -- the cortex, approximately 5mm thick -- as well as some deeper structures called the basal ganglia.
+The brain is composed of three major classes of tissue:
+grey matter (GM), white matter (GM), and cerebrospinal fluid (CSF).
+Grey matter constitutes the peripheral surface of the brain
+-- the cortex, approximately 5mm thick-- as well as some deeper structures called the basal ganglia.
 It contains neuronal cell bodies, and performs the bulk of neural processing.
-The white matter is composed primarily of myelinated axons, and functions to relay information between different GM structures in the brain.
+The white matter is composed primarily of myelinated axons,
+and functions to relay information between different GM structures in the brain.
 The brain is surrounded by CSF, which provides mechanical and immunological defence.
-It is produced by the choroid plexuses in the ventricles of the brain -- a series of 4 connected cavities.
+It is produced by the choroid plexuses in the ventricles of the brain
+-- a series of 4 connected cavities.
 % ==================================================================================================
 \subsection{Magnetic Resonance Imaging}\label{ss:mri}
-Magnetic resonance imaging (MRI) provides superior and flexible brain tissue contrast versus computed tomography (CT) imaging, and is the primary modality for imaging brain disease.
-Whereas CT measures tissue density via attenuation of transmitted X-rays, which does not vary significantly among brain tissues, MRI measures a mutable combination of 3 tissue characteristics: the proton density (PD)%
-\footnote{MRI can be used to image any nucleus with a net nuclear dipole, but proton (hydrogen) imaging is most common since hydrogen is biologically abundant and gives a strong signal intensity.}%
+Magnetic resonance imaging (MRI) provides superior and flexible brain tissue contrast
+versus computed tomography (CT) imaging, and is the primary modality for imaging brain disease.
+Whereas CT measures tissue density via attenuation of transmitted X-rays,
+which does not vary significantly among brain tissues,
+MRI measures a mutable combination of 3 tissue characteristics: the proton density (PD)%
+\footnote{MRI can be used to image any nucleus with a net nuclear dipole,
+  but proton (hydrogen) imaging is most common since hydrogen is biologically abundant
+  and gives a strong signal intensity.}%
 , and T1 and T2 relaxation constants \cite{Pooley2005}.
 The physics of signal generation are described below.
 \par
@@ -30,29 +45,50 @@ The physics of signal generation are described below.
   \label{fig:mridecay3d}
 \end{figure}
 In an MR scanner, a powerful magnetic field induces alignment of proton dipoles with the field.
-Only a tiny fraction of the total protons align, but they create a small magnetic field $M_z$ which is distinct from the main field \cite{Bloch1946}.
-The aligned protons also rotate about the axis of alignment, imperfectly, like a spinning top; this is called precession, and the frequency of rotation is roughly homogeneous and proportional to the main field strength \cite{Bloch1946}.
-If a second magnetic field is applied which is $90^{\circ}$ perpendicular to the first, and rotating at the precession frequency, the aligned protons can be forced into temporary alignment with this transverse rotating field, before decaying back towards their original state, as illustrated in Figure \ref{fig:mridecay3d} \cite{Bloch1946}.
-This transient applied magnetic field is induced by a radio frequency (RF) pulse, and the rate at which the original magnetization $M_z$ is regained is described by the tissue-specific T1 relaxation constant,
+Only a tiny fraction of the total protons align,
+but they create a small magnetic field $M_z$ which is distinct from the main field \cite{Bloch1946}.
+The aligned protons also rotate about the axis of alignment, imperfectly, like a spinning top;
+this is called precession, and the frequency of rotation is roughly homogeneous and proportional
+to the main field strength \cite{Bloch1946}.
+If a second magnetic field is applied which is $90^{\circ}$ perpendicular to the first,
+and rotating at the precession frequency, the aligned protons can be forced into
+temporary alignment with this transverse rotating field, before decaying
+back towards their original state, as illustrated in Figure \ref{fig:mridecay3d} \cite{Bloch1946}.
+This transient applied magnetic field is induced by a radio frequency (RF) pulse,
+and the rate at which the original magnetization $M_z$ is regained is described by
+the tissue-specific T1 relaxation constant,
 \begin{equation}
-M_z = M_0\et\left(1-e^{-\left(\frac{t}{T1}\right)}\right)\label{eq:T1}.
+  M_z = M_0\et\left(1-e^{-\left(\frac{t}{T1}\right)}\right)\label{eq:T1}.
 \end{equation}
-The T1 constant is dictated by the ability of protons in the tissue to transfer energy to bonded atoms and surrounding molecules, since this energy transfer defines the transition from the high energy transverse state to the low energy original state \cite{Bloch1946,Bryant2005}.
-Large macromolecules, membranes, and lipids are generally able to facilitate this energy transfer more effectively than small molecules like water, producing a shorter T1 \cite{Koenig1990}.
-For this reason, myelinated WM has a shorter T1 than GM, which in turn has a shorter T1 than CSF, which is mostly water \cite{Roberts2007}.
+The T1 constant is dictated by the ability of protons in the tissue to transfer energy
+to bonded atoms and surrounding molecules, since this energy transfer defines the transition
+from the high energy transverse state to the low energy original state \cite{Bloch1946,Bryant2005}.
+Large macromolecules, membranes, and lipids are generally able to facilitate this energy transfer
+more effectively than small molecules like water, producing a shorter T1 \cite{Koenig1990}.
+For this reason, myelinated WM has a shorter T1 than GM,
+which in turn has a shorter T1 than CSF, which is mostly water \cite{Roberts2007}.
 \par
-The rate of decay of the transverse moment $M_{xy}$ is actually not equal to the rate of regeneration of $M_z$.
+The rate of decay of the transverse moment $M_{xy}$
+is actually not equal to the rate of regeneration of $M_z$.
 Rather, this is governed by the T2 relaxation constant,
 \begin{equation}
 M_{xy} = M_0\et\left(e^{-\left(\frac{t}{T2}\right)}\right)\label{eq:T2},
 \end{equation}
 which is always shorter that T1.
-This is because, in addition to T1 effects, the net rotating moment $M_{xy}$ is eroded by proton dephasing.
-When precessing protons, having a net dipole, interact with other dipoles or charged particles, their rotational frequency can be increased or decreased, but overall less coherent, reducing the perceptible net magnetization $M_{xy}$ \cite{Bloch1946}.
-In highly structured tissues like GM and WM, these interactions are more variable, dephasing is faster, and T2 is shorter \cite{Roberts2007}.
-In fluid environments like CSF, proton interactions are more homogeneous, yielding longer T2 \cite{Roberts2007}.
-For this reason, T2-weighted images are especially useful in identifying pathologies which degrade tissue structure, since they will have abnormally high T2 \cite{Roberts2007}.
-Both relaxation constants depend in a small way on the main magnetic field strength, measured in Tesla (T); T1 and T2 values for various brain tissues at 1.5T are summarized in Table \ref{tab:t1t2tissues}.
+This is because, in addition to T1 effects,
+the net rotating moment $M_{xy}$ is eroded by proton dephasing.
+When precessing protons, having a net dipole, interact with other dipoles or charged particles,
+their rotational frequency can be increased or decreased, but overall less coherent,
+reducing the perceptible net magnetization $M_{xy}$ \cite{Bloch1946}.
+In highly structured tissues like GM and WM, these interactions are more variable, 
+dephasing is faster, and T2 is shorter \cite{Roberts2007}.
+In fluid environments like CSF, proton interactions are more homogeneous,
+yielding longer T2 \cite{Roberts2007}.
+For this reason, T2-weighted images are especially useful in identifying pathologies
+which degrade tissue structure, since they will have abnormally high T2 \cite{Roberts2007}.
+Both relaxation constants depend in a small way on the main magnetic field strength,
+measured in Tesla (T).
+T1 and T2 values for various brain tissues at 1.5T are summarized in Table \ref{tab:t1t2tissues}.
 \par
 \begin{table}
   \caption{T1 and T2 constants for brain tissues at 1.5 Tesla.}
@@ -66,22 +102,39 @@ Both relaxation constants depend in a small way on the main magnetic field stren
       WML && 1124 & $\pm$ & 372 &&  136 & $\pm$ &  79 &&      &  $-$  &      && \cite{Stevenson2000}\ss{a}\\
       \hline
   \end{tabular}}
-  \tablepost{\ss{a} Estimated from Fig 1 supratentorial data (numerical results not given); $\pm$ IQR, not SD; cf. \S\ \ref{ss:WMD} for definition.}
+  \tablepost{\ss{a} Estimated from Fig 1 supratentorial data (numerical results not given);
+    $\pm$ IQR, not SD; cf. \S\ \ref{ss:WMD} for definition.}
 \end{table}
-Image acquisition involves sensing the transverse magnetization $M_{xy}$ following proton excitation by an RF pulse.
-The problem is that this small signal decays very quickly due to proton dephasing, which occurs even faster than $T2$ would predict due to a third factor, inhomogeneity in the main magnetic field \cite{Chavhan2009}.
-The time constant for this decays is termed $T2^*$, and its effects are usually undesirable \cite{Chavhan2009}.
-As a result, $M_{xy}$ is easily overpowered by the magnetic moment from the RF pulse, even after it is turned off, due to resonance.
-An important solution to this, called the spin-echo, was proposed by Erwin Hahn in \citeyear{Hahn1950} \cite{Hahn1950}.
-If $T2^*$ for each proton is assumed to be constant, then reversing the direction of rotation at a time $t$ should cause all protons to align again at exactly $2t$.
-Therefore, at $2t$ the transverse magnetization $M_{xy}$ -- the image signal -- manifests again for sensing, no longer confounded by RF coil resonance \cite{Hahn1950}.
+Image acquisition involves sensing the transverse magnetization $M_{xy}$
+following proton excitation by an RF pulse.
+The problem is that this small signal decays very quickly due to proton dephasing,
+which occurs even faster than $T2$ would predict due to a third factor,
+inhomogeneity in the main magnetic field \cite{Chavhan2009}.
+The time constant for this decays is termed $T2^*$,
+and its effects are usually undesirable \cite{Chavhan2009}.
+As a result, $M_{xy}$ is easily overpowered by the magnetic moment from the RF pulse,
+even after it is turned off, due to resonance.
+An important solution to this, called the spin-echo,
+was proposed by Erwin Hahn in \citeyear{Hahn1950} \cite{Hahn1950}.
+If $T2^*$ for each proton is assumed to be constant, then reversing the direction of rotation
+at a time $t$ should cause all protons to align again at exactly $2t$.
+Therefore, at $2t$ the transverse magnetization $M_{xy}$ -- the image signal -- 
+manifests again for sensing, no longer confounded by RF coil resonance \cite{Hahn1950}.
 \par
-This second signal is called the Spin Echo ($SE$), and the interval $2t$ is termed the echo time ($TE$).
-Reversing the direction of rotation can be achieved by a $180^{\circ}$ RF pulse at time $TE/2$, in the same way the original excitation is achieved using a $90^{\circ}$ RF pulse (amount of rotation is proportional to the energy of the pulse).
-Acquisition of an entire image requires repetitions of this sequence with an interval called the repetition time ($TR$).
-An example spin echo sequence, showing $TE$ and $TR$, as well as $T1$ and $T2$ decay, is illustrated in Figure \ref{fig:mrispinecho}.
-Spatial encoding for creation of 2D and 3D images requires the use of additional electromagnetic gradients; however this topic is omitted here since it is quite involved, and not essential to the current work%
-\footnote{The interested reader is directed to this comprehensive resource on the topic: \hreftt{http://mri-q.com/}}.
+This second signal is called the Spin Echo ($SE$),
+and the interval $2t$ is termed the echo time ($TE$).
+Reversing the direction of rotation can be achieved by a $180^{\circ}$ RF pulse
+at time $TE/2$, in the same way the original excitation is achieved using a $90^{\circ}$
+RF pulse (amount of rotation is proportional to the energy of the pulse).
+Acquisition of an entire image requires repetitions of this sequence with an interval
+called the repetition time ($TR$).
+An example spin echo sequence, showing $TE$ and $TR$, as well as $T1$ and $T2$ decay,
+is illustrated in Figure \ref{fig:mrispinecho}.
+Spatial encoding for creation of 2D and 3D images
+requires the use of additional electromagnetic gradients; 
+however this topic is omitted here since it is quite complex, and not essential to the current work%
+\footnote{The interested reader is directed to this comprehensive resource on the topic:
+  \hreftt{http://mri-q.com/}}.
 \par
 \begin{figure}
   \centering\includegraphics[width=\plotwidth]{mrispinecho}
@@ -89,30 +142,56 @@ Spatial encoding for creation of 2D and 3D images requires the use of additional
   \label{fig:mrispinecho}
 \end{figure}
 Using these principals, the nature of MR image contrast can finally be understood.
-That is, the signal intensity $\Psi$ for a spin echo sequence at location $x$ can be described by the following 3-term equation,
+That is, the signal intensity $\Psi$ for a spin echo sequence at location $x$
+can be described by the following 3-term equation,
 \begin{equation}\label{eq:MRI-SE}
-\Psi_{SE}(x) = \bigg[K [H](x)\bigg]\bigg[e^{-\left(\frac{TE}{T2(x)}\right)}\bigg]\bigg[1 - e^{-\left(\frac{TR}{T1(x)}\right)}\bigg],
+  \Psi_{SE}(x) = \bigg[K [H](x)\bigg]
+    \bigg[e^{-\left(\frac{TE}{T2(x)}\right)}\bigg]
+    \bigg[1 - e^{-\left(\frac{TR}{T1(x)}\right)}\bigg],
 \end{equation}
 where $K$ is scaling factor, and $\left[H\right]$ denotes the proton density.
-If $TR$ is chosen to be relatively long, then the longitudinal magnetization $M_z$ is allowed to recover completely after each repetition, the third term tends towards 1 for all tissues, and differences in tissue specific $T1$ are nullified.
-Similarly, if $TE$ is relatively short, then $M_{xy}$ has little time to dephase, the second term is maintained close to 1, and differences in $T2$ are nullified.
-In order to emphasize differences in $T1$, therefore, $TR$ can be chosen shorter; for $T2$-weighted contrast, $TE$ can be chosen longer; and if differences in $[H]$ (proton density, PD) are to be emphasized, $TR$ can be kept long and $TE$ short.
-An example MRI slice using each of these image sequences is shown in Figure \ref{fig:4mriT1}, \ref{fig:4mriT2}, and \ref{fig:4mriPD}.
+If $TR$ is chosen to be relatively long, 
+then the longitudinal magnetization $M_z$ is allowed to recover completely after each repetition,
+the third term tends towards 1 for all tissues,
+and differences in tissue specific $T1$ are nullified.
+Similarly, if $TE$ is relatively short,
+then $M_{xy}$ has little time to dephase,
+the second term is maintained close to 1,
+and differences in $T2$ are nullified.
+In order to emphasize differences in $T1$, therefore, $TR$ can be chosen shorter;
+for $T2$-weighted contrast, $TE$ can be chosen longer;
+and if differences in $[H]$ (proton density, PD) are to be emphasized,
+$TR$ can be kept long and $TE$ short.
+An example MRI slice using each of these image sequences
+is shown in Figure \ref{fig:4mriT1}, \ref{fig:4mriT2}, and \ref{fig:4mriPD}.
 \par
 For identifying WML, T2-weighted images were conventionally used, since the lesions appear bright.
-However, CSF in the sulci and ventricles also appears bright on T2 images, making delineation of lesions -- especially periventricular ones -- difficult in T2 images (Figure \ref{fig:4mriT2}).
-To solve this problem, an adaptation of the spin echo RF pulse sequence can be used, called an inversion recovery (IR) \cite{Bydder1985}.
-In this sequence, an additional $180^{\circ}$ inverting RF pulse is added before the $90^{\circ}$ pulse, so that the longitudinal magnetization $M_z$ is inverted, then recovers to the original state, passing for a brief moment through zero net magnetization.
+However, CSF in the sulci and ventricles also appears bright on T2 images,
+making delineation of lesions -- especially periventricular ones --
+difficult in T2 images (Figure \ref{fig:4mriT2}).
+To solve this problem, an adaptation of the spin echo RF pulse sequence can be used,
+called an inversion recovery (IR) \cite{Bydder1985}.
+In this sequence, an additional $180^{\circ}$ inverting RF pulse is added before the
+$90^{\circ}$ pulse, so that the longitudinal magnetization $M_z$ is inverted,
+then recovers to the original state, passing for a brief moment through zero net magnetization.
 The rate of recovery is governed by $T1$, so it is tissue specific.
-Furthermore, if the $90^{\circ}$ pulse is applied at the instant of zero net magnetization, no transverse moment will develop, nor the subsequent spin echo.
-Therefore this time interval, called the inversion time ($TI$), can be chosen to null the signal from any tissue with a unique $T1$.
+Furthermore, if the $90^{\circ}$ pulse is applied at the instant of zero net magnetization,
+no transverse moment will develop, nor the subsequent spin echo.
+Therefore this time interval, called the inversion time ($TI$), 
+can be chosen to null the signal from any tissue with a unique $T1$.
 The equation governing the image signal simply adds an inversion term,
 \begin{equation}\label{eq:MRI-IR}
-\Psi_{IR}(x) = \bigg[K \left[H(x)\right]\bigg]\bigg[e^{-\left(\frac{TE}{T2(x)}\right)}\bigg]\bigg[1 + e^{-\left(\frac{TR}{T1(x)}\right)} - 2e^{-\left(\frac{TI}{T1(x)}\right)}\bigg].
+  \Psi_{IR}(x) = \bigg[K \left[H(x)\right]\bigg]
+    \bigg[e^{-\left(\frac{TE}{T2(x)}\right)}\bigg]
+    \bigg[1 + e^{-\left(\frac{TR}{T1(x)}\right)} - 2e^{-\left(\frac{TI}{T1(x)}\right)}\bigg].
 \end{equation}
-This inversion principal is now often used to null the signal from CSF, especially for delineation of WMH, in a sequence called FLuid Attenuation Inversion Recovery (FLAIR) \cite{Hajnal1992}.
+This inversion principal is now often used to null the signal from CSF,
+especially for delineation of WMH, in a sequence called
+FLuid Attenuation Inversion Recovery (FLAIR) \cite{Hajnal1992}.
 FLAIR images are usually T2-weighted.
-Figure \ref{fig:4mriIR} shows an example FLAIR image, where a WMH can be seen, posterior to the occipital horn of the left lateral ventricle, much more clearly than in the T2 image.
+Figure \ref{fig:4mriIR} shows an example FLAIR image, where a WMH can be seen,
+posterior to the occipital horn of the left lateral ventricle,
+much more clearly than in the T2 image.
 \begin{figure}
   \centering
   \begin{subfigure}{0.24\textwidth}\includegraphics[width=\textwidth]{i15_training01_01_mprage.png}\caption{T1}  \label{fig:4mriT1}\end{subfigure}
@@ -125,75 +204,172 @@ Figure \ref{fig:4mriIR} shows an example FLAIR image, where a WMH can be seen, p
 % ==================================================================================================
 \subsection{White Matter Disease}\label{ss:WMD}
 ``Normal'' ageing of the brain is characterized by a variety of physical and cognitive changes.
-Memory, synaptic plasticity, and brain volume decline, with observable effects on cognitive function \cite{Peters2006,Good2002}.
-Brain ageing is also expedited in many patients by neurodegenerative diseases targeting the white matter, including Alzheimer's disease (AD), cerebrovascular disease, and in rare cases Multiple Sclerosis (MS).
-While the etiologies of these diseases are not yet fully understood, there is considerable evidence to suggest that the they are intertwined \cite{Debette2010,Conklin2014,Heppner2015,Snyder2015}.
+Memory, synaptic plasticity, and brain volume decline,
+with observable effects on cognitive function \cite{Peters2006,Good2002}.
+Brain ageing is also expedited in many patients by neurodegenerative diseases
+targeting the white matter, including
+Alzheimer's disease (AD), cerebrovascular disease, and in rare cases Multiple Sclerosis (MS).
+While the etiologies of these diseases are not yet fully understood,
+there is considerable evidence to suggest that the they are intertwined
+\cite{Debette2010,Conklin2014,Heppner2015,Snyder2015}.
 \par
-Cerebrovascular disease describes changes to blood vessels in the brain which increase the risk of ischemic injury -- a reduction in blood flow due to vessel occlusion or hemorrhage.
-Ischemic injuries include major events (stroke) \cite{VanderWorp2007}, transient ischemic attacks \cite{Albers2002}, and chronic hypoperfusion due to small vessel disease \cite{Pantoni2010}.
+Cerebrovascular disease describes changes to blood vessels in the brain which increase the risk of
+ischemic injury -- a reduction in blood flow due to vessel occlusion or hemorrhage.
+Ischemic injuries include
+major events (stroke) \cite{VanderWorp2007},
+transient ischemic attacks \cite{Albers2002}, and
+chronic hypoperfusion due to small vessel disease \cite{Pantoni2010}.
 In all such events, neuronal death occurs from insufficient nutrient supply \cite{VanderWorp2007}.
-Strokes involving major cerebral arteries can be fatal, and post-event quality of life in survivors is highly variable \cite{Prabhakaran2015}.
-In the less dramatic courses, clinically quiet disease progression can lead to personality changes, memory loss, and reduced cognitive ability; such changes are termed vascular dementia \cite{Roman1993}.
+Strokes involving major cerebral arteries can be fatal,
+and post-event quality of life in survivors is highly variable \cite{Prabhakaran2015}.
+In the less dramatic courses, clinically quiet disease progression can lead to
+personality changes, memory loss, and reduced cognitive ability;
+such changes are termed vascular dementia \cite{Roman1993}.
 \par
-Alzheimer's Disease is another subclass of dementia with similar symptoms; in fact it is the most common type, affecting about 6\% of the population over age 65 \cite{Burns2009}.
+Alzheimer's Disease is another subclass of dementia with similar symptoms;
+in fact it is the most common type,
+affecting about 6\% of the population over age 65 \cite{Burns2009}.
 The cause of Alzheimer's disease is hotly debated.
-Two 30-year-old theories linking the disease to the build up of amyloid $\beta$ protein and misfolded protein $\tau$ have been widely supported by correlational studies \cite{Masters1985,Hardy2002,Lee2011}, but have lacked clear mechanisms of injury until recently.
-It is now thought that amyloid $\beta$ oligomers interfere with neuronal mitochondria and synapse function, leading to cell death \cite{Kim2013,Tu2014}, while aberrant $\tau$ proteins disrupt microtubules necessary for intraneuronal transport \cite{Lee2011}.
-During the search for these mechanisms, competing theories implicating vascular injury \cite{Snyder2015}, immune response \cite{Heppner2015}, and blood brain barrier disruption \cite{Bell2009} have emerged, painting the picture of a more complex disease.
+Two 30-year-old theories linking the disease to
+the build up of amyloid $\beta$ protein and misfolded protein $\tau$
+have been widely supported by correlational studies \cite{Masters1985,Hardy2002,Lee2011},
+but have lacked clear mechanisms of injury until recently.
+It is now thought that amyloid $\beta$ oligomers interfere with
+neuronal mitochondria and synapse function, leading to cell death \cite{Kim2013,Tu2014},
+while aberrant $\tau$ proteins disrupt microtubules
+necessary for intraneuronal transport \cite{Lee2011}.
+During the search for these mechanisms, competing theories implicating
+vascular injury \cite{Snyder2015},
+immune response \cite{Heppner2015},
+and blood brain barrier disruption \cite{Bell2009} have emerged,
+painting the picture of a more complex disease.
 \par
-The pathophysiology of multiple sclerosis is similarly unclear, though genetics are a necessary factor, and it is known that symptoms arise from erosion of myelin -- a fatty insulating layer surrounding axons which is critical for normal neuron firing \cite{Trapp2008}.
-Several theories hypothesize either that this damage is driven by autoimmune attack, followed by neuronal dysfunction and death, or that neurodegenerative changes stimulate recruitment of immune cells as part of the usual response to injury \cite{Lucchinetti2000,Trapp2008}.
-Recent evidence favours the former mechanism, particularly with inflammatory injury as the initiating event \cite{Ciccarelli2014,Mahad2015}.
+The pathophysiology of multiple sclerosis is similarly unclear,
+though genetics are a necessary factor,and it is known that symptoms arise from erosion of myelin 
+-- a fatty insulating layer surrounding axons
+which is critical for normal neuron firing \cite{Trapp2008}.
+Several theories hypothesize either that this damage is driven by
+autoimmune attack, followed by neuronal dysfunction and death,
+or that neurodegenerative changes stimulate recruitment of immune cells
+as part of the usual response to injury \cite{Lucchinetti2000,Trapp2008}.
+Recent evidence favours the former mechanism,
+particularly with inflammatory injury as the initiating event \cite{Ciccarelli2014,Mahad2015}.
 %A helpful visualization of MS lesion progression over one year is available here\footnote{\hreftt{http://www.msdiscovery.org/sites/default/files/MGrid\_crop4\_full\_0.gif}}.
 \par
-Connecting all these diseases are white matter lesions (WML, \textsc{aka} Leukoariosis), which represent the macroscopic changes to brain tissue in regions of white matter damage \cite{Debette2010,Bakshi2005,Wardlaw2015}.
-WML are very common in elderly populations, and a small volume of lesion does not necessarily implicate one of the above diseases; in one study of 1077 subjects aged 60-90, 95\% had at least one WML \cite{DeLeeuw2001}.
-WML appear as bright tissue regions in T2-weighted MRI due to some combination of inflammatory injury and degradation of tissue structure \cite{Bakshi2005,Wardlaw2015}; in this imaging context, WML are often called white matter hyperintensities (WMH).
-Lesions are often focal, as opposed to diffuse, but there is evidence to suggest that surrounding regions of moderate hyperintensity, sometimes called ``dirty appearing white matter (DAWM)'', are also related to the diseases \cite{Ge2003}.
-As biomarkers of the most common WM diseases -- conditions with unsolved etiologies and inadequate treatments -- WML are of special interest to many brain researchers.
+Connecting all these diseases are white matter lesions (WML, \textsc{aka} Leukoariosis),
+which represent the macroscopic changes to brain tissue
+in regions of white matter damage \cite{Debette2010,Bakshi2005,Wardlaw2015}.
+WML are very common in elderly populations,
+and a small volume of lesion does not necessarily implicate one of the above diseases;
+in one study of 1077 subjects aged 60-90, 95\% had at least one WML \cite{DeLeeuw2001}.
+WML appear as bright tissue regions in T2-weighted MRI due to some combination of
+inflammatory injury and degradation of tissue structure \cite{Bakshi2005,Wardlaw2015};
+in this imaging context, WML are often called white matter hyperintensities (WMH).
+Lesions are often focal, as opposed to diffuse, but there is evidence to suggest that
+surrounding regions of moderate hyperintensity,
+sometimes called ``dirty appearing white matter (DAWM)'',
+are also related to the diseases \cite{Ge2003}.
+As biomarkers of the most common WM diseases
+-- conditions with unsolved etiologies and inadequate treatments --
+WML are of special interest to many brain researchers.
 The next section discusses how they are used.
 % ==================================================================================================
 \subsection{MRI in White Matter Disease}
 MR imaging plays important roles in diagnosis and research of white matter diseases.
-Typical MRI protocols include T1, T2, and FLAIR sequences, though only the latter two sequences depict WML as hyperintense \cite{Simon2006,Wardlaw2013}.
-Depending on the disease and context, WMH can be quantified in several ways, including binary criteria (e.g. is there a lesion in a  specific location) \cite{Polman2011,Roman1993}, rating scales (e.g. a summary of several criteria) \cite{Fazekas1987}, or explicit manual segmentation of the lesions by an expert \cite{Egger2017}.
+Typical MRI protocols include T1, T2, and FLAIR sequences,
+though only the latter two sequences depict WML as hyperintense \cite{Simon2006,Wardlaw2013}.
+Depending on the disease and context, WMH can be quantified in several ways,
+including binary criteria (e.g. is there a lesion in a specific location) \cite{Polman2011},
+rating scales (e.g. a summary of several criteria) \cite{Fazekas1987},
+or explicit manual segmentation of the lesions by an expert \cite{Egger2017}.
 \par
 WMH are arguably most important in MS.
-Particularly since WMH are more specific to this disease in younger patients, WMH have long been used in the diagnosis of MS, and can even be used to replace some clinical criteria, as in the 2010 McDonald Criteria \cite{Polman2011}.
-MRI can also be used to discriminate between MS subtypes, which stratify disease aggression and course \cite{Polman2011,Lublin2014,Traboulsee2015}.
-In numerous clinical trials, WMH have also been used as biomarkers of treatment efficacy \cite{Sormani2013,Fahrbach2013,Ziemssen2015}, since WMH have been shown to be more sensitive to disease progression than clinical features in certain subtypes \cite{ORiordan1998}.
-In fact, despite the central role of MRI in management and research of MS, there exists a so-called ``clinico-radiological'' paradox, which is the surprisingly limited correlation between WMH and clinical MS symptoms like physical and cognitive impairment \cite{Mollison2017}.
-However, this only strengthens the case for continued WMH research, particularly considering the recommendations by \citeauthor{Mollison2017} in \cite{Mollison2017} to standardize image analysis in order to better understand the paradox.
+Particularly since WMH are more specific to this disease in younger patients,
+WMH have long been used in the diagnosis of MS,
+and can even be used to replace some clinical criteria,
+as in the 2010 McDonald Criteria \cite{Polman2011}.
+MRI can also be used to discriminate between MS subtypes,
+which stratify disease aggression and course \cite{Polman2011,Lublin2014,Traboulsee2015}.
+In numerous clinical trials,WMH have also been used as biomarkers of treatment efficacy
+\cite{Sormani2013,Fahrbach2013,Ziemssen2015},
+since WMH have been shown to be more sensitive to disease progression than clinical features
+in certain subtypes \cite{ORiordan1998}.
+In fact, despite the central role of MRI in management and research of MS,
+there exists a so-called ``clinico-radiological'' paradox,
+which is the surprisingly limited correlation between WMH and clinical MS symptoms
+like physical and cognitive impairment \cite{Mollison2017}.
+However, this only strengthens the case for continued WMH research,
+particularly considering the recommendations by \citeauthor{Mollison2017} in \cite{Mollison2017}
+to standardize image analysis in order to better understand the paradox.
 \par
-In dementia (including vascular and AD), WMH are used to discriminate between disease subtypes during diagnosis.
-For example, the presence of at least one WML was deemed \textit{necessary} for diagnosis of vascular dementia in \citeyear{Roman1993} \cite{Roman1993}, and subsequent revisions to these widely used criteria (NINCDS-ADRDA) have added this feature as an \textit{exclusionary} criteria for AD \cite{Dubois2007}.
-While diagnosis of additional dementia subtypes may be improved using imaging \cite{Sorbi2012,Verhagen2016}, diagnosis of the most prevalent -- AD -- continues to be based on clinical features alone \cite{McKhann2011}.
+In dementia (including vascular and AD),
+WMH are used to discriminate between disease subtypes during diagnosis.
+For example, the presence of at least one WML was deemed \textit{necessary}
+for diagnosis of vascular dementia in \citeyear{Roman1993} \cite{Roman1993},
+and subsequent revisions to these widely used criteria (NINCDS-ADRDA)
+have added this feature as an \textit{exclusionary} criteria for AD \cite{Dubois2007}.
+While diagnosis of additional dementia subtypes may be improved using imaging
+\cite{Sorbi2012,Verhagen2016}, diagnosis of the most prevalent -- AD --
+continues to be based on clinical features alone \cite{McKhann2011}.
 As a result, WMH have not been used as an endpoint to any AD clinical trial.
-In fact, only recently have specific standards for use of WMH in vascular dementia studies been outlined \cite{Wardlaw2013,Wardlaw2015}, with some subsequent uptake \cite{VanWesten2016}.
-And yet, a \citeyear{Debette2010} meta-analysis found that WMH in brain MRI were independently correlated with stroke risk, dementia (including AD) and death \cite{Debette2010}, suggesting that much more can be done to make use of WMH as hallmarks of neurodegenerative disease.
+In fact, only recently have specific standards for
+use of WMH in vascular dementia studies been outlined \cite{Wardlaw2013,Wardlaw2015},
+with some subsequent uptake \cite{VanWesten2016}.
+And yet, a \citeyear{Debette2010} meta-analysis found that
+WMH in brain MRI were independently correlated with
+stroke risk, dementia (including AD) and death \cite{Debette2010},
+suggesting that much more can be done to make use of WMH as hallmarks of neurodegenerative disease.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Problem Statement}
-White matter hyperintensities, as ubiquitous biomarkers of several diseases with unsolved pathophysiology, are of great interest to brain researchers.
-Segmentation of WMH, compared to visual rating scales, provides a finer resolution for quantification of lesion load, and gives the explicit spatial distribution of pathology.
-This spatial information can be very useful, since diagnostic criteria often consider lesion location \cite{Sorbi2012} and there are several correlations between lesion location and suspected etiology of WMH \cite{Kim2008,Wardlaw2015}.
+White matter hyperintensities,
+as ubiquitous biomarkers of several diseases with unsolved pathophysiology,
+are of great interest to brain researchers.
+Segmentation of WMH, compared to visual rating scales, provides a finer resolution
+for quantification of lesion load, and gives the explicit spatial distribution of pathology.
+This spatial information can be very useful,
+since diagnostic criteria often consider lesion location \cite{Sorbi2012}
+and there are several correlations between lesion location
+and suspected etiology of WMH \cite{Kim2008,Wardlaw2015}.
 \par
-Unfortunately, manual segmentation of WMH is laborious, and subject to large inter- and intra-rater variability, as reported in several works.
-Table \ref{tab:interrater-cite} summarizes these reports, where similarity index (SI $\in [0,1]$) is a measure of voxel-wise agreement, and interclass correlation coefficient (ICC $\in [0,1]$) measures total volume agreement (cf. \S\ \ref{ss:metrics} for definitions).
-Table \ref{tab:interrater-cite} also gives the results using four semi-automated approaches, since these methods are reported to reduce variability and task time over strictly manual segmentation.
-Yet, for very large scale research studies, any approach requiring human intervention would be prohibitively time consuming and subjective.
+Unfortunately, manual segmentation of WMH is
+laborious, and subject to large inter- and intra-rater variability, as reported in several works.
+Table \ref{tab:interrater-cite} summarizes these reports,
+where similarity index (SI $\in [0,1]$) is a measure of voxel-wise agreement,
+and interclass correlation coefficient (ICC $\in [0,1]$) measures total volume agreement
+(cf. \S\ \ref{ss:metrics} for definitions).
+Table \ref{tab:interrater-cite} also gives the results using four semi-automated approaches,
+since these methods are reported to reduce variability and task time
+over strictly manual segmentation.
+Yet, for very large scale research studies,
+any approach requiring human intervention would be prohibitively time consuming and subjective.
 \par 
 Therefore, a fully automated algorithm to segment WMH in MRI is required.
-Such an algorithm would have, by construction, perfect repeatability, and consistent bias -- which is especially important for perceiving small changes in longitudinal studies \cite{MSISBI2015}.
-Additionally, while an automated approach may not necessarily be faster than manual or semi-automatic segmentation on a per-case basis, it could be run on several computers in parallel, yielding significant overall speed up.
+Such an algorithm would have, by construction,
+perfect repeatability, and consistent bias -- which is especially important
+for perceiving small changes in longitudinal studies \cite{MSISBI2015}.
+Additionally, while an automated approach may not necessarily
+be faster than manual or semi-automatic segmentation on a per-case basis,
+it could be run on several computers in parallel, yielding significant overall speed up.
 \par
-Furthermore, while T1, T2, and FLAIR sequences are typically recommended for both MS and dementia investigations \cite{Simon2006,Wardlaw2013,Traboulsee2015}, FLAIR sequences are at least as sensitive as T2 images for the detection of WML%
-\footnote{Early studies exploring the utility of FLAIR sequences may contradict this claim \cite{Okuda1999,Rovaris2000}, but FLAIR imaging has since improved \cite{Wardlaw2015}.}.
-As noted above, FLAIR images also have the advantage of easily distinguishing WMH from confounding CSF hyperintensity, which is important for highly prevalent periventricular lesions, and also for excluding lacunar infarcts \cite{Bakshi2001,Barkhof2002}.
+Furthermore, while T1, T2, and FLAIR sequences are typically recommended
+for both MS and dementia investigations \cite{Simon2006,Wardlaw2013,Traboulsee2015},
+FLAIR sequences are at least as sensitive as T2 images for the detection of WML%
+\footnote{Early studies exploring the utility of FLAIR sequences may contradict this claim 
+  \cite{Okuda1999,Rovaris2000}, but FLAIR imaging has since improved \cite{Wardlaw2015}.}.
+As noted above, FLAIR images also have the advantage of easily distinguishing WMH
+from confounding CSF hyperintensity, which is important
+for highly prevalent periventricular lesions,
+and also for excluding lacunar infarcts \cite{Bakshi2001,Barkhof2002}.
 Consequently, it should be feasible to detect WMH using FLAIR MRI alone.
-This has several advantages, including minimizing the required MR sequences available during retrospective analyses, decreasing cost and scan time in prospective studies, and eliminating the need for intra-subject image registration if sequences are acquired at different resolutions (as is often the case).
+This has several advantages, including
+minimizing the required MR sequences available during retrospective analyses,
+decreasing cost and scan time in prospective studies,
+and eliminating the need for intra-subject image registration if
+sequences are acquired at different resolutions (as is often the case).
 \par
 \begin{table}[h]
-  \caption{Mean inter-rater agreement measures for manual and semi-automated WMH segmentation reported in previous works.}
+  \caption{Mean inter-rater agreement measures
+    for manual and semi-automated WMH segmentation reported in previous works.}
   \centering
   \begin{tabular}{lccccc}
     \hline
@@ -211,7 +387,8 @@ This has several advantages, including minimizing the required MR sequences avai
 \end{table}
 % ==================================================================================================
 \subsection{Objective}
-The primary objective of this thesis is to develop an algorithm for fully automatic segmentation of WMH, using FLAIR MRI alone.
+The primary objective of this thesis is to develop an algorithm
+for fully automatic segmentation of WMH, using FLAIR MRI alone.
 Secondary objectives include:
 \begin{itemize}
   \item analysis of the limitations of prior work in this area;

@@ -24,7 +24,7 @@ The most popular CV frameworks include:
 % ==================================================================================================
 \subsection{Leave-One-Source-Out CV}
 The choice of cross validation framework can have significant impacts on the reported model performance (see \cite{Arlot2010} for an in-depth review), and there is at least one assumption of the above methods which is not always valid: that examples are independent and identically distributed (iid).
-This is not true for data originating from multiple sources with different underlying distributions (e.g. MRI with different scan-parameter combinations) \cite{Geras2013}
+This is not true for data originating from multiple sources with different underlying distributions (e.g. MRI with different scan-parameter combinations) \cite{Geras2013}.
 In fact, \citeauthor{Geras2013} show that in multi-source problems where the expected use case involves data from entirely new sources, random KFCV (and therefore also LOO, as a special case of KFCV with $B=1$) significantly overestimates the generalization performance.
 This is because random training fold selection allows the model to perceive source-specific characteristics of the test examples, which cannot be repeated for truly new examples.
 In such scenarios, the authors propose the following:
@@ -101,7 +101,6 @@ Furthermore, several works \cite{Klauschen2009,Eggert2012} have noted significan
 %This version of the VLR model (``\texttt{base}'') is summarized in Table \ref{tab:hyperparams}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Graylevel Standardization}
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
