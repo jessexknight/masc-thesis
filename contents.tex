@@ -1,3 +1,4 @@
+% ==================================================================================================
 %\pagenumbering{Roman}
 \begin{singlespacing}
 \tableofcontents
@@ -6,10 +7,11 @@
 \newpage
 \listoftables
 \newpage
+% ==================================================================================================
 \subsection*{Abbreviations}
 \begin{table}[H]
   \begin{tabular}{ll}
-  	\hline
+  	\toprule
   	GM      & Grey matter                          \\
   	WM      & White matter                         \\
   	CSF     & Cerebrospinal fluid                  \\
@@ -36,29 +38,35 @@
   	MRF     & Markov random field                  \\
   	FPR     & False positive reduction             \\
     PMF     & Probability mass function            \\
-    CDF     & Cumulative density function          \\ \hline
+    CDF     & Cumulative density function          \\ \bottomrule
   \end{tabular}
 \end{table}
 \clearpage
+% ==================================================================================================
 \subsection*{Notation}
 \begin{table}[H]
   \begin{tabular}{lll}
-  	\hline
-  	\multicolumn{3}{l}{Variables}                                                              \\ \hline
+  	\toprule
+  	\multicolumn{3}{l}{Variables}                                                              \\
+    \midrule
   	$y$                   & feature                                      & $\in\Re$            \\
   	$\tilde{y}$           & standardized feature                         & $\in\Re$            \\
   	$c$                   & true class                                   & $\in\{0,1\}$        \\
   	$\hat{c}$             & estimated class                              & $\in[0,1]$          \\
   	$\beta$               & logistic model feature weight                & $\in\Re$            \\
   	$\gamma$              & synthetic feature                            & $\in\Re$            \\
-  	$\rho$                & prior probability                            & $\in[0,1]$          \\ \hline
-  	\multicolumn{3}{l}{Indexing -- e.g. arbitrary variable $a$}                                \\ \hline
+  	$\rho$                & prior probability                            & $\in[0,1]$          \\
+    \midrule
+  	\multicolumn{3}{l}{Indexing -- e.g.\ arbitrary variable $a$}                               \\
+    \midrule
   	$k$                   & feature index                                & $\in \{1,\dots,K\}$ \\
   	$n$                   & subject index                                & $\in \{1,\dots,N\}$ \\
   	$t$                   & iteration index                              & $\in \{1,\dots,X\}$ \\
   	$x$                   & spatial location                             & $= [\xxx]$          \\
-   	${a_n^k}^{(t)}(x)$    & $k$\ss{th} feature; $n$\ss{th} subject; $t$\ss{th} iteration; location $x$ & \\ \hline
-  	\multicolumn{3}{l}{Images \& sets -- e.g. arbitrary variable $a$}                          \\ \hline
+   	${a_n^k}^{(t)}(x)$&$k$\ss{th} feature; $n$\ss{th} subject; $t$\ss{th} iteration; location $x$&\\
+    \midrule
+  	\multicolumn{3}{l}{Images \& sets -- e.g.\ arbitrary variable $a$}                         \\
+    \midrule
   	$a$                   & one voxel, one feature, one subject          &                     \\
   	$\bm{a}$              & one voxel, all features, one subject         &                     \\
   	$\mathrm{A}(x)$       & image in native space                        &                     \\
@@ -66,10 +74,13 @@
   	$\bm{A}(x)$           & image set: all features, one subject         &                     \\
   	$\mathcal{A}(x)$      & image set: one feature, all subjects         &                     \\
   	$\bm{\mathcal{A}}(x)$ & image superset: all features, all subjects   &                     \\
-  	$\vox{A}$             & full dataset: all features, subjects, voxels &                     \\ \hline
+  	$\vox{A}$             & full dataset: all features, subjects, voxels &                     \\
+    \bottomrule
   \end{tabular}
 \end{table}
 \end{singlespacing}
+% ==================================================================================================
 \clearpage
 \pagenumbering{arabic}
 \setcounter{page}{1}
+% ==================================================================================================

@@ -1,17 +1,15 @@
 \documentclass[11pt]{article}
-\usepackage{cmap}
-\usepackage{totcount}
-\usepackage{multicol}
-\usepackage{setspace}
-\usepackage{tabu}
+\usepackage{tabu,booktabs,multicol,setspace,totcount,cmap}
 \usepackage[margin=2cm]{geometry}
 \usepackage[backend=biber,
 			style=numeric,
 			maxcitenames=1,
 			sorting=none]{biblatex}
-\include{src}
-\include{matrices}
 \bibliography{C:/Users/Jesse/Documents/tex/src/tex/latex/library.bib}
+\makeatletter\newcommand{\setmaxcitenames}[1]{\numdef\blx@maxcitenames{#1}}\makeatother
+\newcounter{papercount}
+\newcommand{\citefortable}[1]{%
+  \stepcounter{papercount}{\thepapercount}&{\cite{#1}}&{\citeyear{#1}}&{\citeauthor{#1}}}
 \begin{document}
 \begin{table}
 	\input{../wmlsegtable}

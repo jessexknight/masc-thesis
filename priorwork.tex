@@ -1,60 +1,60 @@
 % --------------------------------------------------------------------------------------------------
 \priorworksub{Thresholding Techniques}
 Since WMH are brighter than healthy brain tissue in FLAIR images, many unsupervised works have used thresholding of FLAIR intensities as the initial lesion segmentation.
-For example, in the works by \citeauthor{Jack2001} \cite{Jack2001}, \citeauthor{DeBoer2009b} \cite{DeBoer2009b}, and \citeauthor{Smart2011}, \cite{Smart2011} optimal FLAIR thresholds are empirically estimated relative to histogram statistics, though \citeauthor{DeBoer2009b} use only estimated GM voxels in the histogram.
-\citeauthor{Gibson2010} use a conservative FLAIR threshold initially, but then classify the remaining voxels using Fuzzy C Means clustering \cite{Gibson2010}.
+For example, in the works by~\citeauthor{Jack2001}~\cite{Jack2001},~\citeauthor{DeBoer2009b}~\cite{DeBoer2009b}, and~\citeauthor{Smart2011},~\cite{Smart2011} optimal FLAIR thresholds are empirically estimated relative to histogram statistics, though~\citeauthor{DeBoer2009b} use only estimated GM voxels in the histogram.
+\citeauthor{Gibson2010} use a conservative FLAIR threshold initially, but then classify the remaining voxels using Fuzzy C Means clustering~\cite{Gibson2010}.
 \citeauthor{Samaille2012} use nonlinear diffusion filtering and watershed segmentation, before classifying candidate regions based on a FLAIR image threshold.
-\citeauthor{Yoo2014} estimate the optimal threshold for FLAIR images using histogram statistics, derived from a regression model primarily considering the total lesion load \cite{Yoo2014}.
-In works by \citeauthor{Khademi2014}, a peak in the conditional probability of edge content on graylevel is used to predict the transition between healthy tissue and lesion \cite{Khademi2014,Khademi2015,Knight2016a}.
+\citeauthor{Yoo2014} estimate the optimal threshold for FLAIR images using histogram statistics, derived from a regression model primarily considering the total lesion load~\cite{Yoo2014}.
+In works by~\citeauthor{Khademi2014}, a peak in the conditional probability of edge content on graylevel is used to predict the transition between healthy tissue and lesion~\cite{Khademi2014,Khademi2015,Knight2016a}.
 % --------------------------------------------------------------------------------------------------
 \priorworksub{Mixture Models}
 Most other unsupervised approaches are probabilistic models, often framed as a mixture model.
-The work by \citeauthor{VanLeemput2001} \cite{VanLeemput2001} uses a similar framework as the early work by \citeauthor{Ashburner1997} \cite{Ashburner1997}, later incorporated into the SPM ``segment'' tool \cite{Ashburner2005}, which jointly estimates Gaussian graylevel distributions for each tissue class, and also bias field, using expectation maximization. In the model by \citeauthor{VanLeemput2001}, distribution parameters are estimated using outlier-insensitive estimators, and WMH are derived from model outliers using heuristic rules. The predicted classes are also smoothed spatially using a Markov Random Field (MRF).
+The work by~\citeauthor{VanLeemput2001}~\cite{VanLeemput2001} uses a similar framework as the early work by~\citeauthor{Ashburner1997}~\cite{Ashburner1997}, later incorporated into the SPM ``segment'' tool~\cite{Ashburner2005}, which jointly estimates Gaussian graylevel distributions for each tissue class, and also bias field, using expectation maximization. In the model by~\citeauthor{VanLeemput2001}, distribution parameters are estimated using outlier-insensitive estimators, and WMH are derived from model outliers using heuristic rules. The predicted classes are also smoothed spatially using a Markov Random Field (MRF).
 \par
-Similar works by \citeauthor{Bricq2008} \cite{Bricq2008}, \citeauthor{Schmidt2012} \cite{Schmidt2012}, \citeauthor{Jain2015} \cite{Jain2015}, and \citeauthor{Roura2015} \cite{Roura2015} use parametric mixture models to predict WMH as model outliers, and all but \cite{Roura2015} embed the model in a MRF.
-\citeauthor{Khayati2008} \cite{Khayati2008} and \citeauthor{Subbanna2009} \cite{Subbanna2009} also use MRF-constrained mixture models, but model WMHs as a Gaussian-distributed tissue class, rather than as outliers.
-In the works by \citeauthor{Harmouche2006}, parametric distributions are also used to model lesions, but such distributions are parameterized independently per brain region, in order to reflect lobe heterogeneity; a MRF is again used for regularization \cite{Harmouche2006,Harmouche2015}.
-\citeauthor{Schwarz2009} again employ a Bayesian MRF model, but use lognormal distributions for WM and WMH \cite{Schwarz2009}.
-\citeauthor{Souplet2008} use an augmented mixture model which includes partial volume averaging classes and an outlier class to perform initial brain tissue segmentation; WMH are subsequently classified using a FLAIR intensity threshold after contrast enhancement \cite{Souplet2008}. 
-The work by \citeauthor{Herskovits2008} is much the same, but uses statistical information from training data to classify lesions (i.e. it is supervised) \cite{Herskovits2008}.
-More recently, Graph-Cuts have been used in conjunction with mixture models, as in the works by \citeauthor{Garcia-Lorenzo2009} \cite{Garcia-Lorenzo2009}, \citeauthor{Tomas-Fernandez2015} \cite{Tomas-Fernandez2015}, and \citeauthor{Strumia2016} \cite{Strumia2016}.
+Similar works by~\citeauthor{Bricq2008}~\cite{Bricq2008},~\citeauthor{Schmidt2012}~\cite{Schmidt2012},~\citeauthor{Jain2015}~\cite{Jain2015}, and~\citeauthor{Roura2015}~\cite{Roura2015} use parametric mixture models to predict WMH as model outliers, and all but~\cite{Roura2015} embed the model in a MRF\@.
+~\citeauthor{Khayati2008}~\cite{Khayati2008} and~\citeauthor{Subbanna2009}~\cite{Subbanna2009} also use MRF-constrained mixture models, but model WMHs as a Gaussian-distributed tissue class, rather than as outliers.
+In the works by~\citeauthor{Harmouche2006}, parametric distributions are also used to model lesions, but such distributions are parameterized independently per brain region, in order to reflect lobe heterogeneity; a MRF is again used for regularization~\cite{Harmouche2006,Harmouche2015}.
+\citeauthor{Schwarz2009} again employ a Bayesian MRF model, but use lognormal distributions for WM and WMH~\cite{Schwarz2009}.
+\citeauthor{Souplet2008} use an augmented mixture model which includes partial volume averaging classes and an outlier class to perform initial brain tissue segmentation; WMH are subsequently classified using a FLAIR intensity threshold after contrast enhancement~\cite{Souplet2008}. 
+The work by~\citeauthor{Herskovits2008} is much the same, but uses statistical information from training data to classify lesions (i.e.\ it is supervised)~\cite{Herskovits2008}.
+More recently, Graph-Cuts have been used in conjunction with mixture models, as in the works by~\citeauthor{Garcia-Lorenzo2009}~\cite{Garcia-Lorenzo2009},~\citeauthor{Tomas-Fernandez2015}~\cite{Tomas-Fernandez2015}, and~\citeauthor{Strumia2016}~\cite{Strumia2016}.
 \par
-The Lesion-TOADS method by \citeauthor{Shiee2010} \cite{Shiee2010}, a lesion-specific adaptation of the TOADS algorithm \cite{Bazin2008}, presents an entirely new non-Gaussian paradigm for modelling class distributions, and incorporates topological energies in the objective function.
-Other proposed unsupervised methods have used clustering by Fuzzy C-Means, including the works by \citeauthor{Admiraal-Behloul2005} \cite{Admiraal-Behloul2005}, \citeauthor{Gibson2010} \cite{Gibson2010}, and \citeauthor{Valverde2016} \cite{Valverde2016}.
+The Lesion-TOADS method by~\citeauthor{Shiee2010}~\cite{Shiee2010}, a lesion-specific adaptation of the TOADS algorithm~\cite{Bazin2008}, presents an entirely new non-Gaussian paradigm for modelling class distributions, and incorporates topological energies in the objective function.
+Other proposed unsupervised methods have used clustering by Fuzzy C-Means, including the works by~\citeauthor{Admiraal-Behloul2005}~\cite{Admiraal-Behloul2005},~\citeauthor{Gibson2010}~\cite{Gibson2010}, and~\citeauthor{Valverde2016}~\cite{Valverde2016}.
 % --------------------------------------------------------------------------------------------------
 \priorworksub{Classic Supervised Methods}
 Many early supervised methods used K-Nearest Neighbours (K-NN) for voxel-wise WMH classification.
-\citeauthor{Anbeek2005} used a K-NN model with features derived from spatial coordinates and voxel intensities from several modalities \cite{Anbeek2004,Anbeek2005}.
-In the works by \citeauthor{Wu2006} \cite{Wu2006}, \citeauthor{Steenwijk2013} \cite{Steenwijk2013}, and \citeauthor{Fartaria2015} \cite{Fartaria2015}, spatial coordinates are substituted for tissue priors as K-NN features.
-In the recently proposed BIANCA algorithm by \citeauthor{Griffanti2016} \cite{Griffanti2016}, spatial coordinates are added back, along with some patch-based features.
+\citeauthor{Anbeek2005} used a K-NN model with features derived from spatial coordinates and voxel intensities from several modalities~\cite{Anbeek2004,Anbeek2005}.
+In the works by~\citeauthor{Wu2006}~\cite{Wu2006},~\citeauthor{Steenwijk2013}~\cite{Steenwijk2013}, and~\citeauthor{Fartaria2015}~\cite{Fartaria2015}, spatial coordinates are substituted for tissue priors as K-NN features.
+In the recently proposed BIANCA algorithm by~\citeauthor{Griffanti2016}~\cite{Griffanti2016}, spatial coordinates are added back, along with some patch-based features.
 \par
 Other works have also explored Support Vector Machines (SVM) for classification.
-The works by \citeauthor{Lao2006} \cite{Lao2006}, \citeauthor{Abdullah2012} \cite{Abdullah2012}, and \citeauthor{Scully2010} \cite{Scully2010} each use a selection of intensity features, neighbouring intensities, tissue priors, morphological, and texture features with an SVM classifier.
+The works by~\citeauthor{Lao2006}~\cite{Lao2006},~\citeauthor{Abdullah2012}~\cite{Abdullah2012}, and~\citeauthor{Scully2010}~\cite{Scully2010} each use a selection of intensity features, neighbouring intensities, tissue priors, morphological, and texture features with an SVM classifier.
 Several more recent works have used decision tree-based classifiers, including Random Forest (RF) and AdaBoost.
-\citeauthor{Akselrod-Ballin2009} \cite{Akselrod-Ballin2009} employ over 30 features for multi-scale image representation and classify voxels using RF.
-Both \citeauthor{Geremia2011} \cite{Geremia2011} and \citeauthor{Roy2015} \cite{Roy2015} use a combination of intensity and tissue prior features to train a RF classifier, whereas \citeauthor{Wels2008} \cite{Wels2008} use a large number of Haar-like features to train an AdaBoost model.
-\citeauthor{Ithapu2014} \cite{Ithapu2014} explore the use of texton features in both SVM and RF models.
+\citeauthor{Akselrod-Ballin2009}~\cite{Akselrod-Ballin2009} employ over 30 features for multi-scale image representation and classify voxels using RF\@.
+Both~\citeauthor{Geremia2011}~\cite{Geremia2011} and~\citeauthor{Roy2015}~\cite{Roy2015} use a combination of intensity and tissue prior features to train a RF classifier, whereas~\citeauthor{Wels2008}~\cite{Wels2008} use a large number of Haar-like features to train an AdaBoost model.
+\citeauthor{Ithapu2014}~\cite{Ithapu2014} explore the use of texton features in both SVM and RF models.
 \par
 Logistic regression models have also gained popularity recently.
-In the OASIS model by \citeauthor{Sweeney2013} \cite{Sweeney2013}, image intensities from T1, T2, PD, and FLAIR sequences are used individually, in multiplicative combination, and with Gaussian blurring as predictors for a global set of logistic regression parameters.
-In the work by \citeauthor{Zhan2017} \cite{Zhan2017}, a similar logistic model is fitted using only the raw T1, T2, and FLAIR intensities, while bias correction is performed as preprocessing and spatial smoothness using MRF post processing.
-In the work by \citeauthor{Dadar2017} \cite{Dadar2017}, spatial and intensity features from a flexible selection of MR sequences are used to train a linear regression model, the results of which are thresholded to give the lesion prediction.
-Still more works have proposed other supervised models, including nonparametric Parzen classifiers \cite{Sajja2006}.
+In the OASIS model by~\citeauthor{Sweeney2013}~\cite{Sweeney2013}, image intensities from T1, T2, PD, and FLAIR sequences are used individually, in multiplicative combination, and with Gaussian blurring as predictors for a global set of logistic regression parameters.
+In the work by~\citeauthor{Zhan2017}~\cite{Zhan2017}, a similar logistic model is fitted using only the raw T1, T2, and FLAIR intensities, while bias correction is performed as preprocessing and spatial smoothness using MRF post processing.
+In the work by~\citeauthor{Dadar2017}~\cite{Dadar2017}, spatial and intensity features from a flexible selection of MR sequences are used to train a linear regression model, the results of which are thresholded to give the lesion prediction.
+Still more works have proposed other supervised models, including nonparametric Parzen classifiers~\cite{Sajja2006}.
 % --------------------------------------------------------------------------------------------------
 \priorworksub{Deep Learning}
 A number of deep learning approaches have also been proposed, though their permeation in this problem space is surprisingly limited.
-Both \citeauthor{Zijdenbos2002} \cite{Zijdenbos2002} and \citeauthor{Dyrby2008} \cite{Dyrby2008} train fully-connected voxel-wise Neural Networks with a selection of intensity, spatial, and tissue prior features to predict the lesion class.
-In contrast, \citeauthor{Brosch2015} \cite{Brosch2015} construct a more modern deep convolutional model, which is capable of capturing both local and global dependencies.
+Both~\citeauthor{Zijdenbos2002}~\cite{Zijdenbos2002} and~\citeauthor{Dyrby2008}~\cite{Dyrby2008} train fully-connected voxel-wise Neural Networks with a selection of intensity, spatial, and tissue prior features to predict the lesion class.
+In contrast,~\citeauthor{Brosch2015}~\cite{Brosch2015} construct a more modern deep convolutional model, which is capable of capturing both local and global dependencies.
 % --------------------------------------------------------------------------------------------------
 \priorworksub{External Toolboxes}
 Many of the proposed methods use registration, brain extraction, bias field correction, and segmentation tools available in freely available toolkits; these include the SPM\footnote{\hreftt{http://www.fil.ion.ucl.ac.uk/spm/}} toolkit
-\cite{Sajja2006,Dyrby2008,Akselrod-Ballin2009,Smart2011,Schmidt2012,Yoo2014,Ithapu2014,Roy2015,Valverde2016} and the
+~\cite{Sajja2006,Dyrby2008,Akselrod-Ballin2009,Smart2011,Schmidt2012,Yoo2014,Ithapu2014,Roy2015,Valverde2016} and the
 FSL\footnote{\hreftt{https://fsl.fmrib.ox.ac.uk/fsl/}} toolkit
-\cite{Herskovits2008,Gibson2010,Datta2013,Steenwijk2013,Sweeney2013,Roy2015,Wang2015,Griffanti2016,Zhan2017},
+~\cite{Herskovits2008,Gibson2010,Datta2013,Steenwijk2013,Sweeney2013,Roy2015,Wang2015,Griffanti2016,Zhan2017},
 as well as bias correction by the
 N3/4
-%\footnote{\hreftt{https://www.slicer.org/wiki/Documentation/4.6/Modules/N4ITKBiasFieldCorrection}} 
-\cite{Tustison2010}
+\footnote{\hreftt{https://www.slicer.org/wiki/Documentation/4.6/Modules/N4ITKBiasFieldCorrection}} 
+~\cite{Tustison2010}
 algorithm
-\cite{Zijdenbos2002,Harmouche2006,Fartaria2015,Guizard2015,Harmouche2015,Mechrez2016,Valverde2016,Dadar2017,Zhan2017}.
+~\cite{Zijdenbos2002,Harmouche2006,Fartaria2015,Guizard2015,Harmouche2015,Mechrez2016,Valverde2016,Dadar2017,Zhan2017}.
 % --------------------------------------------------------------------------------------------------

@@ -5,89 +5,188 @@
 This section presents various mathematical results which are not essential to the thesis.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{FLAIR MRI Intensity Modelling}\label{s:simflair}
-While MR imaging is both complex and mutable, simulation of the expected signal intensities is possible using the relaxometry data in Table \ref{tab:t1t2tissues} and sequence signal equations -- e.g. (\ref{eq:MRI-SE}) and (\ref{eq:MRI-IR}).
-In practice, this simulation helps select appropriate acquisition parameters $TE/TR/TI$ for the desired contrast;
-however, these characteristics can also be later considered as covariates in performance analysis of segmentation tools.
+While MR imaging is both complex and mutable,
+simulation of the expected signal intensities is possible
+using the relaxometry data in Table~\ref{tab:t1t2tissues} and
+sequence signal equations -- e.g.\ (\ref{eq:MRI-SE}) and (\ref{eq:MRI-IR}).
+In practice, this simulation helps select appropriate acquisition parameters $TE/TR/TI$
+for the desired contrast;
+however, these characteristics can also be later considered
+as covariates in performance analysis of segmentation tools.
 To this end, Equation (\ref{eq:MRI-IR}) -- repeated here for reference,
 \begin{equation}
-\Psi_{IR}(x) = \bigg[K \left[H(x)\right]\bigg]\bigg[e^{-\left(\frac{TE}{T2(x)}\right)}\bigg]\bigg[1 + e^{-\left(\frac{TR}{T1(x)}\right)} - 2e^{-\left(\frac{TI}{T1(x)}\right)}\bigg]
+  \Psi_{IR}(x) = \bigg[K \left[H(x)\right]\bigg]
+    \bigg[e^{-\left(\frac{TE}{T2(x)}\right)}\bigg]
+    \bigg[1 + e^{-\left(\frac{TR}{T1(x)}\right)} - 2e^{-\left(\frac{TI}{T1(x)}\right)}\bigg].
 \end{equation}
--- was used with the acquisition parameters of the FLAIR image database (Table \ref{tab:database}) and the relaxometry data from Table \ref{tab:t1t2tissues} to calculate the expected tissue intensities and $WMH$ contrasts for the experimental data.
-These results are summarized in Table \ref{tab:simflair}.
-In Figure \ref{fig:simflair}, an example image is shown for each parameter set using the tissue maps from the BrainWeb database \cite{Collins1998}%
-\footnote{\hreftt{http://brainweb.bic.mni.mcgill.ca/}}%
-, while in Figure \ref{fig:simflairplot}, the PMF for each tissue class from the same data are given.
+-- was used with the acquisition parameters of the FLAIR image database (Table~\ref{tab:database})
+and the relaxometry data from Table~\ref{tab:t1t2tissues}
+to calculate the expected tissue intensities and $WMH$ contrasts for the experimental data.
+These results are summarized in Table~\ref{tab:simflair}.
+In Figure~\ref{fig:simflair}, an example image is shown for each parameter set
+using the tissue maps from the BrainWeb database~\cite{Collins1998},%
+\footnote{\hreftt{http://brainweb.bic.mni.mcgill.ca/}}
+while in Figure~\ref{fig:simflairplot}, the PMF for each tissue class from the same data are given.
 \begin{table}
   \centering
-  \caption{Simulated FLAIR tissue intensities and WMH contrasts using scan parameters from the experimental database. Tissue intensities are normalized to the WM value.}
+  \caption{Simulated FLAIR tissue intensities and WMH contrasts
+    using scan parameters from the experimental database.
+    Tissue intensities are normalized to the WM value.}%
   \label{tab:simflair}
   \input{simflair}
 \end{table}
 \begin{figure}
   \centering
-  \begin{subfigure}{0.25\textwidth}\centering\includegraphics[height=\fullheight]{simflair-s=01.png}\caption{WMH 2017 (1)}\end{subfigure}
-  \begin{subfigure}{0.25\textwidth}\centering\includegraphics[height=\fullheight]{simflair-s=02.png}\caption{WMH 2017 (2)}\end{subfigure}
-  \begin{subfigure}{0.25\textwidth}\centering\includegraphics[height=\fullheight]{simflair-s=03.png}\caption{WMH 2017 (3)}\end{subfigure}\\[0.5em]
-  \begin{subfigure}{0.25\textwidth}\centering\includegraphics[height=\fullheight]{simflair-s=04.png}\caption{MS  2016 (1)}\end{subfigure}
-  \begin{subfigure}{0.25\textwidth}\centering\includegraphics[height=\fullheight]{simflair-s=05.png}\caption{MS  2016 (2)}\end{subfigure}
-  \begin{subfigure}{0.25\textwidth}\centering\includegraphics[height=\fullheight]{simflair-s=06.png}\caption{MS  2016 (3)}\end{subfigure}\\[0.5em]
-  \begin{subfigure}{0.25\textwidth}\centering\includegraphics[height=\fullheight]{simflair-s=08.png}\caption{MS  2008 UNC}\end{subfigure}
-  \begin{subfigure}{0.25\textwidth}\centering\includegraphics[height=\fullheight]{simflair-s=09.png}\caption{ISBI MS 2015}\end{subfigure}
-  \begin{subfigure}{0.25\textwidth}\centering\includegraphics[height=\fullheight]{simflair-s=10.png}\caption{In-House    }\end{subfigure}\\[0.5em]
+  \begin{subfigure}{0.25\textwidth}
+    \centering\includegraphics[height=\fullheight]{simflair-s=01.png}
+    \caption{WMH 2017 (1)}
+  \end{subfigure}
+  \begin{subfigure}{0.25\textwidth}
+    \centering\includegraphics[height=\fullheight]{simflair-s=02.png}
+    \caption{WMH 2017 (2)}
+  \end{subfigure}
+  \begin{subfigure}{0.25\textwidth}
+    \centering\includegraphics[height=\fullheight]{simflair-s=03.png}
+    \caption{WMH 2017 (3)}
+  \end{subfigure}\\[0.5em]
+  \begin{subfigure}{0.25\textwidth}
+    \centering\includegraphics[height=\fullheight]{simflair-s=04.png}
+    \caption{MS  2016 (1)}
+  \end{subfigure}
+  \begin{subfigure}{0.25\textwidth}
+    \centering\includegraphics[height=\fullheight]{simflair-s=05.png}
+    \caption{MS  2016 (2)}
+  \end{subfigure}
+  \begin{subfigure}{0.25\textwidth}
+    \centering\includegraphics[height=\fullheight]{simflair-s=06.png}
+    \caption{MS  2016 (3)}
+  \end{subfigure}\\[0.5em]
+  \begin{subfigure}{0.25\textwidth}
+    \centering\includegraphics[height=\fullheight]{simflair-s=08.png}
+    \caption{MS  2008 UNC}
+  \end{subfigure}
+  \begin{subfigure}{0.25\textwidth}
+    \centering\includegraphics[height=\fullheight]{simflair-s=09.png}
+    \caption{ISBI MS 2015}
+  \end{subfigure}
+  \begin{subfigure}{0.25\textwidth}
+    \centering\includegraphics[height=\fullheight]{simflair-s=10.png}
+    \caption{In-House}
+  \end{subfigure}\\[0.5em]
   \includegraphics[width=0.25\textwidth]{hcbar-NIH3-0-3}
-  \caption{Simulated FLAIR images using scan parameters from the experimental database. Colourmap is arbitrary but consistent.}
+  \caption{Simulated FLAIR images using scan parameters from the experimental database.
+    Colourmap is arbitrary but consistent.}%
   \label{fig:simflair}
 \end{figure}
 \begin{figure}
   \centering
-  \begin{subfigure}{\plotwidth}\centering\includegraphics[width=\textwidth]{simflairplot-s=01}\caption{WMH 2017 (1)}\end{subfigure}
-  \begin{subfigure}{\plotwidth}\centering\includegraphics[width=\textwidth]{simflairplot-s=02}\caption{WMH 2017 (2)}\end{subfigure}\\[0.5em]
-  \begin{subfigure}{\plotwidth}\centering\includegraphics[width=\textwidth]{simflairplot-s=03}\caption{WMH 2017 (3)}\end{subfigure}
-  \begin{subfigure}{\plotwidth}\centering\includegraphics[width=\textwidth]{simflairplot-s=04}\caption{MS  2016 (1)}\end{subfigure}\\[0.5em]
-  \begin{subfigure}{\plotwidth}\centering\includegraphics[width=\textwidth]{simflairplot-s=05}\caption{MS  2016 (2)}\end{subfigure}
-  \begin{subfigure}{\plotwidth}\centering\includegraphics[width=\textwidth]{simflairplot-s=06}\caption{MS  2016 (3)}\end{subfigure}\\[0.5em]
-  \begin{subfigure}{\plotwidth}\centering\includegraphics[width=\textwidth]{simflairplot-s=08}\caption{MS  2008 UNC}\end{subfigure}
-  \begin{subfigure}{\plotwidth}\centering\includegraphics[width=\textwidth]{simflairplot-s=09}\caption{ISBI MS 2015}\end{subfigure}\\[0.5em]
-  \begin{subfigure}{\plotwidth}\centering\includegraphics[width=\textwidth]{simflairplot-s=10}\caption{In-House    }\end{subfigure}
-  \caption{PMF of each tissue from simulated FLAIR images. The PMF of the WMH class is scaled by 10 for visibility.}
+  \begin{subfigure}{\plotwidth}
+    \centering\includegraphics[width=\textwidth]{simflairplot-s=01}
+    \caption{WMH 2017 (1)}
+  \end{subfigure}
+  \begin{subfigure}{\plotwidth}
+    \centering\includegraphics[width=\textwidth]{simflairplot-s=02}
+    \caption{WMH 2017 (2)}
+  \end{subfigure}\\[0.5em]
+  \begin{subfigure}{\plotwidth}
+    \centering\includegraphics[width=\textwidth]{simflairplot-s=03}
+    \caption{WMH 2017 (3)}
+  \end{subfigure}
+  \begin{subfigure}{\plotwidth}
+    \centering\includegraphics[width=\textwidth]{simflairplot-s=04}
+    \caption{MS  2016 (1)}
+  \end{subfigure}\\[0.5em]
+  \begin{subfigure}{\plotwidth}
+    \centering\includegraphics[width=\textwidth]{simflairplot-s=05}
+    \caption{MS  2016 (2)}
+  \end{subfigure}
+  \begin{subfigure}{\plotwidth}
+    \centering\includegraphics[width=\textwidth]{simflairplot-s=06}
+    \caption{MS  2016 (3)}
+  \end{subfigure}\\[0.5em]
+  \begin{subfigure}{\plotwidth}
+    \centering\includegraphics[width=\textwidth]{simflairplot-s=08}
+    \caption{MS  2008 UNC}
+  \end{subfigure}
+  \begin{subfigure}{\plotwidth}
+    \centering\includegraphics[width=\textwidth]{simflairplot-s=09}
+    \caption{ISBI MS 2015}
+  \end{subfigure}\\[0.5em]
+  \begin{subfigure}{\plotwidth}
+    \centering\includegraphics[width=\textwidth]{simflairplot-s=10}
+    \caption{In-House}
+  \end{subfigure}
+  \caption{PMF of each tissue from simulated FLAIR images.
+    The PMF of the WMH class is scaled by 10 for visibility.}%
   \label{fig:simflairplot}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Graylevel Standardization}
 % ==================================================================================================
 \subsection{Histogram Matching vs Histogram Equalization}\label{ss:hm-vs-he}
-In \S\ \ref{ss:meth-ystd} it was argued that histogram matching is equivalent to histogram equalization in terms of effectiveness at standardizing graylevels in heterogeneous input images.
-This is because the histogram matching operation is defined as the function composition of the histogram equalization transform of the input image, $F_{\sy}$, and the inverse equalization transform for the desired output histogram, ${F_{\tilde{\sy}}}^{-1}$,
+In \S~\ref{ss:meth-ystd} it was argued that
+histogram matching is equivalent to histogram equalization
+in terms of effectiveness at standardizing graylevels in heterogeneous input images.
+This is because the histogram matching operation is defined as
+the function composition of the histogram equalization transform of the input image, $F_{\sy}$,
+and the inverse equalization transform for the desired output histogram, ${F_{\tilde{\sy}}}^{-1}$,
 \begin{equation}
   \uptau(y) = {F_{\tilde{\textsc{y}}}}^{-1}\big(F_{\sy}(y)\big)
 \end{equation}
-The second transformation in the cascade does not depend on $Y$, and so it is applied equally to images.
+The second transformation in the cascade does not depend on $Y$,
+and so it is applied equally to images.
 Therefore the choice of target PMF is not important for the objective of graylevel standardization.
 This result is verified experimentally using synthetic images.
-Four $100\times100\times100$ images were generated to have the following density functions $f_{\sy}$,
+Four $100\times100\times100$ images were created to have the following density functions $f_{\sy}$,
 \begin{itemize}[itemsep=0pt,topsep=0pt]
-  \item \parbox{2cm}{Uniform:} $y\sim\mathcal{U}(y_{\min}=0,y_{\max}=1)$
-  \item \parbox{2cm}{Unimodal:} $y\sim\N(\mu=0.5,\sigma=0.08)$
-  \item \parbox{2cm}{Bimodal:} $y\sim\big(0.5\et\N(\mu=0.3,\sigma=0.05)+0.5\et\N(\mu=0.7,\sigma=0.05)\big)$
-  \item \parbox{2cm}{Trimodal:} $y\sim\big(0.3\et\N(\mu=0.25,\sigma=0.05)+0.4\et\N(\mu=0.5,\sigma=0.05)+0.3\et\N(\mu=0.75,\sigma=0.05)\big)$
+  \item \parbox{2cm}{Uniform:}
+  $y\sim\mathcal{U}(y_{\min}=0,y_{\max}=1)$
+  \item \parbox{2cm}{Unimodal:}
+  $y\sim\N(\mu=0.5,\sigma=0.08)$
+  \item \parbox{2cm}{Bimodal:}
+  $y\sim\big(0.5\et\N(\mu=0.3,\sigma=0.05)
+            +0.5\et\N(\mu=0.7,\sigma=0.05)\big)$
+  \item \parbox{2cm}{Trimodal:}
+  $y\sim\big(0.3\et\N(\mu=0.25,\sigma=0.05)
+            +0.4\et\N(\mu=0.5,\sigma=0.05)
+            +0.3\et\N(\mu=0.75,\sigma=0.05)\big)$
 \end{itemize}
-All four images were then histogram-matched to each of the respective density functions, with the aim of increasing agreement of image intensities.
-This agreement can be approximated by the alignment of intensity quantiles, since this is the target of histogram matching operations.
-As shown in Figure \ref{fig:hm-vs-he}, the quantiles agree almost perfectly in every output image, regardless of the choice of output PMF.
+All four images were then histogram-matched to each of the respective density functions,
+with the aim of increasing agreement of image intensities.
+This agreement can be approximated by the alignment of intensity quantiles,
+since this is the target of histogram matching operations.
+As shown in Figure~\ref{fig:hm-vs-he}, the quantiles agree almost perfectly in every output image,
+regardless of the choice of output PMF\@.
 \begin{figure}
   \centering
-  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{histmatch-q-original}\caption{Original}\end{subfigure}
+  \begin{subfigure}{\plotwidth}
+    \includegraphics[width=\textwidth]{histmatch-q-original}
+    \caption{Original}
+  \end{subfigure}
   \parbox[c]{\plotwidth}{\includegraphics[width=0.7\plotwidth]{histmatch-q-legend}}\\
-  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{histmatch-q-uniform} \caption{Uniform target} \end{subfigure}
-  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{histmatch-q-unimodal}\caption{Unimodal target}\end{subfigure}
-  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{histmatch-q-bimodal} \caption{Bimodal target} \end{subfigure}
-  \begin{subfigure}{\plotwidth}\includegraphics[width=\textwidth]{histmatch-q-trimodal}\caption{Trimodal target}\end{subfigure}
-  \caption{Histogram matching of synthetic data to different target histograms. Quantiles show high agreement regardless of the target histogram.}
+  \begin{subfigure}{\plotwidth}
+    \includegraphics[width=\textwidth]{histmatch-q-uniform}
+    \caption{Uniform target}
+  \end{subfigure}
+  \begin{subfigure}{\plotwidth}
+    \includegraphics[width=\textwidth]{histmatch-q-unimodal}
+    \caption{Unimodal target}
+  \end{subfigure}
+  \begin{subfigure}{\plotwidth}
+    \includegraphics[width=\textwidth]{histmatch-q-bimodal}
+    \caption{Bimodal target}
+  \end{subfigure}
+  \begin{subfigure}{\plotwidth}
+    \includegraphics[width=\textwidth]{histmatch-q-trimodal}
+    \caption{Trimodal target}
+  \end{subfigure}
+  \caption{Histogram matching of synthetic data to different target histograms.
+    Quantiles show high agreement regardless of the target histogram.}%
   \label{fig:hm-vs-he}
 \end{figure}
 % ==================================================================================================
 \subsection{Nyul Approximation of Histogram Matching}\label{ss:nyul-approx}
-This topic is treated in \cite{Knight2017}.
+This topic is treated in~\cite{Knight2017}.
 % --------------------------------------------------------------------------------------------------
 % ==================================================================================================
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

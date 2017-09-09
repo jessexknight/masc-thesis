@@ -1,33 +1,15 @@
 \documentclass[openany,11pt,vi,oneside]{mitthesis}
-\usepackage{lgrind}
-\usepackage{calc}
-\usepackage{cmap}
-\usepackage{mathtools}
-\usepackage{amssymb}
-\usepackage{bm}
-\usepackage{upgreek}
-\usepackage{enumitem}
-\usepackage{scrextend}
-\usepackage{lscape}
-\usepackage{geometry}
-\usepackage{multicol}
-\usepackage{multirow}
-\usepackage{xcolor}
-\usepackage{float}
-\usepackage{lscape}
-\usepackage{tabu}
-\usepackage{graphicx}
-\usepackage{subcaption}
-\usepackage{nameref}
-%\usepackage{xifthen}
-\usepackage{tikz}
-\usepackage{matlab-prettifier}
-\usepackage{listings}
-\usepackage{mdframed}
+\usepackage{lgrind,cmap,geometry,enumitem}          % fundamental packages
+\usepackage{mathtools,amssymb,bm,upgreek,scrextend} % math packages
+\usepackage{tabu,booktabs,multirow,multicol}        % table packages
+\usepackage{graphicx,float,subcaption}              % figure packages
+\usepackage{matlab-prettifier,listings,mdframed}    % code packages
+\usepackage{nameref,xcolor,calc,tikz}               % beautify packages
 \usepackage[hang, flushmargin]{footmisc}
 \usepackage[colorlinks]{hyperref}
 \usetikzlibrary{shapes,arrows.meta,calc}
-\usepackage[backend=biber, style=numeric, maxcitenames=2, sorting=none, url=false, isbn=false, doi=true, eprint=false]{biblatex}
+\usepackage[backend=biber, style=numeric, maxcitenames=2, sorting=none,
+            url=false, isbn=false, doi=true, eprint=false]{biblatex}
 \hypersetup{citecolor={purple},linkcolor={blue}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % resources
@@ -35,6 +17,9 @@
 \graphicspath{{figs/}{figs/tikz/}{figs/tikz/algorithm/}}
 \newcommand{\matlabdir}{m/}
 \makeatletter\newcommand{\setmaxcitenames}[1]{\numdef\blx@maxcitenames{#1}}\makeatother
+\newcounter{papercount}
+\newcommand{\citefortable}[1]{%
+  \stepcounter{papercount}{\thepapercount}&{\cite{#1}}&{\citeyear{#1}}&{\citeauthor{#1}}}
 % layout
 \geometry{margin=2cm}
 \setlength{\parindent}{0pt}
@@ -66,7 +51,7 @@
 \newcommand{\Z}{\mathcal{Z}}
 \newcommand{\Y}{\mathcal{Y}}
 \newcommand{\C}{\mathcal{C}}
-\newcommand{\x}{\mathcal{X}}
+\newcommand{\X}{\mathcal{X}}
 \newcommand{\bY}{\bm{\mathcal{Y}}}
 \newcommand{\bC}{\bm{\mathcal{C}}}
 \newcommand{\bV}{\bm{\mathcal{V}}}
@@ -120,7 +105,7 @@
   \include{ch-exp}
   \include{ch-conc}
 	\begin{singlespace}
-    \printbibliography
+    \printbibliography{}
   \end{singlespace}
   \appendix
   \include{ap-math}
