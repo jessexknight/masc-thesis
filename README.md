@@ -24,6 +24,8 @@
 - [ ] Decide: introduce TPMs sooner?
 
 #### To Done
+- [x] src: big chktex retrospective
+- [x] src: line-breaks every 100 chars, for git diff and edits tracking
 - [x] src: all sentences on their own line for git diff.
 - [x] Add: what is image registration, MNI space, etc.?
 - [x] Add: methods parameter image smoothing
