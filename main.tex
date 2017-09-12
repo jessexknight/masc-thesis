@@ -1,10 +1,30 @@
 \documentclass[openany,11pt,vi,oneside]{mitthesis}
-\usepackage{lgrind,cmap,geometry,enumitem}          % fundamental packages
-\usepackage{mathtools,amssymb,bm,upgreek,scrextend} % math packages
-\usepackage{tabu,booktabs,multirow,multicol}        % table packages
-\usepackage{graphicx,float,subcaption}              % figure packages
-\usepackage{matlab-prettifier,listings,mdframed}    % code packages
-\usepackage{nameref,xcolor,calc,tikz}               % beautify packages
+\usepackage{lgrind}
+\usepackage{calc}
+\usepackage{cmap}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{upgreek}
+\usepackage{enumitem}
+\usepackage{scrextend}
+\usepackage{lscape}
+\usepackage{geometry}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{lscape}
+\usepackage{tabu}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{nameref}
+\usepackage{booktabs}
+%\usepackage{xifthen}
+\usepackage{tikz}
+\usepackage{matlab-prettifier}
+\usepackage{listings}
+\usepackage{mdframed}            
 \usepackage[hang, flushmargin]{footmisc}
 \usepackage[colorlinks]{hyperref}
 \usetikzlibrary{shapes,arrows.meta,calc}
@@ -13,7 +33,7 @@
 \hypersetup{citecolor={purple},linkcolor={blue}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % resources
-\addbibresource{library.bib}
+\addbibresource{./library.bib}
 \graphicspath{{figs/}{figs/tikz/}{figs/tikz/algorithm/}}
 \newcommand{\matlabdir}{m/}
 \makeatletter\newcommand{\setmaxcitenames}[1]{\numdef\blx@maxcitenames{#1}}\makeatother
@@ -105,7 +125,7 @@
   \include{ch-exp}
   \include{ch-conc}
 	\begin{singlespace}
-    \printbibliography{}
+    \printbibliography
   \end{singlespace}
   \appendix
   \include{ap-math}

@@ -18,7 +18,7 @@ The main problem associated with overfitting is decreased performance on new dat
 (\textsc{aka} generalization performance)~\cite{Hawkins2004}.
 Popular techniques for characterizing this expected decrease include
 cross validation (CV) procedures.
-These involve splitting the $N$ available examples into training ($t$) and testing ($e$) subsets,
+These involve splitting the $N$ available examples into training ($r$) and testing ($e$) subsets,
 where the training data are used to fit the model parameters,
 and the test data are used to approximate the expected generalization performance;
 the data splits are usually repeated, randomly or exhaustively,
@@ -27,13 +27,13 @@ The most popular CV frameworks include:
 \begin{itemize}
   \item\textbf{LOO -- Leave-One-Out:}
   Withhold one example from the training set,
-  and use it as the test case ($N_t$ = $N-1$; $N_e = 1$);
+  and use it as the test case ($N_r$ = $N-1$; $N_e = 1$);
   repeat $N$ times.
   \\\textit{Benefit:} Close approximation of the expected generalization performance
   \\\textit{Drawback:} Expensive to compute -- $\mathcal{O}(N)$
   \item\textbf{KFCV -- K-Fold Cross Validation:}
   Withhold a random batch of $B = N/K$ examples from the training set,
-  and use it as the test set ($N_t$ = $N-B$; $N_e = B$);
+  and use it as the test set ($N_r$ = $N-B$; $N_e = B$);
   repeat $K$ times (without replacement).
   \\\textit{Benefit:} Less expensive to compute -- $\mathcal{O}(N/K)$
   \\\textit{Drawback:} Worse approximation of the expected generalization performance
@@ -58,7 +58,7 @@ In such scenarios, the authors propose the following:
   \item\textbf{LOSO -- Leave-One-Source-Out:}%
     \footnote{Authors' original name was ``Multi-Source Cross Validation''}
     Withhold all examples from source $s\in 1\dots S$ from the training set,
-    and use these as the test set ($N_t$ = $N-N_s$; $N_e = N_s$);
+    and use these as the test set ($N_r$ = $N-N_s$; $N_e = N_s$);
     repeat $S$ times.
   \\\textit{Benefit:} Best approximation of the expected generalization performance
   in multi-source problems
@@ -92,10 +92,10 @@ Table~\ref{tab:datacomp}
       \toprule
       && \multicolumn{2}{c}{Training} & \multicolumn{2}{c}{Testing} \\
       Database     &       Ref.        & $I$ & $S$ & $I$ & $S$ \\ \midrule
-      WMH 2017     &~\cite{WMHSEG2017} & 60  &  3  & 110 &  5  \\
-      MS 2016      &~\cite{MSSEG2016}  & 15  &  3  & 38  &  4  \\
-      MS 2015 ISBI &~\cite{MSISBI2015} & 21  &  1  & 61  &  1  \\
-      MS 2008      &~\cite{MSSEG2008}  & 20  &  2  & 32  &  2  \\ \bottomrule
+      WMH 2017     & \cite{WMHSEG2017} & 60  &  3  & 110 &  5  \\
+      MS 2016      & \cite{MSSEG2016}  & 15  &  3  & 38  &  4  \\
+      MS 2015 ISBI & \cite{MSISBI2015} & 21  &  1  & 61  &  1  \\
+      MS 2008      & \cite{MSSEG2008}  & 20  &  2  & 32  &  2  \\ \bottomrule
     \end{tabu}
 \end{table}
 \par...\par
@@ -153,10 +153,10 @@ and there is little documentation as to how these were generated.%
 Furthermore, several works~\cite{Klauschen2009,Eggert2012} have noted significant discrepancies
 in estimated segmentation performance between BrainWeb and real data (ISBR~\cite{IBSR}).
 %% ==================================================================================================
-%\subsection{Baseline Model Performance}
-%The remainder of this chapter explores model variants which hopefully yield performance improvements
-%For sake of comparison, we first present results from a minimal working algorithm.
-%This version of the VLR model (``\texttt{base}'') is summarized in Table~\ref{tab:hyperparams}.
+\subsection{Baseline Model Performance}
+The remainder of this chapter explores model variants which yield performance improvements.
+For sake of comparison, results from a minimal working algorithm are first presented.
+This version of the VLR model (``\texttt{base}'') is summarized in Table~\ref{tab:hyperparams}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Graylevel Standardization}
 
