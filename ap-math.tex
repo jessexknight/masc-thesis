@@ -13,118 +13,96 @@ In practice, this simulation helps select appropriate acquisition parameters $TE
 for the desired contrast;
 however, these characteristics can also be later considered
 as covariates in performance analysis of segmentation tools.
-To this end, Equation (\ref{eq:MRI-IR}) -- repeated here for reference,
-\begin{equation}
-  \Psi_{IR}(x) = \bigg[K \left[H(x)\right]\bigg]
-    \bigg[e^{-\left(\frac{TE}{T2(x)}\right)}\bigg]
-    \bigg[1 + e^{-\left(\frac{TR}{T1(x)}\right)} - 2e^{-\left(\frac{TI}{T1(x)}\right)}\bigg].
-\end{equation}
--- was used with the acquisition parameters of the FLAIR image database (Table~\ref{tab:database})
-and the relaxometry data from Table~\ref{tab:t1t2tissues}
-to calculate the expected tissue intensities and $WMH$ contrasts for the experimental data.
+To this end, Equations (\ref{eq:MRI-SE}) and (\ref{eq:MRI-IR})
+were used with the relaxometry data from Table~\ref{tab:t1t2tissues}
+to calculate expected tissue intensities and $WMH$ contrasts.
+Nine sets of acquisition parameters were taken from
+the FLAIR image database (Table~\ref{tab:database}),
+in addition to one simulated T1 image (TE/TR = 5/15 ms)
+and one simulated T2 image (TE/TR = 100/5500 ms).
 These results are summarized in Table~\ref{tab:simflair}.
 In Figure~\ref{fig:simflair}, an example image is shown for each parameter set
 using the tissue maps from the BrainWeb database~\cite{Collins1998},%
 \footnote{\hreftt{http://brainweb.bic.mni.mcgill.ca/}}
-while in Figure~\ref{fig:simflairplot}, the PMF for each tissue class from the same data are given.
+while in Figure~\ref{fig:simflairplot},
+the PMF for each tissue class from the same data are given.
 \begin{table}
   \centering
   \caption{Simulated FLAIR tissue intensities and WMH contrasts
     using scan parameters from the experimental database.
     Tissue intensities are normalized to the WM value.}%
   \label{tab:simflair}
-  \input{simflair}
+  \input{tab-simflair}
 \end{table}
 \begin{figure}
   \centering
-  \begin{subfigure}{0.25\textwidth}
-    \centering\includegraphics[height=\fullheight]{simflair-s=01.png}
-    \caption{WMH 2017 (1)}
-  \end{subfigure}
-  \begin{subfigure}{0.25\textwidth}
-    \centering\includegraphics[height=\fullheight]{simflair-s=02.png}
-    \caption{WMH 2017 (2)}
-  \end{subfigure}
-  \begin{subfigure}{0.25\textwidth}
-    \centering\includegraphics[height=\fullheight]{simflair-s=03.png}
-    \caption{WMH 2017 (3)}
-  \end{subfigure}\\[0.5em]
-  \begin{subfigure}{0.25\textwidth}
-    \centering\includegraphics[height=\fullheight]{simflair-s=04.png}
-    \caption{MS  2016 (1)}
-  \end{subfigure}
-  \begin{subfigure}{0.25\textwidth}
-    \centering\includegraphics[height=\fullheight]{simflair-s=05.png}
-    \caption{MS  2016 (2)}
-  \end{subfigure}
-  \begin{subfigure}{0.25\textwidth}
-    \centering\includegraphics[height=\fullheight]{simflair-s=06.png}
-    \caption{MS  2016 (3)}
-  \end{subfigure}\\[0.5em]
-  \begin{subfigure}{0.25\textwidth}
-    \centering\includegraphics[height=\fullheight]{simflair-s=08.png}
-    \caption{MS  2008 UNC}
-  \end{subfigure}
-  \begin{subfigure}{0.25\textwidth}
-    \centering\includegraphics[height=\fullheight]{simflair-s=09.png}
-    \caption{ISBI MS 2015}
-  \end{subfigure}
-  \begin{subfigure}{0.25\textwidth}
-    \centering\includegraphics[height=\fullheight]{simflair-s=10.png}
-    \caption{In-House}
-  \end{subfigure}\\[0.5em]
-  \includegraphics[width=0.25\textwidth]{hcbar-NIH3-0-3}
+  \foreach \i/\iname in {% % chktex 1
+    01/WMH 2017 (1),
+    02/WMH 2017 (2),
+    03/WMH 2017 (3),
+    04/MS  2016 (1),
+    05/MS  2016 (2),
+    06/MS  2016 (3),
+    08/MS  2008 UNC,
+    09/ISBI MS 2015,
+    10/In-House}{%
+    \begin{subfigure}{0.25\textwidth}%
+      \centering\includegraphics[width=\textwidth]{simflair-s=\i.png}%
+      \caption{\iname}%
+    \end{subfigure}
+  }\\[0.5em]
+  \includegraphics[width=0.25\textwidth]{hcbar-simflair}
   \caption{Simulated FLAIR images using scan parameters from the experimental database.
     Colourmap is arbitrary but consistent.}%
   \label{fig:simflair}
 \end{figure}
 \begin{figure}
   \centering
-  \begin{subfigure}{\plotwidth}
-    \centering\includegraphics[width=\textwidth]{simflairplot-s=01}
-    \caption{WMH 2017 (1)}
+  \begin{subfigure}{0.25\textwidth}
+    \centering\includegraphics[width=\textwidth]{simflair-s=11.png}%
+    \caption{T1}
   \end{subfigure}
-  \begin{subfigure}{\plotwidth}
-    \centering\includegraphics[width=\textwidth]{simflairplot-s=02}
-    \caption{WMH 2017 (2)}
-  \end{subfigure}\\[0.5em]
-  \begin{subfigure}{\plotwidth}
-    \centering\includegraphics[width=\textwidth]{simflairplot-s=03}
-    \caption{WMH 2017 (3)}
+  \begin{subfigure}{0.25\textwidth}
+    \centering\includegraphics[width=\textwidth]{simflair-s=12.png}%
+    \caption{T2}
   \end{subfigure}
-  \begin{subfigure}{\plotwidth}
-    \centering\includegraphics[width=\textwidth]{simflairplot-s=04}
-    \caption{MS  2016 (1)}
-  \end{subfigure}\\[0.5em]
-  \begin{subfigure}{\plotwidth}
-    \centering\includegraphics[width=\textwidth]{simflairplot-s=05}
-    \caption{MS  2016 (2)}
+  \caption{Simulated T1 (TE/TR = 5/15 ms) and T2 (TE/TR = 100/5500 ms) images.}%
+  \label{fig:simt1t2}
+\end{figure}
+\begin{figure}
+  \centering
+  \foreach \i/\iname in {% % chktex 1
+    01/WMH 2017 (1),
+    02/WMH 2017 (2),
+    03/WMH 2017 (3),
+    04/MS  2016 (1),
+    05/MS  2016 (2),
+    06/MS  2016 (3),
+    08/MS  2008 UNC,
+    09/ISBI MS 2015,
+    10/In-House}{%
+    \begin{subfigure}{0.8\plotwidth}%
+      \centering\includegraphics[width=\textwidth]{simflairplot-s=\i}%
+      \caption{\iname}%
+    \end{subfigure}
+  }\\
+  \begin{subfigure}{0.8\plotwidth}%
+    \centering\includegraphics[width=\textwidth]{simflairplot-s=11}%
+    \caption{T1 e.g.}%
   \end{subfigure}
-  \begin{subfigure}{\plotwidth}
-    \centering\includegraphics[width=\textwidth]{simflairplot-s=06}
-    \caption{MS  2016 (3)}
-  \end{subfigure}\\[0.5em]
-  \begin{subfigure}{\plotwidth}
-    \centering\includegraphics[width=\textwidth]{simflairplot-s=08}
-    \caption{MS  2008 UNC}
+  \begin{subfigure}{0.8\plotwidth}%
+    \centering\includegraphics[width=\textwidth]{simflairplot-s=12}%
+    \caption{T2 e.g.}%
   \end{subfigure}
-  \begin{subfigure}{\plotwidth}
-    \centering\includegraphics[width=\textwidth]{simflairplot-s=09}
-    \caption{ISBI MS 2015}
-  \end{subfigure}\\[0.5em]
-  \begin{subfigure}{\plotwidth}
-    \centering\includegraphics[width=\textwidth]{simflairplot-s=10}
-    \caption{In-House}
-  \end{subfigure}
-  \caption{PMF of each tissue from simulated FLAIR images.
-    The PMF of the WMH class is scaled by 10 for visibility.}%
+  \caption{PMF of each tissue from simulated FLAIR, T1, and T2 images.
+    The PMF of the WMH class is scaled by 25 for visibility.}%
   \label{fig:simflairplot}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Graylevel Standardization}
 % ==================================================================================================
 \subsection{Histogram Matching vs Histogram Equalization}\label{ss:hm-vs-he}
-In \S~\ref{ss:meth-ystd} it was argued that
+In \S~\ref{s:pre-ystd} it was argued that
 histogram matching is equivalent to histogram equalization
 in terms of effectiveness at standardizing graylevels in heterogeneous input images.
 This is because the histogram matching operation is defined as
@@ -156,7 +134,7 @@ with the aim of increasing agreement of image intensities.
 This agreement can be approximated by the alignment of intensity quantiles,
 since this is the target of histogram matching operations.
 As shown in Figure~\ref{fig:hm-vs-he}, the quantiles agree almost perfectly in every output image,
-regardless of the choice of output PMF\@.
+regardless of the choice of output PMF.
 \begin{figure}
   \centering
   \begin{subfigure}{\plotwidth}

@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ==================================================================================================
 % --------------------------------------------------------------------------------------------------
-\chapter{Introduction}
+\chapter{Introduction}\label{ch-intro}
 Digitization of medical imaging has facilitated
 innumerable advances in disease understanding and treatment.
 From multi-modal image fusion to image guided therapy, software tools now underpin
@@ -12,8 +12,11 @@ in which the objective is to automatically predict the
 class, or label, of every voxel (``volume pixel'') in the image.
 The objects of interest are white matter hyperintensities (WMH),
 non-cancerous brain lesions which are correlated with several neurodegenerative diseases.
-This chapter presents the motivation for automated WMH segmentation
-gives a problem definition, and explores the previously proposed solutions.
+This chapter
+presents the motivation for automated WMH segmentation,
+gives a problem definition,
+explores the previously proposed solutions,
+and briefly introduces the algorithm proposed in this work.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Background}
 The brain is composed of three major classes of tissue:
@@ -105,7 +108,7 @@ T1 and T2 values for various brain tissues at 1.5T are summarized in Table~\ref{
       \bottomrule
   \end{tabular}}
   \tablepost{\ss{a} Estimated from Fig 1 supratentorial data (numerical results not given);
-    $\pm$ IQR, not SD\@; cf. \S~\ref{ss:WMD} for definition.}
+    $\pm$ IQR, not SD; cf.~\S~\ref{ss:WMD} for definition.}
 \end{table}
 Image acquisition involves sensing the transverse magnetization $M_{xy}$
 following proton excitation by an RF pulse.
@@ -302,7 +305,7 @@ including binary criteria (e.g.\ is there a lesion in a specific location)~\cite
 rating scales (e.g.\ a summary of several criteria)~\cite{Fazekas1987},
 or explicit manual segmentation of the lesions by an expert~\cite{Egger2017}.
 \par
-WMH are arguably most important in MS\@.
+WMH are arguably most important in MS.
 Particularly since WMH are more specific to this disease in younger patients,
 WMH have long been used in the diagnosis of MS,
 and can even be used to replace some clinical criteria,
@@ -355,7 +358,7 @@ laborious, and subject to large inter- and intra-rater variability, as reported 
 Table~\ref{tab:interrater-cite} summarizes these reports,
 where similarity index (SI $\in [0,1]$) is a measure of voxel-wise agreement,
 and interclass correlation coefficient (ICC $\in [0,1]$) measures total volume agreement
-(cf. \S~\ref{ss:metrics} for definitions).
+(cf.~\S~\ref{ss:exp-metrics} for definitions).
 Table~\ref{tab:interrater-cite} also gives the results using four semi-automated approaches,
 since these methods are reported to reduce variability and task time
 over strictly manual segmentation.
@@ -364,11 +367,12 @@ any approach requiring human intervention would be prohibitively time consuming 
 \par 
 Therefore, a fully automated algorithm to segment WMH in MRI is required.
 Such an algorithm would have, by construction,
-perfect repeatability, and consistent bias -- which is especially important
+perfect repeatability and consistent bias -- which is especially important
 for perceiving small changes in longitudinal studies~\cite{MSISBI2015}.
 Additionally, while an automated approach may not necessarily
 be faster than manual or semi-automatic segmentation on a per-case basis,
-it could be run on several computers in parallel, yielding significant overall speed up.
+it could be run on several computers in parallel continuously,
+yielding a significant overall speed up.
 \par
 Furthermore, while T1, T2, and FLAIR sequences are typically recommended
 for both MS and dementia investigations~\cite{Simon2006,Wardlaw2013,Traboulsee2015},
@@ -424,15 +428,25 @@ help radiologists to distinguish WML from image artifacts.
 Thus, there are several challenges to automatic segmentation.
 These can be summarized as follows:
 \begin{enumerate}[itemsep=0pt,topsep=0pt]
-  \item\label{chauto:overlap}
-  \textbf{Overlapping distributions:}\\
-    Using the relaxation constants in Table~\ref{tab:t1t2tissues}
-    in conjunction with the FLAIR signal equation (\ref{eq:MRI-IR}),
-    the predicted intensity distributions of GM and WMH can overlap,
-    depending on the choice of TE, TR, and TI
-    (cf. Table~\ref{tab:database} for typical values and \S~\ref{s:simflair} for modelling).
-    As a result, the intensity of image voxels alone
-    cannot be used to determine their class~\cite{Mortazavi2012}.
+  \item\label{chauto:npva}
+    \textbf{Noise \& Partial volume effect:}\\
+    The intensity of image voxels alone is not sufficient to determine their class;
+    this is on account of two factors.    
+    First, the magnitude of magnetization sensed during image acquisition is extremely small.
+    As a result, quasi-Gaussian additive noise from several sources
+    corrupts image intensities throughout the image~\cite{Dietrich2008a}.
+    Second, with finite image resolution,
+    voxels located on tissue boundaries will inevitably contain tissues of two or more tissues.
+    This is known as partial volume effect (PVE), and the resulting signal intensity
+    can be modelled as a linear mixture of the components~\cite{Santago1995,Khademi2014}.
+    \citeauthor{Niessen1999}~\cite{Niessen1999} show that inadequate modelling of PVE
+    can result in significant errors in tissue segmentation,
+    though the widely reported 30\% figure from this work is derived from unrealistic conditions.%
+    \footnote{\citeauthor{Niessen1999} used morphological dilation of binary tissue masks % chktex 42
+    in every direction, and compared the volumes of the resulting mask to the original.
+    Practically, PVE modelling errors are much more likely to result in
+    some areas of overestimation and some areas of underestimation,
+    with overall effect closer to 4\%, as the authors show.}
   \item\label{chauto:bias}
   \textbf{Bias field:}\\
     The most common image artifact in MRI is due to
@@ -443,21 +457,12 @@ These can be summarized as follows:
     the same tissues may have different graylevels in different locations,
     further confounding the uniqueness of WMH graylevels~\cite{Wardlaw2015}.
   \item\label{chauto:dawm}
-  \textbf{DAWM\@:}\\
+  \textbf{DAWM:}\\
     Most of the inter-rater disagreement in manual segmentation of WMH is arguably due to
     ambiguity of pathological extent at the lesion borders,
     where the core lesion meets so-called DAWM~\cite{Ge2003}.
     If human judgement of this boundary is difficult,
     then programmatic definitions could be expected to be similarly challenged.
-  \item\label{chauto:pva}
-  \textbf{Partial volume effect:}\\
-    With finite image resolution,
-    voxels located on tissue boundaries will inevitably contain tissues of two or more tissues.
-    This is known as partial volume effect (PVE), and the resulting signal intensity
-    can be modelled as a linear mixture of the components~\cite{Santago1995}.
-    \citeauthor{Niessen1999}~\cite{Niessen1999} show that inadequate modelling of PVE
-    can result in significant errors in tissue segmentation,
-    though the widely reported 30\% figure from this work is derived from unrealistic conditions.
   \item\label{chauto:artifacts} 
   \textbf{Artifacts:}\\
     Due to the complexity of signal acquisition,
@@ -469,7 +474,7 @@ These can be summarized as follows:
     \begin{itemize}[itemsep=0pt,topsep=0pt]
       \item CSF flow artifacts -- 
       ventricular hyperintensities resulting from movement of magnetically polarized CSF fluid
-      during the inversion interval (cf. \S~\ref{ss:mri})~\cite{Bakshi2000};  
+      during the inversion interval (cf.~\S~\ref{ss:mri})~\cite{Bakshi2000};  
       \item Perivascular spaces --
       minuscule spaces adjacent to cerebral vessels
       whose properties differ from ventricular and sulcal CSF,
@@ -503,7 +508,7 @@ These can be summarized as follows:
 \end{enumerate}
 An optimal WMH segmentation algorithm will therefore consider and address each of these challenges.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Prior Work}
+\section{Prior Work}\label{s:prior}
 This endeavour is far from original.
 Efforts to automate segmentation of WMH date back to~\citeyear{Kapouleas1990}~\cite{Kapouleas1990},
 and the task has been the subject of several major reviews in%
@@ -517,21 +522,14 @@ and the
 ISBI (International Symposium on Biomedical Imaging) Conference -- 
 2015~\cite{MSISBI2015} --
 in which researchers vie to produce the best segmentation algorithms
-(for more on competitions, cf. \S~\ref{ss:competitions}).
-A summary of many of the proposed approaches is given in Table~\ref{tab:wmlsegtable}.%
-\footnote{A more detailed and interactive version of this table is available at
-  \hreftt{www.uoguelph.ca/~jknigh04/wmlseg/table.html}}
-Below, the most important contributions in this area are introduced and summarized.
-\begin{table}
-  \caption{Summary of previous approaches to WMH segmentation
-    with respect to image variability and reported performance (SI).}%
-  \label{tab:wmlsegtable}
-  \footnotesize{\centering{\input{wmlsegtable}}}
-\end{table}
+%(for more on competitions, cf.~\S~\ref{ss:competitions}).
+\par
+This section reviews the approaches proposed in these competitions and other publications.
 % ==================================================================================================
-\subsection{Segmentation Models \& Features}
+\subsection{Segmentation Models \& Features}\label{ss:prior-models+feats}
 Segmentation models represent a mapping
-from the content of an observed image to an image of labels or classes -- in this case, tissues.
+from the content of an observed image -- the features --
+to an image of labels or classes -- in this case, tissues.
 The output class image comprises an estimated label for each observed voxel,
 or, in probabilistic models, the probability of each class for each voxel.
 As in many classification problems, models can be described as either supervised or unsupervised.
@@ -541,8 +539,45 @@ but learn a mapping relevant to the current task using feedback from labelled ex
 Unsupervised models, by contrast, are usually problem-specific,
 and leverage prior knowledge and the image features to predict the label image;
 they do not require labelled data for optimization, at least in principle.
+The core segmentation model is usually constructed using prior knowledge,
+or wrapped in pre-and post-processing steps to create the overall algorithm.
+% --------------------------------------------------------------------------------------------------
+\subsubsection{Algorithm Types}\label{sss:prior-models}
+Three general approaches have emerged for segmentation of brain MRI.
+The first and most popular is the pipeline,
+in which sub-tasks are completed in sequence,
+such as: pre-processing, classification, post-processing.
+This approach permits a flexible algorithm definition
+which can incorporate existing methods for individual steps.
+Most thresholding and classic supervised are implemented in this way.
+The main drawback of this approach is that
+some steps could be improved by the results of downstream steps.
+For example, tissue classifying modules typically assume that the bias field is already corrected,
+but bias field estimation can be more accurate if the tissue segmentation is known.
 \par
-Features used for segmentation can be derived from
+The second paradigm, a unified generative model, aims to solve this chicken-egg problem.
+The segmentation is parameterized in one integrated probabilistic model,
+which often combines the input images with
+tissue prior probability images, a bias field model, and smoothness terms.
+Parameters of each sub-model are estimated using several expectation maximization (EM) iterations
+before the final segmentation is inferred.
+The challenges to this approach include
+balancing model complexity with estimability,
+robust convergence issues,
+and reduced ability to include external tools.
+\par
+The final paradigm, deep learning,
+uses error back-propagation to update thousands of parameters
+in a large, relatively unstructured model mapping the input MRI to the output segmentation image.
+Using so-called ``end-to-end'' training, there is no guarantee that the usual sub-components
+(e.g.\ bias field, tissue graylevel distributions, etc.) will be estimated,
+though such elements could be expected to develop in the internal relationships
+if they are relevant to the task at hand.
+Most deep learning models still require standardization in space and graylevel,
+and more importantly, large training datasets -- which are rare in medical imaging.
+% --------------------------------------------------------------------------------------------------
+\subsubsection{Features}\label{sss:prior-feats}
+Features used in the above segmentation algorithms can be derived from
 individual voxels (e.g.\ graylevel),
 groups of voxels (e.g.\ local mean graylevel),
 the entire image (e.g.\ a histogram feature),
@@ -557,7 +592,7 @@ subspaces corresponding to each class,
 In probabilistic models,
 these subspaces are better described as distributions of each class over the features.
 \par
-Previous approaches to WMH segmentation have generally employed three types of features:
+Previous approaches to WMH segmentation have generally employed four types of features:
 \begin{itemize}
   \item \textbf{Graylevel:}
   graylevels of MRI sequences, often following standardization
@@ -568,24 +603,35 @@ Previous approaches to WMH segmentation have generally employed three types of f
   \item \textbf{Spatial:}
   spatial location, often normalized to a common space
   (e.g.\ $\xxx$).
+  \item \textbf{Contextual:}
+  local graylevel statistics or texture measures
+  (e.g.\ local edge magnitude).
 \end{itemize}
 Additional features types are rarely used,
 since the combination of the above features are typically the only ones employed by human raters.
 At least one graylevel feature is always used,
-since it is the only image-specific information (i.e.\ the evidence).
+since it is the only voxel-specific information (i.e.\ the evidence).
 %__JK__ introduce image registration here?
 % ==================================================================================================
-\subsection{Proposed Methods}\label{ss:priorproposed}
-The specific methods proposed for WMH segmentation are now reviewed.%
-\footnote{This section copied verbatim from a paper in submission~\cite{Knight2017a}}
-%__JK__ is this allowed?
+\subsection{Proposed Methods}\label{ss:prior-proposed}
+For a more detailed understanding of the prior work,
+specific methods proposed for WMH segmentation are now reviewed.%
+\footnote{This section adapted from a paper in submission~\cite{Knight2017a}}
+A summary of many of these works is also given in Table~\ref{tab:wmlsegtable}.%
+\footnote{A more detailed and interactive version of this table is available at
+  \hreftt{www.uoguelph.ca/~jknigh04/wmlseg/table.html}}
+\begin{table}
+  \caption{Summary of previous approaches to WMH segmentation
+    with respect to image variability and reported performance (SI).}%
+  \label{tab:wmlsegtable}
+  \footnotesize{\centering{\input{tab-priorwork}}}
+\end{table}
 % --------------------------------------------------------------------------------------------------
 \newcommand{\priorworksub}[1]{\subsubsection{#1}}
 \input{priorwork}
 % --------------------------------------------------------------------------------------------------
 % \subsubsection{WMH Segmentation Toolboxes}\label{sss:wmhsegtoolboxes}
 % __JK__ should list here the freely available methods, like in paper. Paper text:
-% 
 % We commend the authors of several freely available WMH segmentation tools
 % for deploying their algorithms in usable form,
 % and for accepting their inevitable role of as the butt of comparisons with other methods.
@@ -613,7 +659,8 @@ The specific methods proposed for WMH segmentation are now reviewed.%
 % ==================================================================================================
 \subsection{Limitations}\label{ss:priorlimits}
 Despite over 50 proposed algorithms and several competitions,
-no WMH segmentation algorithm has clearly emerged the superior method,
+no WMH segmentation algorithm has clearly emerged the superior method,%
+\footnote{Things may have changed recently, cf.~\S~\ref{ss:exp-wmhseg17}.}
 nor has any been taken up for use in the wider research community.
 This is contrasted with other neuroimaging tasks,
 where several robust tools noted above are now regularly used in analysis pipelines -- e.g.
@@ -621,7 +668,14 @@ N3/4~\cite{Tustison2010} for bias field correction,
 BET for brain extraction~\cite{Smith2002a},
 SPM Segment~\cite{Ashburner2005} / FSL FAST~\cite{Zhang2001} for healthy brain segmentation,
 SPM Normalize~\cite{Ashburner2005} / FSL FNIRT~\cite{Andersson2007} for registration.
-There are two hypothesized reasons for this gap in WMH segmentation tools.
+\par
+Some general reasons for
+the lack of confidence placed in previous approaches will be explored in the next section.
+Then, specific limitations of the more promising models, on which this work is based,
+will also be discussed.
+% --------------------------------------------------------------------------------------------------
+\subsubsection{Confidence Factors}\label{sss:limits-conf}
+In general, two hypotheses help explain the gap in widely used WMH segmentation tools.
 \par
 First, very few of the proposed methods have been released
 as either open-source code or compiled applications.
@@ -639,7 +693,7 @@ for development of 3D Slicer modules.%
 \par
 Second, very few of the WMH segmentation methods
 have been validated on large, multi-centre databases:
-of the 53 works reviewed (Table~\ref{tab:wmlsegtable}),
+of the 54 works reviewed (Table~\ref{tab:wmlsegtable}),
 less than half use more than one scanner for validation, and only 4 use more than three.
 As noted in \S~\ref{ss:autochallenges}, there are several sources of image variability in MRI,
 and both supervised and unsupervised methods can be sensitive to these factors,
@@ -670,7 +724,7 @@ which in turn are subject to MR slice thickness, noise level, and contrast%
 Graylevel thresholding techniques~\cite{Jack2001,Smart2011,Samaille2012,Schmidt2012,Khademi2014}
 are similarly affected by changes in image properties.
 \par
-It is worth noting three works%
+It is worth noting four works%
 \footnote{The work by~\citeauthor{Samaille2012} (\citeyear{Samaille2012})~\cite{Samaille2012}
   is also a good candidate, having used 6 scanners for validation;
   however, 43 of the 67 images (64\%) come only from one scanner,
@@ -678,10 +732,10 @@ It is worth noting three works%
 which run counter to this trend, demonstrating robust validation of their proposed methods.
 These works are summarized in Table~\ref{tab:priorworkval}.
 Perhaps not surprisingly, these papers report lower performance
-(mean SI $\le 0.60$) than other works;
+(mean SI $\le 0.64$) than other works;
 as a result, these algorithms would not likely be used for clinical research.
 Yet, even these works do not optimally estimate the model generalization performance
-for data from new scanners, as will be discussed in \S~\ref{s:CVframeworks}.
+for data from new scanners, as will be discussed in \S~\ref{s:cv-frameworks}.
 Moreover, the proposed algorithms in these papers require at least three MRI sequences,
 which fails the objectives of the current work.
 \begin{table}[h]
@@ -693,20 +747,255 @@ which fails the objectives of the current work.
       \toprule
       Ref.&Year&Authors&I&S&SI
       \\\midrule
-      \citefortablev{Dyrby2008} & 362 & 10 & 0.56 \\
-      \citefortablev{Guizard2015} & 108 & 32 & 0.60 \\
-      \citefortablev{Harmouche2015} & 100 & 35 & 0.56 \\
+      \citefortablev{Dyrby2008}      & 362 & 10 & 0.56 \\
+      \citefortablev{Guizard2015}    & 108 & 32 & 0.60 \\
+      \citefortablev{Harmouche2015}  & 100 & 35 & 0.56 \\
+      \citefortablev{Brosch2016}     & 77  & 67 & 0.64 \\
       \bottomrule
     \end{tabular}
   \tablepost{
     Abbreviations.
-    I\@: number of MR image sets used for validation;
-    S\@: number of MRI scanner-parameter combinations used for validation;
-    SI\@: reported validation similarity index.}
+    I: number of MR image sets used for validation;
+    S: number of MRI scanner-parameter combinations used for validation;
+    SI: reported validation similarity index.}
 \end{table}
+% --------------------------------------------------------------------------------------------------
+\subsubsection{FLAIR-Only Methods}\label{sss:limits-flair}
+Since the current work aims to develop a FLAIR-only segmentation method,
+special attention is given to the limitations of these approaches.
+\par
+The majority of FLAIR-only WMH segmentation algorithms use a thresholding technique,
+mapping a single graylevel feature directly to a class or class probability
+(e.g.\ ``healthy'' or ``lesion'').
+Such models often have complex methods of deriving this mapping (e.g.\ 
+using mixture model parameters~\cite{Roura2015},
+histogram features~\cite{Yoo2014},
+or conditional edge probability~\cite{Knight2016}),
+but the final rule is applied equally to the entire graylevel image.
+The most common challenge for these methods is a high number of false positives
+(cf.~\S~\ref{ss:exp-metrics} for definitions),
+since several artifacts and GM can overlap the WMH intensity distribution.
+\par
+Preliminary investigations sought to characterize the spatial distribution of these common errors
+in order to understand the limitations of thresholding methods.
+Using a database of 96 FLAIR images and binary manual WMH segmentations,
+where $0 =$ healthy, and $1 =$ lesion
+(cf.~\S~\ref{s:data} for details),
+the optimal threshold for each image was calculated.%
+\footnote{The \texttt{fminsearch} function in Matlab was used.}
+The optimization maximized the Similarity Index (cf.~\S~\ref{ss:exp-metrics})
+between the thresholded FLAIR image and the manual segmentation.
+The resulting segmentations were spatially transformed (cf.~\S~\ref{s:pre-reg})
+to MNI space, and the average distribution of
+true positives (TP), false positives (FP), and false negatives (FN)
+were computed.
+These results shown in Figure~\ref{fig:tpfpfn-thropt},
+and for reference, the median optimal similarity index (SI) was 0.36.
+\begin{figure}
+  \centering
+  \subfigureoverl[white]{(a) $TP(x)$}{}{%
+    \includegraphics[height=\sliceheight]{rawthropt-tp.png}
+    \includegraphics[height=\sliceheight]{cmap-rawthropt}
+  }\\[0.5em]
+  \subfigureoverl[white]{(b) $FP(x)$}{}{%
+    \includegraphics[height=\sliceheight]{rawthropt-fp.png}
+    \includegraphics[height=\sliceheight]{cmap-rawthropt}
+  }\\[0.5em]
+  \subfigureoverl[white]{(c) $FN(x)$}{}{%
+    \includegraphics[height=\sliceheight]{rawthropt-fn.png}
+    \includegraphics[height=\sliceheight]{cmap-rawthropt}
+  }
+  \caption{Distributions of TP, FP, and FN in 96 FLAIR MRI,
+    following supervised optimal thresholding in MNI space.}%
+  \label{fig:tpfpfn-thropt}
+\end{figure}
+\par
+The large proportion of FP and FN in these results suggests that 
+even if an optimal threshold could be estimated for these data,
+the agreement with manual segmentation would be poor.
+For this reason, graylevels alone could not give a good estimation
+of the lesion segmentation,
+and some additional features should be used.
+It can be seen in Figure~\ref{fig:tpfpfn-thropt} that there are
+regular and distinct spatial distributions of the FP and FN errors.
+Moreover, is it has been suggested that there is
+regional heterogeneity in relaxation rates of brain tissues~\cite{Sled2004},
+and that WML intensity depends in part on location~\cite{Stevenson2000,Harmouche2015}.
+This implies that spatial coordinates could be helpful additional features used for this task,
+especially when incorporated into the main classification model
+(i.e.\ not as post-processing, as in so-called ``false positive reduction'').
+\par
+Spatial features have been used with FLAIR intensities
+in supervised classification models like K-NN, SVM, RF, etc.%
+~\cite{Anbeek2004,Anbeek2005,Dyrby2008,Griffanti2016,Dadar2017}.
+However, such models treat all features equally,
+which can lead to artifacts in the decision boundary that contradict prior knowledge.
+For example, in spatial locations which do not observe any lesions during training,
+the optimized model may learn to never predict the lesion class, regardless of graylevel features.
+Similarly, there are several factors challenging the assumption 
+that FLAIR graylevels will map monotonically to the lesion class.
+Therefore, spatial features should be treated differently.
+A model to do so will be developed throughout the remainder of this work.
+% --------------------------------------------------------------------------------------------------
+\subsubsection{Classic Logistic Regression Models}\label{sss:limits-lr}
+Logistic regression models have more recently gained popularity for WMH segmentation%
+~\cite{Sweeney2013a,Sweeney2013,Schmidt2017a,Zhan2017}, and have several advantages.
+First, model parameters are generally more interpretable than those in other models,
+permitting better design of regularizations.
+Second, the simplicity of the model reduces its capacity for over-fitting.
+Third, model foundations in statistical theory allow probabilistic interpretations of the outputs,
+which may be helpful for quantifying marginally pathological tissues like DAWM.
+\par
+Let $c=1$ denote the lesion class, and $c=0$ denote the healthy class.
+In the classic logistic model,
+the probability of the lesion class,
+given a set of features $\by = {[1,y^1,\dots,y^\sk]}^T$,
+is modelled by a logistic function,
+parameterized by a vector of feature weights $\bb = {[\b^0,\b^1,\dots,\b^\sk]}^T$,
+\begin{equation}
+P\big(c=1\mid\by,\bb\big) = \frac{1}{1+e^{-\eta}},\qquad\eta = \bb^T\by.%
+\label{eq:lrmodel-basic}
+\end{equation}
+This probability -- the estimated lesion class label --
+is denoted $\hat{c} = P(c=1\mid\by,\bb) \in [0,1]$.
+Figure~\ref{fig:lr-basic} shows an example class prediction for an arbitrary input graylevel $y_i$.
+Considering the spatial location $x = [\xxx]$,
+the estimated label image becomes $\hat{C}(x) = P(C(x)=1\mid\bm{Y}(x),\bb)$.
+\par
+\begin{figure}
+  \centering\includegraphics[width=\plotwidth]{lr-basic}
+  \caption{The logistic regression model.}%
+  \label{fig:lr-basic}
+\end{figure}
+In the OASIS algorithm~\cite{Sweeney2013a,Sweeney2013}
+and the algorithm by \citeauthor{Zhan2017}~\cite{Zhan2017},
+this model is used with a number of different graylevel features.
+However, this ignores spatial location%
+\footnote{The OASIS model also uses Gaussian-blurred images as features,
+  which could add some spatial information,
+  but this is different from an explicit global context like $x$.}
+and therefore makes two assumptions:
+first, that graylevels are monotonically related to the lesion class
+-- i.e.\ that WMH are either the brightest or darkest class in the image -- 
+and second, that the distribution of graylevels alone is sufficient to discriminate classes.
+From the graylevel modelling results in \S~\ref{s:simflair},
+it can be shown that typical selections of T1 and T2 imaging parameters
+do not create monotonic relationships between graylevel and class label,
+contrast between GM and WMH graylevel distributions
+is often only around 40\%, even in FLAIR images.
+Moreover, these results are derived from ideal conditions;
+considering image noise, PVE, imperfect bias field correction, and possible tissue heterogeneity,
+the plausibility of class separability by graylevel alone is further diminished.
+Again, the potential utility of spatial features is highlighted.
+% --------------------------------------------------------------------------------------------------
+\subsubsection{Lesion Prediction Algorithm}\label{sss:limits-lpa}
+An alternative approach by \citeauthor{Schmidt2017a} aims to solve this issue
+by introducing a spatial effect parameter, namely the intercept $\b^0 \rightarrow \b^0(x)$.
+In this method, a Gaussian MRF model is used to estimate the spatial parameter $\b^0(x)$,
+while the other $\b$ parameters
+-- in fact there is only one: $\b^1$, corresponding to the FLAIR graylevel --
+are fixed for the entire image.
+A pre-trained version of this method was released as
+the Lesion Prediction Algorithm (LPA) in the LST toolbox.%
+\footnote{\hreftt{http://www.applied-statistics.de/lst.html}}
+\par
+This particular parametrization has significant implications for model estimation, however,
+since $\b^0(x)$ should be estimated uniquely for every spatial location,
+but $\b^1$ should consider evidence from the entire image volume.
+Efficient fitting of such models was the subject of major works
+by~\citeauthor{Schmidt2017}~\cite{Schmidt2017,Schmidt2017a}, but several drawbacks remain.
+First, Markov Chain Monte Carlo estimation of the model
+appears to create discontinuity artifacts in the spatial effect image $\b^0(x)$
+(cf.~Figure~\ref{fig:beta-lpa}, \S~\ref{ss:exp-beta}).
+Second, MRF modelling of the parameter images assumes that the missing data
+(i.e.\ WMH training examples in the more superficial brain regions)
+can be interpolated spatially, but this may not be justified.
+Third, this joint estimation procedure is computationally expensive
+(versus the methods proposed here),
+requiring approximately two hours to estimate $\bb$
+to only about 90\% convergence~\cite{Schmidt2017a}.
+Finally, it is not clear whether any tied $\b$ are necessary or advantageous in this context.
+These deficiencies then motivate investigations into alternative solutions to the above challenges.
+\par
+In addition to these potential modelling weaknesses, there were also several limitations
+to the validation methodology for the LPA algorithm worth noting here.
+First, the ``ground truth'' segmentations were generated using an automated algorithm
+-- the Lesion Growth Algorithm (LGA)~\cite{Schmidt2012} of the same toolbox --
+rather than a human expert.
+Second, the graylevel standardization procedure employed does not consider
+the variance of image graylevels (only the mean is subtracted);
+this strongly assumes that user images will have graylevels spanning a similar range.
+Third, all 53 training cases were obtained on the same MRI scanner,
+which may limit generalization performance.
+Finally, no segmentation performance results
+are given in either of the associated publications~\cite{Schmidt2017,Schmidt2017a}.
+Therefore, while the open-source release of the LPA algorithm is greatly appreciated,
+significant improvements can be made to this algorithm.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Proposed Algorithm}\label{s:intro-proposed}
+This section presents a brief overview of the proposed WMH segmentation method.
+\par
+For several reasons, the supervised pipeline approach
+was selected as the framework for this algorithm.
+First, preliminary work drawing on existing algorithms~\cite{Khademi2014,Schmidt2015}
+showed the feasibility of several relatively simple FLAIR-only methods,
+which confer robustness and interpretability through simplicity.
+Second, the parametric assumptions required by unified probabilistic models
+may be challenged by data from multiple sources~\cite{VanLeemput2001}.
+Third, only a small number of training cases were available during initial development,
+which limited the feasibility of deep learning approaches.
+Finally, time constraints favoured the incorporation of existing tools
+to address challenges like bias correction and image registration,
+which would have been otherwise difficult to develop in a unified model.
+\par
+The proposed pipeline can be summarized as follows.
+Pre-processing steps will aim to
+correct any bias field effect, standardize spatial coordinates, and also image graylevels,
+since the classification model assumes these features are drawn from a consistent distribution.
+The classification model will then employ
+the standardized FLAIR intensities and spatial features to give the initial segmentation.
+Finally, post-processing steps will generally aim to further improve segmentation performance.
+This pipeline is illustrated in Figure~\ref{fig:pipeline}.
+Next, the proposed classification model is introduced.
+\begin{figure}
+  \centering\scalebox{0.65}{\input{figs/tikz/pipeline/tikz-pipeline}}
+  \caption{Overview of the necessary processing steps.}%
+  \label{fig:pipeline}
+\end{figure}
+% ==================================================================================================
+\subsection{Voxel-Wise Logistic Regression}\label{ss:intro-vlr}
+The classification model proposed here is similar to the LPA model.
+However, several modifications are made
+to address the challenges outlined in \S~\ref{sss:limits-lpa}.
+Most significantly, spatial variation of \textit{all} logistic parameters is now permitted,
+yielding a separate logistic regression model for each voxel
+-- i.e. ``Voxel-wise Logistic Regression'' (VLR).
+Mathematically, this is
+\begin{equation}
+P\big(c(x)=1\mid\by(x),\bb(x)\big) = \frac{1}{1+e^{-\eta(x)}},\qquad\eta = {\bb(x)}^T\bm{Y}(x).%
+\label{eq:eq:vlrmodel-intro}
+\end{equation}
+Training the VLR model then yields a complete and unique vector $\bb$ for each voxel,
+or equivalently, one complete image for each parameter.
+Only one additional $\b$ is used here, again corresponding to the FLAIR graylevel.
+This formulation allows completely independent estimation of the logistic model for each voxel $x$,
+facilitating improved estimability.
+In turn, this permits essentially complete convergence in significantly less time,
+and does not require sampling approximations or smoothness assumptions
+(though methods of enforcing smoothness post hoc will be explored).
+\par
+Overall, the VLR model solves the problem of unreliable separability by graylevel alone,
+and presents a method for differential treatment of spatial and graylevel features
+(versus K-NN, etc.).
+That is, the characteristics of the logistic regression model
+are maintained with respect to graylevel features,
+but spatial features can have more complex relationships (non-monotonic) with the output.
+The estimated VLR parameters are also highly interpretable,
+allowing prior knowledge to guide improved regularizations versus those used in the LPA algorithm.
+Different pre- and post-processing methods versus the LPA algorithm are also developed.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Contributions}
-This thesis therefore aims to produce a WMH segmentation algorithm
+This thesis aims to produce a WMH segmentation algorithm
 which can be used on FLAIR MRI from any source,
 and to characterize the expected performance on unseen data.
 The major contributions are as follows:
@@ -719,13 +1008,14 @@ The major contributions are as follows:
   \item Extensive validation of the proposed method and its components.
 \end{enumerate}
 The remainder of this thesis is organized as follows:
-Chapter 2 motivates and develops the voxel-wise logistic regression model,
-including expected challenges and solutions with this approach;
-Chapter 3 explores optimization of model components through experiment,
+Chapter~\ref{ch-pre} explores the pre-processing steps
+required to satisfy the assumptions of the VLR model.
+Chapter~\ref{ch-vlr} develops the voxel-wise logistic regression model,
+including expected challenges and regularization solutions with this approach;
+Chapter~\ref{ch-exp} explores optimization of model components through experiment,
 and then presents segmentation performance results under various cross validation schemes;
-Chapter 4 discusses the performance results,
-summarizes the contributions,
-and highlights avenues of future work.
+Chapter~\ref{ch-conc} draws conclusions about the work,
+and highlights avenues for future investigation.
 % --------------------------------------------------------------------------------------------------
 % ==================================================================================================
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

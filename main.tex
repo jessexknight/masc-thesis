@@ -14,17 +14,19 @@
 \usepackage{multirow}
 \usepackage{xcolor}
 \usepackage{float}
-\usepackage{lscape}
+\usepackage{afterpage}
+\usepackage{rotating}
 \usepackage{tabu}
+\usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{nameref}
-\usepackage{booktabs}
-%\usepackage{xifthen}
 \usepackage{tikz}
 \usepackage{matlab-prettifier}
 \usepackage{listings}
-\usepackage{mdframed}            
+\usepackage{mdframed}
+%\usepackage[T1]{fontenc}
+\usepackage[export]{adjustbox}
 \usepackage[hang, flushmargin]{footmisc}
 \usepackage[colorlinks]{hyperref}
 \usetikzlibrary{shapes,arrows.meta,calc}
@@ -34,7 +36,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % resources
 \addbibresource{./library.bib}
-\graphicspath{{figs/}{figs/tikz/}{figs/tikz/algorithm/}}
+\graphicspath{{figs/}{figs/tikz/}{figs/tikz/algorithm/}{figs/ystd/}{figs/toy/}{figs/seg/}}
 \newcommand{\matlabdir}{m/}
 \makeatletter\newcommand{\setmaxcitenames}[1]{\numdef\blx@maxcitenames{#1}}\makeatother
 \newcounter{papercount}
@@ -46,6 +48,8 @@
 \setlength{\parskip}{8pt}
 \setlength{\skip\footins}{24pt}
 \setlength{\footnotemargin}{0.8em}
+\renewcommand{\floatpagefraction}{.8}
+\renewcommand{\textfraction}{.2}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % math shorthands
 \renewcommand{\Re}{\mathbb{R}}
@@ -58,14 +62,16 @@
 \newcommand{\lr}{\textsc{lr}}
 \newcommand{\sk}{\textsc{k}}
 \newcommand{\sn}{\textsc{n}}
-\newcommand{\sx}{\textsc{x}}
+\newcommand{\sr}{\textsc{r}}
 \newcommand{\sv}{\textsc{v}}
+\newcommand{\sx}{\textsc{x}}
 \newcommand{\sy}{\textsc{y}}
 \renewcommand{\d}{\partial}
 \renewcommand{\b}{\beta}
 \newcommand{\bb}{\bm{\beta}}
 \newcommand{\by}{\bm{y}}
 \renewcommand{\L}{\mathcal{L}}
+\renewcommand{\P}{\mathcal{P}}
 \newcommand{\N}{\mathcal{N}}
 \newcommand{\J}{\mathcal{J}}
 \newcommand{\Z}{\mathcal{Z}}
@@ -76,31 +82,59 @@
 \newcommand{\bC}{\bm{\mathcal{C}}}
 \newcommand{\bV}{\bm{\mathcal{V}}}
 \newcommand{\ep}{\circ}
+\newcommand{\true}{\texttt{true}}
+\newcommand{\false}{\texttt{false}}
 \newcommand{\abs}[1]{\left|#1\right|}
 \newcommand{\norm}[1]{\left|\left|#1\right|\right|}
 \newcommand{\vox}[1]{\mathbb{#1}}
-% colors
-\definecolor{c01}{rgb}{1.00 0.00 0.00}
-\definecolor{c02}{rgb}{1.00 0.38 0.00}
-\definecolor{c03}{rgb}{1.00 0.75 0.00}
-\definecolor{c04}{rgb}{0.13 0.80 0.00}
-\definecolor{c05}{rgb}{0.00 0.80 0.80}
-\definecolor{c06}{rgb}{0.00 0.50 1.00}
-\definecolor{c07}{rgb}{0.00 0.20 1.00}
-\definecolor{c08}{rgb}{0.50 0.00 1.00}
-\definecolor{c09}{rgb}{1.00 0.00 1.00}
-\definecolor{c10}{rgb}{0.50 0.50 0.50}
+% scanner stuff
+\newcommand{\sname}[1]{%
+  \IfStrEqCase{#1}{%
+    {01}{WMH 2017 (1)}
+    {02}{WMH 2017 (2)}
+    {03}{WMH 2017 (3)}
+    {04}{MS  2016 (1)}
+    {05}{MS  2016 (2)}
+    {06}{MS  2016 (3)}
+    {07}{ISBI MS 2015}
+    {08}{In-House}
+    {09}{MS  2008 CHB}
+    {10}{MS  2008 UNC}
+    {11}{T1 e.g.}
+    {12}{T2 e.g.}}
+  []}
+\newcommand{\sclr}[1]{%
+  \IfStrEqCase{#1}{%
+    {00}{\color[rgb]{1.00 1.00 1.00}}
+    {01}{\color[rgb]{1.00 0.00 0.00}}
+    {02}{\color[rgb]{1.00 0.50 0.00}}
+    {03}{\color[rgb]{1.00 0.80 0.00}}
+    {04}{\color[rgb]{0.02 0.80 0.00}}
+    {05}{\color[rgb]{0.00 0.40 1.00}}
+    {06}{\color[rgb]{0.60 0.00 1.00}}
+    {07}{\color[rgb]{1.00 0.00 1.00}}
+    {08}{\color[rgb]{1.00 0.50 0.50}}
+    {09}{\color[rgb]{0.50 1.00 0.70}}
+    {10}{\color[rgb]{0.50 0.70 1.00}}}
+  []}
 \definecolor{gry}{rgb}{0.50 0.50 0.50}
 \definecolor{blue}{rgb}{0.00 0.30 1.00}
 % little text items
+\renewcommand{\_}{\char`_}
 \renewcommand{\ss}[1]{\textsuperscript{#1}}
 \newcommand{\hreftt}[1]{\href{#1}{\footnotesize{\texttt{\lstinline|#1|}}}}
 \newcommand{\et}{\thinspace}
 \newcommand{\en}{\enspace}
 \renewcommand\labelitemi{\raisebox{0.2em}{\fontsize{0.3em}{0}$\blacksquare$}}
 \renewcommand\labelitemii{\raisebox{0.2em}{\fontsize{0.3em}{0}$\square$}}
+\newcommand{\medfilt}[1]{\mathrm{Med}_{#1\times#1}}
 \newcommand{\tablepost}[1]{\\[0.5em]\raggedright{\footnotesize{#1}}}
-\newenvironment{subfigureside}[2][\sliceheight]{\begin{subfigure}{\textwidth}\centering\parbox[b][#1-1em][c]{1cm+\widthof{#2}}{\subcaption{#2}}}{\end{subfigure}}
+\newcommand{\subfigureoverl}[4][black]{%
+  \begin{subfigure}{\textwidth}%
+    \centering\setbox1=\hbox{#4}\leavevmode\rlap{\usebox1}%
+    \rlap{\hspace*{0.5em}\raisebox{\dimexpr0.5em}{\color{#1}#2}}
+    \phantom{\usebox1}\phantomsubcaption#3%
+  \end{subfigure}}
 % LaTeX penalties
 \interfootnotelinepenalty=10000
 \widowpenalty=500
@@ -113,19 +147,26 @@
 % appendix
 \newcommand{\matlabsty}{\color{black}\ttfamily\footnotesize}
 \global\mdfdefinestyle{graybar}{topline=false,rightline=false,bottomline=false,linewidth=0.2em,linecolor=lightgray,innertopmargin=0pt,innerbottommargin=0pt}
-\lstnewenvironment{matlab}{\linespread{1}\mdframed[style=graybar]\lstset{style=Matlab-editor,basicstyle=\matlabsty,basewidth=0.5em}}{\endmdframed}
-\newcommand{\includecode}[1]{\subsubsection[\ttfamily{#1}]{\hspace*{-1.5em}\ttfamily{>> #1}}\label{m:#1}%
-  \begin{mdframed}[style=graybar]\lstinputlisting[style=Matlab-editor,basicstyle=\linespread{1}\matlabsty]{\matlabdir#1}\end{mdframed}}
+\lstnewenvironment{matlab}{%
+  \linespread{1}\mdframed[style=graybar]%
+  \lstset{style=Matlab-editor,basicstyle=\matlabsty,basewidth=0.5em}}%
+  {\endmdframed}
+\newcommand{\includecode}[1]%
+  {\subsubsection[\ttfamily{#1}]{\hspace*{-1.5em}\ttfamily{>> #1}}\label{m:#1}%
+  \begin{mdframed}[style=graybar]%
+    \lstinputlisting[style=Matlab-editor,basicstyle=\linespread{1}\matlabsty]{\matlabdir#1}%
+  \end{mdframed}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
   %\include{front}
 	\include{contents}
   \include{ch-intro}
-  \include{ch-method}
+  \include{ch-pre}
+  \include{ch-vlr}
   \include{ch-exp}
   \include{ch-conc}
 	\begin{singlespace}
-    \printbibliography
+    \printbibliography%
   \end{singlespace}
   \appendix
   \include{ap-math}

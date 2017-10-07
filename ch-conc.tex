@@ -1,11 +1,43 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ==================================================================================================
 % --------------------------------------------------------------------------------------------------
-\chapter{Conclusion}
+\chapter{Conclusion}\label{ch-conc}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Summary}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Future Work}
+
+%The most important data presented in this work are
+%the 2017 WMH Segmentation Competition results (cf.~\S~\ref{ss:res-wmhseg17}).
+%These results illustrate the performance of the VLR model
+%on a database of 110 test subjects from 5 different scanners,
+%relative to 19 other state-of-the-art methods.
+%In this scenario, the proposed method ranked
+%8\ss{th} in SI performance (average 0.70 vs.\ average 0.80 by the first place team)
+%and 15\ss{th} in the overall ranking, which considers per-lesion metrics.
+%While 
+%
+%The poor performance of the proposed model relative to
+%mainly deep learning approaches (especially the U-Net architecture)
+%should not be ignored.
+%In all likeliness, the proposed VLR method will go the way of the dodo.
+%As the No-CV results indicate (cf.~\S~\ref{ss:res-cv}),
+%there are performance limitations associated with this model,
+%regardless of regularization techniques or data augmentation.
+%For example, in spatial locations where both bright GM and WMH are sometimes observed
+%due to anatomical variability,
+%the VLR model simply cannot distinguish between these cases.
+%Conversely, deep learning approaches could learn local contextual features,
+%perhaps at several scales, in order to make this discrimination.
+%\par
+%Trained deep segmentation models represent a mapping
+%from a high dimensional input space
+%to a high dimensional output space.
+%While end-to-end training schemes have usually yielded performance gains,
+%it would certainly be worth investigating potential
+%additional gains through preprocessing the data
+%to encourage consistency in the input distributions.
+
 %Use SPM segment with the FLAIR + T1 to obtain nice GM/WM segmentation. This allows:
 %- mixture-model-based standardization of graylevels, since now more accurate?
 %- estimated GM to clean up false positives
@@ -13,16 +45,16 @@
 %deep learning advantages:
 %- context-aware
 %- minimal graylevel standardization necessary
-% 
+%The explosion of deep learning approaches for WMH segmentation
+%speaks to the advantages of open-source development and publishing
+%championed by the deep learning community.
 %Graylevel standardization still the key to victory, I think -- need justification of this
 %improved registration may also be helpful,
 %since~\cite{Klein2009} note that SPM is not the best (time constraints)
 % ==================================================================================================
-\subsection{Other Features}
+%\subsection{Supervised Graylevel Standardization}
 % ==================================================================================================
-\subsection{Supervised Graylevel Standardization}
-% ==================================================================================================
-\subsection{Integrative Models}
+%\subsection{Integrative Models}
 %There are several advantages to the unified models in the SPM and FSL Segment tools.
 %In fact, early ambitions for the current work included integrating
 %the WMH segmentation model within SPM Segment.
@@ -34,7 +66,6 @@
 % - time constraints...
 % - prelim investigations: using estimated WM / GM distributions for standardization didn't work.
 % ==================================================================================================
-\subsection{Open Sourcing}
 % --------------------------------------------------------------------------------------------------
 % ==================================================================================================
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

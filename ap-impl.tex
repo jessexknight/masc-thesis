@@ -10,16 +10,89 @@ All computation in the current work was performed using the following workstatio
   \item \textbf{CPU:} Intel Core i7-6700K 4.00 GHz
   \item \textbf{RAM:} 16.0 GB DDR4
   \item \textbf{GPU:} NVIDIA GeForce GTX 980 Ti
-  \item \textbf{OS:} Windows 10 Pro
+  \item \textbf{OS:} Windows 10
   \item \textbf{Code:} MATLAB R2011a
 \end{itemize}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Parallelization}
+\section{Manual Segmentations}
+It was necessary to create and edit a small number of binary segmentation masks during this work.
+To do this, the Editor module from the 3D Slicer imaging platform~\cite{Fedorov2012} was used,%
+\footnote{3D Slicer Editor tool documentation is available here:
+  \hreftt{https://www.slicer.org/wiki/Documentation/4.6/Modules/Editor}.}
+including the Wand, Paint, and Erase functions.
+Figure~\ref{fig:m08-rev-slicer} shows the user interface during a lesion segmentation.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{m08rev-slicer.png}
+  \caption{3D Slicer user interface for performing in-house manual segmentations and revisions.
+    The tools used are highlighted in yellow, while the in-progress segmentation is shown in blue.}%
+  \label{fig:m08-rev-slicer}
+\end{figure}
+% ==================================================================================================
+\subsection{MS 2008 WMH Masks}\label{ss:m08-rev}
+Since the reported performance of an automatic segmentation algorithm depends on
+the manual segmentations to which it is compared,
+it is important to obtain good manual segmentations.
+Unfortunately, the original manuals in the MS 2008 Segmentation Challenge
+contained obvious artifacts and inconsistencies,
+as shown at left in Figure~\ref{fig:m08-rev}.
+Therefore, it was deemed necessary to redo these manuals.
+The resulting revisions are shown at right in Figure~\ref{fig:m08-rev}.
+\begin{figure}
+  \centering
+  \begin{minipage}{6cm}
+    \begin{subfigure}{\textwidth}
+      \centering\subcaption{Original}%
+      \label{fig:m08-rev-o}
+      \includegraphics[height=6cm]{m08rev-01-d2-z146-o}\\[0.2em]
+      \includegraphics[height=6cm]{m08rev-05-d2-z107-o}\\[0.2em]
+      \includegraphics[height=6cm]{m08rev-06-d2-z101-o}
+    \end{subfigure}
+  \end{minipage}
+  \begin{minipage}{6cm}
+    \begin{subfigure}{\textwidth}
+      \centering\subcaption{Revision}%
+      \label{fig:m08-rev-r}
+      \includegraphics[height=6cm]{m08rev-01-d2-z146-r}%
+      \makebox[0pt][r]{\textcolor{white}{\raisebox{0.5em}{ CHB 01 }}}\\[0.2em]
+      \includegraphics[height=6cm]{m08rev-05-d2-z107-r}%
+      \makebox[0pt][r]{\textcolor{white}{\raisebox{0.5em}{ CHB 05 }}}\\[0.2em]
+      \includegraphics[height=6cm]{m08rev-06-d2-z101-r}%
+      \makebox[0pt][r]{\textcolor{white}{\raisebox{0.5em}{CHB 06 }}}
+    \end{subfigure}
+  \end{minipage}
+  \caption{Example revisions to the manual segmentations for the MS 2008 challenge dataset.}%
+  \label{fig:m08-rev}
+\end{figure}
+% ==================================================================================================
+\subsection{Brain Mask}\label{ss:brainmask}
+In order to vectorize image data for parallel processing,
+a binary mask selecting voxels of interest in standardized space is also required.
+Since only voxels in the brain are of interest, this mask is called a ``brain mask''.
+The brain mask used here was derived from
+the ICBM tissue prior images~\cite{Mazziotta2001} in MNI space:
+after initial thresholding of the combined $\gm{}+\wm{}+\csf{}$ probabilities at 0.5,
+manual refinements were completed and symmetry was enforced.
+The mask is slightly small on purpose,
+since tissues outside the brain are frequently bright in FLAIR images,
+and can be mistaken for lesions by naive models.
+The resulting mask is shown in Figure~\ref{fig:brainmask}.
+\begin{figure}
+  \centering
+  \includegraphics[height=2\sliceheight]{brainmask.png}
+  \caption{Manually refined brain mask in MNI space, overlaid on a simulated BrainWeb FLAIR image.
+    Mask outline is highlighted in red; inclusions are shown in grayscale; exclusions tinted red.}%
+  \label{fig:brainmask}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Acceleration}
 Speed of model fitting is a significant factor during development,
 particularly considering optimization of hyperparameters.
-Faster training yields more model iterations, which inevitably bear improvements. 
+Faster training yields more model iterations, which inevitably bear improvements.
+This section summarizes the implementation decisions
+specifically taken to accelerate training and testing of the model.
 % ==================================================================================================
-\subsection{Model Estimation}\label{s:parallelfit}
+\subsection{Parallel Model Estimation}\label{s:parallelfit}
 While the estimation procedure outlined in \S~\ref{ss:modelfitting}
 must be repeated for all standardized voxels in the brain mask,
 it is possible to do this in parallel, since every estimation is independent.
@@ -55,7 +128,7 @@ before the first iteration, as in
 Next, for a given iteration $t$,the following vector-compatible expansions of Equations
 (\ref{eq:llgradient}), (\ref{eq:llhessian}), and (\ref{eq:newtonmap})
 yield the desired update matrix $\Delta\vox{B}^{(t)}$.
-These calculations are performed in \nameref{m:logreg.m}.
+These calculations are performed in \nameref{m:vlrmap.m}.
 Regarding notation:
 1.\ the iteration index ${}^{(t)}$ is omitted for clarity,
 2.\ element-wise multiplication is denoted by $\circ$, and
@@ -99,83 +172,71 @@ Regarding notation:
              \end{array}\right]^{T}
 \end{align}
 % ==================================================================================================
-\subsection{Image Deformations}
-% __JK__ describe the SPM deformations workflow
-% Following training, ...
-%
-% While these deformations are saved after initial estimation,
-% their application is computationally expensive.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Manual Segmentations}
-It was necessary to create and edit a small number of binary segmentation masks during this work.
-To do this, the Editor module from the 3D Slicer imaging platform~\cite{Fedorov2012} was used,%
-\footnote{3D Slicer Editor tool documentation is available here:
-  \hreftt{https://www.slicer.org/wiki/Documentation/4.6/Modules/Editor}.}
-including the Wand, Paint, and Erase functions.
-Figure~\ref{fig:m08-rev-slicer} shows the user interface during a lesion segmentation.
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=\textwidth]{m08rev-slicer.png}
-  \caption{3D Slicer user interface for performing in-house manual segmentations and revisions.
-    The tools used are highlighted in yellow, while the in-progress segmentation is shown in blue.}%
-  \label{fig:m08-rev-slicer}
-\end{figure}
+\subsection{Image Deformations}\label{ss:spmdeform}
+During cross validation,
+it is eventually necessary to transform each available image to the MNI brain space for training,
+and also to warp the fitted parameter images $\bb(x)$
+to the native space of every subject for inference.
+The image registration need only be estimated by the SPM Segment algorithm once,
+since this procedure is computationally expensive.
+\par
+For maximum efficiency, the following image outputs from this procedure are saved for future use:
+\begin{itemize}[itemsep=0pt,topsep=0pt]
+  \item the bias-corrected FLAIR image in native space;
+  \item the bias-corrected FLAIR image in MNI space;
+  \item the registration transformation, as a discrete diffeomorphism,
+\end{itemize}
+The SPM function \texttt{spm\_diffeo} can then be used
+to apply the transformation to any new image, in either the forward or reverse direction.
+The only downside to this workflow is that
+\texttt{spm\_diffeo} uses only \texttt{.nii} files for all input and output data flows,
+so the estimated $\bb(x)$ images must be written from Matlab to file before transformation,
+and loaded from file into Matlab afterwards.
 % ==================================================================================================
-\subsection{MS 2008 WMH Masks}\label{ss:m08-rev}
-Since the reported performance of an automatic segmentation algorithm depends on
-the manual segmentations to which it is compared,
-it is important to obtain good manual segmentations.
-Unfortunately, the original manuals in the MS 2008 Segmentation Challenge
-contained obvious artifacts and inconsistencies,
-as shown at left in Figure~\ref{fig:m08-rev}.
-Therefore, it was deemed necessary to redo these manuals.
-The resulting revisions are shown at right in Figure~\ref{fig:m08-rev}.
+\subsection{Half Resolution Model Estimation}\label{ss:halfres}
+Following the results from \S~\ref{sss:exp-beta-smooth},
+it was observed that a minimum amount of parameter image smoothness is always desirable.
+An alternative method to enforcing parameter image smoothness
+is to estimate $\bb(x)$ at a lower resolution, followed by interpolative upsampling.
+This has the additional advantage of requiring significantly less time for model estimation
+at($\mathcal{O}(n^3)$ for isotropic resizing).
+\par
+To implement this approach, all training images and manual segmentations
+were resized by the scale factor $\mathrm{r}$
+\textit{after} application of graylevel standardization
+(in case resizing affects the graylevel statistics).
+The parameter images are then fitted using the methods described in \S~\ref{s:parallelfit},
+yielding low resolution parameter images.
+Next, these images, $\bb_{\mathrm{r}}(x)$,
+were linearly interpolated to the original resolution ($\mathrm{r} = 1$),
+before application of the smoothing filter to yield the final $\bb(x)$.
+For reference, an example parameter image at each resolution
+is shown in Figure~\ref{fig:beta-r}.
+\par
 \begin{figure}
   \centering
-  \begin{minipage}{6cm}
-    \begin{subfigure}{\textwidth}
-      \centering\subcaption{Original}%
-      \label{fig:m08-rev-o}
-      \includegraphics[height=6cm]{m08rev-01-d2-z146-o}\\[0.2em]
-      \includegraphics[height=6cm]{m08rev-05-d2-z107-o}\\[0.2em]
-      \includegraphics[height=6cm]{m08rev-06-d2-z101-o}
-    \end{subfigure}
-  \end{minipage}
-  \begin{minipage}{6cm}
-    \begin{subfigure}{\textwidth}
-      \centering\subcaption{Revision}%
-      \label{fig:m08-rev-r}
-      \includegraphics[height=6cm]{m08rev-01-d2-z146-r}
-        \makebox[0pt][r]{\textcolor{white}{ CHB 01 }}\\[0.2em]
-      \includegraphics[height=6cm]{m08rev-05-d2-z107-r}
-        \makebox[0pt][r]{\textcolor{white}{ CHB 05 }}\\[0.2em]
-      \includegraphics[height=6cm]{m08rev-06-d2-z101-r}
-        \makebox[0pt][r]{\textcolor{white}{ CHB 06 }}
-    \end{subfigure}
-  \end{minipage}
-  \caption{Example revisions to the manual segmentations for the MS 2008 challenge dataset.}%
-  \label{fig:m08-rev}
+  \subfigureoverl[white]{$\mathcal{T}(x)$}{}{%
+    \includegraphics[height=\sliceheight]{T-r1.png}
+    \includegraphics[height=\sliceheight]{cmap-r-T}%
+  }\\[0.5em]
+  \subfigureoverl[white]{$\mathcal{T}_{\mathrm{r}}(x)$}{}{%
+    \includegraphics[height=\sliceheight]{T-r2.png}
+    \includegraphics[height=\sliceheight]{cmap-r-T}%
+  }\\[0.5em]
+  \subfigureoverl[white]{$\mathcal{S}(x)$}{}{%
+    \includegraphics[height=\sliceheight]{S-r1.png}
+    \includegraphics[height=\sliceheight]{cmap-r-S}%
+  }\\[0.5em]
+  \subfigureoverl[white]{$\mathcal{S}_{\mathrm{r}}(x)$}{}{%
+    \includegraphics[height=\sliceheight]{S-r2.png}
+    \includegraphics[height=\sliceheight]{cmap-r-S}%
+  }\\[0.5em]
+  \caption{Comparison of parameter images estimated at full and half-resolution.}%
+  \label{fig:beta-r}
 \end{figure}
-% ==================================================================================================
-\subsection{Brain Mask}\label{ss:brainmask}
-In order to vectorize image data for parallel processing,
-a binary mask selecting voxels of interest in standardized space is also required.
-Since only voxels in the brain are of interest, this mask is called a ``brain mask''.
-The brain mask used here was derived from
-the ICBM tissue prior images~\cite{Mazziotta2001} in MNI space:
-after initial thresholding of the combined $\gm{}+\wm{}+\csf{}$ probabilities at 0.5,
-manual refinements were completed and symmetry was enforced.
-The mask is slightly small on purpose,
-since tissues outside the brain are frequently bright in FLAIR images,
-and can be mistaken for lesions by naive models.
-The resulting mask is shown in Figure~\ref{fig:brainmask}.
-\begin{figure}
-  \centering
-  \includegraphics[height=2\sliceheight]{brainmask.png}
-  \caption{Manually refined brain mask in MNI space, overlaid on a simulated BrainWeb FLAIR image.
-    Mask outline is highlighted in red; inclusions are shown in grayscale; exclusions tinted red.}%
-  \label{fig:brainmask}
-\end{figure}
+All results were computed with this adaptation (specifically $\mathrm{r} = 0.5$)
+except for the parameter image smoothing experiments described in \S~\ref{sss:exp-beta-smooth},
+which justify this modification.
 % --------------------------------------------------------------------------------------------------
 % ==================================================================================================
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

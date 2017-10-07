@@ -22,6 +22,8 @@
 - [ ] Decide: introduce image registration / spatial standardization earlier & more gracefully
 - [ ] Decide: ordering of baseline, toy, full model results in Ch.3
 - [ ] Decide: introduce TPMs sooner?
+- [ ] Decide: Swap versions of priorwork.tex? (currently: paper[long] vs thesis[short])
+- [ ] Fix: formatting of Fig \ref{fig:m08-rev}
 
 #### To Done
 - [x] src: big chktex retrospective
@@ -36,6 +38,7 @@
 - [x] Add: brainmask to appendix
 - [x] Add: Vectorized implementation maths
 - [x] Add: psuedo-lesions details
+- [x] Add: rewrite prior-work section for difference from paper
 - [x] Check: notation - bold, caligraphic/roman, capitals
 - [x] Decide: when to introduce lambda regularization / implementation (methods or ap-impl)
 - [x] Decide: where to put reparameterization of the sigmoid \beta to \tau and s
