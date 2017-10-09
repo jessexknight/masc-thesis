@@ -1145,7 +1145,8 @@ yields decreased WMH graylevels.
 \section{Optimized Model Summary}\label{ss:hyp-final}
 Considering all experimental results, the optimal model hyperparameters were selected.
 These values are summarized in Table~\ref{tab:hyp-final}.
-Fitted parameter images from one LOSO-CV fold are also shown in Figure~\ref{fig:beta-final}.
+Fitted parameter images from one LOSO-CV fold are also shown in Figure~\ref{fig:beta-final},
+and an example segmentation is shown in Figure~\ref{fig:exseg}.
 \par
 \begin{table}
   \centering
@@ -1186,6 +1187,22 @@ Fitted parameter images from one LOSO-CV fold are also shown in Figure~\ref{fig:
   \caption{Fitted parameter images $\mathcal{T}(x)$ and $\mathcal{S}(x)$
     from the first LOSO-CV fold of the final model.}%
   \label{fig:beta-final}
+\end{figure}
+\begin{figure}
+  \centering
+  \foreach \i/\cap in {%
+    I/$\mathrm{Y}(x)$,
+    J/$\tilde{\mathrm{Y}}(x)$,
+    T/$\mathrm{T}(x)$,
+    S/$\mathrm{S}(x)$,
+    Q/$\hat{\mathrm{C}}(x)$,
+    P/$\et\cdot\et(x)$}{%
+    \begin{subfigure}{0.13\textwidth}
+      \centering\includegraphics[height=\sliceheight]{exseg-\i.png}
+      \caption{\cap}
+    \end{subfigure}~}
+  \caption{Example segmentation.}%
+  \label{fig:exseg}
 \end{figure}
 % ==================================================================================================
 \subsection{Segmentation Performance}
