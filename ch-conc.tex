@@ -3,39 +3,46 @@
 % --------------------------------------------------------------------------------------------------
 \chapter{Conclusion}\label{ch-conc}
 This chapter concludes the thesis.
-
-A roadmap for research building on this work will be presented,
-following an analysis of the current limitations.
+A summary of the major contributions will be given.
+Then, a roadmap for research which builds on this work will be presented,
+following an analysis of limitations of this work.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Summary}
 This thesis explored the task of automated white matter hyperintensity segmentation,
 which aims to improve the speed and precision over manual analysis.
 % ==================================================================================================
-\subsection{Validation}
+\subsection{Algorithm Validation}
 One of the major limitations of previous works in this area
 is the use of validation conditions which over-estimate
-the segmentation performance on images from new sources
-(which were not seen during training).
+the segmentation performance on images from sources
+were not seen during training.
 These conditions include a small number of different image sources,
 and the use of training data which comes from the same source as the test data,
-which is unrealistic for most naive algorithm uses.
-In fact, this criticism likely applies to many image analysis tasks
+an unrealistic condition for most naive algorithm use cases.
+In fact, this criticism likely applies to
+validation of solutions in many different image analysis tasks.
 \par
-In the current work, the Leave-One-Source-Out Cross Validation framework is presented,
+In the current work, the Leave-One-Source-Out Cross Validation (LOSO-CV) framework is presented,
 a rediscovery of the ``Multi-Source'' Cross Validation procedure
 described by \citeauthor{Geras2013} in \cite{Geras2013}.
-Experimental results illustrate how other frameworks like
+Experimental results show how other frameworks like
 Leave-One-Out (LOO) and K-Fold (KF) Cross Validation
-
+estimate higher segmentation performance than LOSO-CV.
+Imprudent use of such frameworks could lead to
+premature adoption of particular automated WMH segmentation algorithms,
+or overconfidence in their results.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Future Work}
 
 
+There are several limitations to the current work.
 
 In \S~\ref{ss:exp-cv} it was shown how the current model
 can be trained and tested using the exact same data,
-and performance still only reaches.
-
+and Similarity Index still only reaches 0.71.
+This demonstrates a significant ceiling to performance
+which perhaps cannot be overcome through
+changes to pre / post-processing or regularization alone.
 
 
 %The most important data presented in this work are

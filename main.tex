@@ -25,14 +25,24 @@
 \usepackage{matlab-prettifier}
 \usepackage{listings}
 \usepackage{mdframed}
+\usepackage{minitoc-hyper}
 %\usepackage[T1]{fontenc}
 \usepackage[export]{adjustbox}
 \usepackage[hang, flushmargin]{footmisc}
-\usepackage[colorlinks]{hyperref}
-\usetikzlibrary{shapes,arrows.meta,calc}
-\usepackage[backend=biber, style=numeric, maxcitenames=2, sorting=none,
-            url=false, isbn=false, doi=true, eprint=false]{biblatex}
+\usepackage[colorlinks,
+            pdfusetitle]%
+            {hyperref}
+\usepackage[backend=biber,
+            style=numeric,
+            maxcitenames=2,
+            sorting=none,
+            url=false,
+            isbn=false,
+            doi=true,
+            eprint=false]%
+            {biblatex}
 \hypersetup{citecolor={purple},linkcolor={blue}}
+\usetikzlibrary{shapes,arrows.meta,calc}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % resources
 \addbibresource{./library.bib}
@@ -158,7 +168,7 @@
   \end{mdframed}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
-  %\include{front}
+  \include{front}
 	\include{contents}
   \include{ch-intro}
   \include{ch-pre}
