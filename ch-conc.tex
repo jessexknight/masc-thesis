@@ -4,12 +4,22 @@
 \chapter{Conclusion}\label{ch-conc}
 This chapter concludes the thesis.
 A summary of the major contributions will be given.
-Then, a roadmap for research which builds on this work will be presented,
-following an analysis of limitations of this work.
+Then, an analysis of limitations of this work will help define
+a roadmap for follow-on research.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Summary}
 This thesis explored the task of automated white matter hyperintensity segmentation,
 which aims to improve the speed and precision over manual analysis.
+After reviewing the motivation for this task,
+and the previously proposed solutions,
+a novel segmentation algorithm -- Voxel-Wise Logistic Regression --
+was proposed in Chapter~\ref{ch-intro}.
+This algorithm, the necessary regularizations, and pre- and post-processing components
+were then developed throughout Chapters~\ref{ch-pre}~and~\ref{ch-vlr}.
+Chapter~\ref{ch-exp} then presented extensive validation of
+the model and parameter optimization,
+including a critical analysis of the popular cross validation frameworks.
+In this section, the major contributions and conclusions are summarized.
 % ==================================================================================================
 \subsection{Algorithm Validation}
 One of the major limitations of previous works in this area
@@ -21,89 +31,195 @@ and the use of training data which comes from the same source as the test data,
 an unrealistic condition for most naive algorithm use cases.
 In fact, this criticism likely applies to
 validation of solutions in many different image analysis tasks.
+However, this criticism does assume that the goal of these projects is to develop
+algorithms for general-purpose use
+-- i.e.\ for segmentation of images from any given source.
 \par
-In the current work, the Leave-One-Source-Out Cross Validation (LOSO-CV) framework is presented,
+In the current work, the Leave-One-Source-Out Cross Validation (LOSO-CV) framework was presented,
 a rediscovery of the ``Multi-Source'' Cross Validation procedure
-described by \citeauthor{Geras2013} in \cite{Geras2013}.
-Experimental results show how other frameworks like
+described by \citeauthor{Geras2013} in~\cite{Geras2013}.
+Experimental results showed how other frameworks like
 Leave-One-Out (LOO) and K-Fold (KF) Cross Validation
 estimate higher segmentation performance than LOSO-CV.
-Imprudent use of such frameworks could lead to
+Imprudent use of such frameworks could therefore lead to
 premature adoption of particular automated WMH segmentation algorithms,
 or overconfidence in their results.
+\par
+Another fault in previously employed validation frameworks is
+the small number of images and different image sources.
+Only 5 of the 54 reviewed methods use more than 3 scanners for validation.
+Considering the many aspects of image variability, including
+MR imaging parameters,
+voxel size,
+subject anatomy,
+scanner field strength, noise and bias field characteristics,
+validation of any brain MRI analysis algorithm
+should employ data from more sources which better reflect this variation.
+Fortunately, as illustrated here, there are now at least 96 free labelled FLAIR (and T1) image sets
+(Table~\ref{tab:database})
+which can be used for validation of WMH segmentation algorithms.
+Future works in this area are encouraged to follow the lead of the machine learning community
+and adopt standardized datasets, facilitating direct comparison of reported performance
+across publications.
+While the numbers of images from the 7 scanners used in this work are imbalanced
+$(20,20,20,5,5,5,21)$,
+these data still serve as a good starting point for establishing such a dataset.
+% ==================================================================================================
+\subsection{Voxel-Wise Logistic Regression}
+Many of the previously proposed WMH segmentation algorithms use some sort of thresholding technique,
+mapping a single graylevel feature to the class probabilities.
+This approach is attractive for FLAIR-only methods,
+since it mimics the basic decision making process by human experts.
+However, preliminary investigations (Figure~\ref{fig:tpfpfn-thropt}) showed how
+such techniques can incur a large number of False Positives and False Negatives, 
+even if the optimal threshold%
+\footnote{The threshold which maximizes Similarity Index with the manual segmentation.}
+is used.
+\par
+The circumvention to this problem proposed by \citeauthor{Schmidt2017a}
+was to include a ``spatial effect'' parameter $\b^0(x)$,
+which expands the feature space from one to four dimensions:
+FLAIR graylevel $y$, and $\xxx$.
+However, fitting this model was computationally expensive,
+and required various sampling approximations and assumptions about smoothness.
+The Voxel-Wise Logistic Regression model overcomes these challenges
+by relaxing the assumption that all voxels are equally sensitive to the FLAIR feature
+-- i.e.\ that $\b^1$ is constant.
+By doing so, all parameters may vary spatially: $\bb \rightarrow \bb(x)$,
+yielding independent parameters for all voxels,
+and the following predictive model:
+\begin{equation}
+P\big(c(x)=1\mid\by(x),\bb(x)\big) = \frac{1}{1+e^{-\eta(x)}},\qquad\eta = {\bb(x)}^T\bm{Y}(x).%
+\label{eq:eq:vlrmodel-conc}
+\end{equation}
+A Newtonian algorithm for estimating the parameters $\bb(x)$ is presented,
+maintaining generality for any number of input features.
+However, the implementation explored in this work uses only the FLAIR graylevels,
+yielding only two parameter images,
+and facilitating the efficient parallel fitting described in \S~\ref{s:parallelfit}.
+These images can then be reparametrized via (\ref{eq:reparameterize}) to yield
+a threshold image $\mathcal{T}(x)$
+and a sensitivity image $\mathcal{S}(x)$.
+\par
+As explored in \S~\ref{ss:exp-beta}, these parameter images
+agree with prior knowledge about the expected class discrimination function.
+In particular, the threshold image illustrates a spatially varying graylevel decision boundary
+corresponding to $\hat{c}(x) = 0.5$.
+As one might expect, this boundary is higher in spatial regions of common false positives
+(e.g.\ the cortical gray matter and corpus callosum)
+and lower in regions of common false negatives
+(e.g.\ the periventricular white matter).
+Similarly, the sensitivity image illustrates the separability of the classes,
+where lower values arise in voxels with overlapping class distributions.
+% --------------------------------------------------------------------------------------------------
+\subsubsection{Pre-Processing}
+The VLR model assumes that both spatial and graylevel features are comparable across input images,
+which is not true for raw MRI.
+Standardization of these features, therefore, is the main objective of pre-processing steps.
+Graylevel standardization is achieved using a histogram matching operation.
+Specifically, it was found that a target histogram with high contrast in the upper intensity range
+helped improve segmentation performance.
+For standardization of spatial coordinates during model estimation,
+images are registered and resampled to the MNI template brainspace
+using the ``Segment'' feature in SPM.
+This confers the additional benefit of estimating and correcting any bias field artifact.
+At test time, the inverse transform is applied to map the estimated parameter images
+to the native subject space for inference.
+% --------------------------------------------------------------------------------------------------
+\subsubsection{Regularization}
+Estimating independent models for every voxels drastically reduces the number of observations.
+This yields several challenges, namely MLE-fitted parameters which
+contradict prior knowledge about the problem, as discussed in cf.~\ref{ss:vlr-chmle}.
+To address these challenges, several regularization strategies were explored.
+The most successful technique, as in many other problem domains, was data augmentation.
+In this work, this consisted of reasonable image transformations
+applied to training image sets, including
+reflection about the midline,
+and shifting by one voxel (1.5 mm) in MNI space.
+In addition, a zero-mean Gaussian prior on the values of $\bb$ was used,
+with variance proportional to a tunable parameter $\lambda$.
+In order to deal with the unique challenge of an unobserved class (the $c=1$ lesion class) 
+in many of the peripheral voxels,
+pseudo-lesions -- deterministic synthetic data points --
+were appended to the training set.
+This approach is really just dataset balancing,
+and can be employed in other supervised segmentation algorithms.
+Finally, parameter images can be smoothed after estimation, using any simple filter;
+performance was not particularly sensitive to the selection
+(cf. Figure~\ref{fig:seg-box-beta} in \S~\ref{sss:exp-beta-smooth}).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Future Work}
-
-
-There are several limitations to the current work.
-
-In \S~\ref{ss:exp-cv} it was shown how the current model
-can be trained and tested using the exact same data,
-and Similarity Index still only reaches 0.71.
-This demonstrates a significant ceiling to performance
-which perhaps cannot be overcome through
-changes to pre / post-processing or regularization alone.
-
-
-%The most important data presented in this work are
-%the 2017 WMH Segmentation Competition results (cf.~\S~\ref{ss:res-wmhseg17}).
-%These results illustrate the performance of the VLR model
-%on a database of 110 test subjects from 5 different scanners,
-%relative to 19 other state-of-the-art methods.
-%In this scenario, the proposed method ranked
-%8\ss{th} in SI performance (average 0.70 vs.\ average 0.80 by the first place team)
-%and 15\ss{th} in the overall ranking, which considers per-lesion metrics.
-%While 
-%
-%The poor performance of the proposed model relative to
-%mainly deep learning approaches (especially the U-Net architecture)
-%should not be ignored.
-%In all likeliness, the proposed VLR method will go the way of the dodo.
-%As the No-CV results indicate (cf.~\S~\ref{ss:res-cv}),
-%there are performance limitations associated with this model,
-%regardless of regularization techniques or data augmentation.
-%For example, in spatial locations where both bright GM and WMH are sometimes observed
-%due to anatomical variability,
-%the VLR model simply cannot distinguish between these cases.
-%Conversely, deep learning approaches could learn local contextual features,
-%perhaps at several scales, in order to make this discrimination.
-%\par
-%Trained deep segmentation models represent a mapping
-%from a high dimensional input space
-%to a high dimensional output space.
-%While end-to-end training schemes have usually yielded performance gains,
-%it would certainly be worth investigating potential
-%additional gains through preprocessing the data
-%to encourage consistency in the input distributions.
-
-%Use SPM segment with the FLAIR + T1 to obtain nice GM/WM segmentation. This allows:
-%- mixture-model-based standardization of graylevels, since now more accurate?
-%- estimated GM to clean up false positives
-%
-%deep learning advantages:
-%- context-aware
-%- minimal graylevel standardization necessary
-%The explosion of deep learning approaches for WMH segmentation
-%speaks to the advantages of open-source development and publishing
-%championed by the deep learning community.
-%Graylevel standardization still the key to victory, I think -- need justification of this
-%improved registration may also be helpful,
-%since~\cite{Klein2009} note that SPM is not the best (time constraints)
+Despite significant segmentation performance gains over its LPA forbearer (cf.~\ref{ss:exp-lpa}),
+and performance reaching human level (cf.~\ref{sss:exp-turing}),
+there are several limitations to the proposed VLR model.
+Chiefly, when training and testing the proposed algorithm on the exact same data,
+Similarity Index still only reaches 0.71 (cf. \S~\ref{ss:exp-cv}).
+This demonstrates a significant ceiling on performance
+which likely cannot be overcome by the regularizations explored in this work:
+L2-priors on $\bb$, pseudo-lesions, and parameter image smoothing.
 % ==================================================================================================
-%\subsection{Supervised Graylevel Standardization}
+\subsection{Model Variants}
+Potential solutions to these challenges, which might be the subject of future work, include
+improved graylevel standardization and 
+inclusion of additional features (graylevel or otherwise).
+Improved graylevel standardization is perhaps the most promising,
+since there is evidence to suggest that the histogram matching method employed
+here was suboptimal, particularly for subjects with large LL.
+For example, Recall consistently declined for very high LL
+(e.g.\ Figure~\ref{fig:seg-final-scat-re}), as discussed in \S~\ref{ss:exp-finalseg}.
+\par
+As outlined in Chapter~\ref{ch-intro}, additional graylevel features were not explored in this work
+because the aim was to develop a FLAIR-only WMH segmentation algorithm.
+Considering the performance limitations with the current model,
+it might be tempting to include graylevel features from other MRI sequences, such as T1 and T2.
+However, as noted in \S~\ref{sss:limits-lr}, the WMH class is not monotonic in
+T1 or T2 intensities, which makes their inclusion on the logistic regression model improper.
+Similarly, texture features, derived from raw MRI sequences could possibly be explored,
+but the inclusion of many features significantly erodes the model interpretability,
+and there is little evidence to suggest that WMH have unique texture characteristics.
 % ==================================================================================================
-%\subsection{Integrative Models}
-%There are several advantages to the unified models in the SPM and FSL Segment tools.
-%In fact, early ambitions for the current work included integrating
-%the WMH segmentation model within SPM Segment.
-% advantages:
-% - better estimation of bias field
-% - more robust registration at low voxel resolution.
-% - don't include WMH in estimated healthy tissue classes
-% why not:
-% - time constraints...
-% - prelim investigations: using estimated WM / GM distributions for standardization didn't work.
-% ==================================================================================================
+\subsection{Deep Learning}
+The poor performance of the proposed model relative to the deep learning approaches
+from the 2017 WMH Segmentation Competition (cf.~\S~\ref{ss:exp-wmhseg17}),
+especially the U-Net architecture, should not be ignored.
+Convolutional neural networks and the VLR model really occupy opposite ends of the
+model complexity spectrum.
+The VLR model achieves good performance with relatively little fine-tuning,
+since prior knowledge of the problem is incorporated in the model itself.
+However, as shown here, these ``strongly-biased'' models
+often eventually reach a limit in performance due to invalid assumptions.
+For example, the VLR model assumes that in a given spatial location,
+FLAIR graylevel alone is sufficient to discriminate the WMH class from healthy tissues;
+however, in spatial locations where both bright GM and WMH are sometimes observed
+due to anatomical variability, this assumption fails.
+Instead, more complex contextual information may actually be needed to
+make this discrimination.
+\par
+Deep learning approaches have the capacity to learn such features
+much more efficiently than human-guided methods, even at several scales.
+Issues associated with learning the complex image-to-image mappings
+with such models have recently been overcome with considerable success,
+and these methods have clearly emerged
+as dominant in other image analysis tasks~\cite{Ronneberger2015}.
+The results of the 2017 WMH Segmentation Challenge suggest that this task too
+might be added to their palmares.
+\par
+Therefore, in all likeliness, the proposed VLR method will go the way of the dodo.
+These problem spaces, after all, employ the sober rules of natural selection,
+algorithms flourishing and dying as time goes on.%
+\footnote{Perhaps it is even bold to suggest the VLR method ever flourished.}
+The VLR method is, in fact, quite inflexible to application in any other task --
+a feature which typifies species slated for extinction.
+This is not to say that the work presented here is all for naught.
+Many of the regularization strategies explored here,
+including pseudo-lesion synthetic data,
+parameter constraints (typically already used),
+and preprocessing methods for ensuring consistent distributions of input data,
+might improve performance of convolutional neural networks.
+Indeed, all of the top-performing methods in the 2017 WMH Challenge 
+already employed standardization of images in space and graylevel dimensions.
+Moreover -- perhaps more importantly -- validation of these networks 
+can and should make use of the LOSO-CV framework presented here.
 % --------------------------------------------------------------------------------------------------
 % ==================================================================================================
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

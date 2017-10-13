@@ -27,7 +27,7 @@ As in many probabilistic models,
 parameter estimation involves maximizing the likelihood of the model, given this data --
 i.e.\ maximum likelihood estimation (MLE).
 % ==================================================================================================
-\subsection{Challenges}
+\subsection{Challenges}\label{ss:vlr-chmle}
 Three major challenges emerge during model fitting.
 These challenges involve contradictions between prior knowledge
 and the fitted model using the available training data.
@@ -256,9 +256,8 @@ translated, reflected, rotated, and perhaps resized,
 thereby avoiding the generation of genuinely synthetic examples.
 In the current work, reflections and small (one-voxel) translations
 can be applied to the label and FLAIR images following registration to the MNI brainspace.
-The potential benefits of this augmentation are explored in \S~\ref{}.
-%__JK__ need to define this reference
-%__JK__ need also to define MNI before here...!
+The potential benefits of this augmentation are explored in \S~\ref{ss:exp-reg}.
+%__JK__ need also to define MNI before here...?
 % ==================================================================================================
 \subsection{Classic Regularization}\label{ss:vlr-reg-lambda}
 The separable classes challenge is well-known in regression problems,

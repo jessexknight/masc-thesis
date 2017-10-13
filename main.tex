@@ -25,7 +25,8 @@
 \usepackage{matlab-prettifier}
 \usepackage{listings}
 \usepackage{mdframed}
-\usepackage{minitoc-hyper}
+\usepackage{catchfile}
+%\usepackage{minitoc-hyper}
 %\usepackage[T1]{fontenc}
 \usepackage[export]{adjustbox}
 \usepackage[hang, flushmargin]{footmisc}
@@ -36,7 +37,7 @@
             style=numeric,
             maxcitenames=2,
             sorting=none,
-            url=false,
+            url=true,
             isbn=false,
             doi=true,
             eprint=false]%
@@ -179,9 +180,8 @@
     \printbibliography%
   \end{singlespace}
   \appendix
-  \include{ap-math}
+  \include{ap-res}
   \include{ap-impl}
-  \include{ap-code}
-  %\include{ap-res}
+%  \include{ap-code}
 \end{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

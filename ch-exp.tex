@@ -157,7 +157,7 @@ The most popular CV frameworks include:
   \\\textit{Drawback:} Expensive to compute -- $\mathcal{O}(N)$
   \item\textbf{KFCV -- K-Fold Cross Validation:}
   Use all images except a random batch of $B = N/K$ images as the training set;
-  and these as the test set ($N_r = N-B$; $N_e = B$);
+  use these as the test set ($N_r = N-B$; $N_e = B$);
   repeat $K$ times (without replacement).
   \\\textit{Benefit:} Less expensive to compute -- $\mathcal{O}(N/K)$
   \\\textit{Drawback:} Worse approximation of the expected generalization performance
@@ -170,7 +170,7 @@ repeating the process for all sources.
 %will always be available from the use-case scanner.
 This framework can be summarized as follows:
 \begin{itemize}
-  \item\textbf{OSAAT -- One-Scanner-At-A-Time}
+  \item\textbf{OSAAT -- One-Scanner-At-A-Time:}
   Use all images from a single scanner ($N_s$) except one as the training set;
   use it as the test case ($N_r = N_s-1$; $N_e = 1$);
   repeat $N$ times.
@@ -1018,7 +1018,8 @@ yielding the remaining panels in Figure~\ref{fig:beta-smooth}.
   \caption{Parameter images following different smoothing filters.}%
   \label{fig:beta-smooth}
 \end{figure}
-Performance differences among the different filters were not large in magnitude.
+Performance differences among the different filters
+(Figure~\ref{fig:seg-box-beta}) were not large in magnitude.
 However, the Gaussian filter with $\sigma = 2$ MNI voxels (3 mm)
 achieved statistically higher performance than all other conditions except $G_{\sigma1}$.
 This method also has the advantage of producing exceedingly smooth parameter images,
@@ -1045,11 +1046,11 @@ These details are presented in \S~\ref{ss:halfres}.
   \begin{subfigure}{0.32\textwidth}
     \centering\includegraphics[scale=0.4]{beta-box-re}
     \caption{$Re$}%
-    \label{fig:seg-box-lambeta-re}
+    \label{fig:seg-box-beta-re}
   \end{subfigure}
   \caption{Comparison of the optimized model under LOSO-CV
     using different $\bb(x)$ smoothing.}%
-  \label{fig:seg-beta-lam}
+  \label{fig:seg-box-beta}
 \end{figure}
 %\begin{table}
 %  \centering
@@ -1190,7 +1191,7 @@ and an example segmentation is shown in Figure~\ref{fig:exseg}.
 \end{figure}
 \begin{figure}
   \centering
-  \foreach \i/\cap in {%
+  \foreach \i/\cap in {% % chktex 1
     I/$\mathrm{Y}(x)$,
     J/$\tilde{\mathrm{Y}}(x)$,
     T/$\mathrm{T}(x)$,
@@ -1205,7 +1206,7 @@ and an example segmentation is shown in Figure~\ref{fig:exseg}.
   \label{fig:exseg}
 \end{figure}
 % ==================================================================================================
-\subsection{Segmentation Performance}
+\subsection{Segmentation Performance}\label{ss:exp-finalseg}
 This section explores more detailed segmentation performance results
 associated with the final model definition.
 Median overall $SI$ performance was 0.69, a reasonable improvement over the baseline of 0.63,
@@ -1332,7 +1333,7 @@ will be explored in the next chapter.
   \label{fig:tpfpfn-final}
 \end{figure}
 % --------------------------------------------------------------------------------------------------
-\subsubsection{``Turing Test''}
+\subsubsection{``Turing Test''}\label{sss:exp-turing}
 In order to determine whether the VLR algorithm produces results which are indistinguishable
 from other human raters, it was first necessary to establish a measure of human performance.
 To do so, the inter-rater agreement was calculated for those datasets
@@ -1379,7 +1380,7 @@ several existing algorithms have already been deployed for use by other research
 It is therefore possible to compare the performance of these methods with
 the proposed VLR model directly.
 % ==================================================================================================
-\subsection{Lesion Prediction Algorithm (LPA)}
+\subsection{Lesion Prediction Algorithm (LPA)}\label{ss:exp-lpa}
 The LPA algorithm is the only freely available FLAIR-only WMH segmentation tool,
 and has been used in several comparisons with other methods%
 ~\cite{Griffanti2016,Brosch2016,Egger2017}%
@@ -1477,11 +1478,10 @@ is given in Figure~\ref{fig:wmh-results}.%
 \begin{sidewaysfigure}
     \centering
     \includegraphics[width=\textheight]{wmh-results.png}\\
-    
     \caption{Results report for the submitted method provided by the WMH Segmentation Competition.}%
     \label{fig:wmh-results}
 \end{sidewaysfigure}
-At the MICCAI 2016 MSSEG Competition, only [X] of the 15 submitted methods used deep learning,
+At the MICCAI 2016 MSSEG Competition, only 4 of the 15 submitted methods used deep learning,
 while the 2017 competition saw 15 of 20 methods use this approach,
 \textit{including the top performing 13 methods}.
 This impressive and sudden display of model dominance should not be taken for granted,
