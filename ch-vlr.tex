@@ -178,10 +178,10 @@ after incorporation of the regularizations described in the next section.
 \par
 Finally, the model has so far been derived in general terms,
 so that any choice of feature set $\by$ can be used.
-However, with only one feature -- the FLAIR graylevel --
+However, with only one feature -- the FLAIR graylevel $y = y^1$ --
 it is possible to reparameterize the sigmoid argument as
 \begin{align}
-  \bb^T\by &= \b^0 + \b^1 y^1\nonumber\\
+  \bb^T\by &= \b^0(1) + \b^1(y)\nonumber\\
            &= s(y-\tau)
            \qquad\begin{cases}
              s = \b^1\\
