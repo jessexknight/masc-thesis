@@ -272,7 +272,7 @@ which is critical for normal neuron firing~\cite{Trapp2008}.
 Several theories hypothesize either that this damage is driven by
 autoimmune attack, followed by neuronal dysfunction and death,
 or that neurodegenerative changes stimulate recruitment of immune cells
-as part of the usual response to injury~\cite{Lucchinetti2000,Trapp2008}.
+as part of the usual response to injury~\cite{Trapp2008,Lucchinetti2000}.
 Recent evidence favours the former mechanism,
 particularly with inflammatory injury as the initiating event~\cite{Ciccarelli2014,Mahad2015}.
 %A helpful visualization of MS lesion progression over one year is available here%
@@ -335,7 +335,7 @@ While diagnosis of additional dementia subtypes may be improved using imaging
 continues to be based on clinical features alone~\cite{McKhann2011}.
 As a result, WMH have not been used as an endpoint to any AD clinical trial.
 In fact, only recently have specific standards for
-use of WMH in vascular dementia studies been outlined~\cite{Wardlaw2013,Wardlaw2015},
+use of WMH in vascular dementia studies been outlined~\cite{Wardlaw2015,Wardlaw2013},
 with some subsequent uptake~\cite{VanWesten2016}.
 And yet, a~\citeyear{Debette2010} meta-analysis found that
 WMH in brain MRI were independently correlated with
@@ -351,7 +351,7 @@ for quantification of lesion load, and gives the explicit spatial distribution o
 This spatial information can be very useful,
 since diagnostic criteria often consider lesion location~\cite{Sorbi2012}
 and there are several correlations between lesion location
-and suspected etiology of WMH~\cite{Kim2008,Wardlaw2015}.
+and suspected etiology of WMH~\cite{Wardlaw2015,Kim2008}.
 \par
 Unfortunately, manual segmentation of WMH is
 laborious, and subject to large inter- and intra-rater variability, as reported in several works.
@@ -722,7 +722,7 @@ often employ an outlier definition which depends on mixture model parameters
 (e.g.\ tissue graylevel mean and variance),
 which in turn are subject to MR slice thickness, noise level, and contrast%
 ~\cite{VanLeemput2001,Souplet2008,Garcia-Lorenzo2011,Roura2015}.
-Graylevel thresholding techniques~\cite{Jack2001,Smart2011,Samaille2012,Schmidt2012,Khademi2014}
+Graylevel thresholding techniques~\cite{Khademi2014,Jack2001,Smart2011,Samaille2012,Schmidt2012}
 are similarly affected by changes in image properties.
 \par
 It is worth noting four works%
@@ -841,7 +841,7 @@ A model to do so will be developed throughout the remainder of this work.
 % --------------------------------------------------------------------------------------------------
 \subsubsection{Classic Logistic Regression Models}\label{sss:limits-lr}
 Logistic regression models have more recently gained popularity for WMH segmentation%
-~\cite{Sweeney2013a,Sweeney2013,Schmidt2017a,Zhan2017}, and have several advantages.
+~\cite{Sweeney2013,Zhan2017,Sweeney2013a,Schmidt2017a}, and have several advantages.
 First, model parameters are generally more interpretable than those in other models,
 permitting better design of regularizations.
 Second, the simplicity of the model reduces its capacity for over-fitting.
@@ -869,7 +869,7 @@ the estimated label image becomes $\hat{C}(x) = P(C(x)=1\mid\bm{Y}(x);\bb)$.
   \caption{The logistic regression model.}%
   \label{fig:lr-basic}
 \end{figure}
-In the OASIS algorithm~\cite{Sweeney2013a,Sweeney2013}
+In the OASIS algorithm~\cite{Sweeney2013,Sweeney2013a}
 and the algorithm by \citeauthor{Zhan2017}~\cite{Zhan2017},
 this model is used with a number of different graylevel features.
 However, this ignores spatial location%
@@ -905,7 +905,7 @@ This particular parametrization has significant implications for model estimatio
 since $\b^0(x)$ should be estimated uniquely for every spatial location,
 but $\b^1$ should consider evidence from the entire image volume.
 Efficient fitting of such models was the subject of major works
-by~\citeauthor{Schmidt2017}~\cite{Schmidt2017,Schmidt2017a}, but several drawbacks remain.
+by~\citeauthor{Schmidt2017}~\cite{Schmidt2017a,Schmidt2017}, but several drawbacks remain.
 First, Markov Chain Monte Carlo estimation of the model
 appears to create discontinuity artifacts in the spatial effect image $\b^0(x)$
 (cf.~Figure~\ref{fig:beta-lpa}, \S~\ref{ss:exp-beta}).
@@ -930,7 +930,7 @@ this strongly assumes that user images will have graylevels spanning a similar r
 Third, all 53 training cases were obtained on the same MRI scanner,
 which may limit generalization performance.
 Finally, no segmentation performance results
-are given in either of the associated publications~\cite{Schmidt2017,Schmidt2017a}.
+are given in either of the associated publications~\cite{Schmidt2017a,Schmidt2017}.
 Therefore, while the open-source release of the LPA algorithm is greatly appreciated,
 significant improvements can be made to this algorithm.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
