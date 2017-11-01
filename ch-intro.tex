@@ -854,14 +854,14 @@ given a set of features $\by = {[1,y^1,\dots,y^\sk]}^T$,
 is modelled by a logistic function,
 parameterized by a vector of feature weights $\bb = {[\b^0,\b^1,\dots,\b^\sk]}^T$,
 \begin{equation}
-P\big(c=1\mid\by,\bb\big) = \frac{1}{1+e^{-\eta}},\qquad\eta = \bb^T\by.%
+P\big(c=1\mid\by;\bb\big) = \frac{1}{1+e^{-\eta}},\qquad\eta = \bb^T\by.%
 \label{eq:lrmodel-basic}
 \end{equation}
 This probability -- the estimated lesion class label --
-is denoted $\hat{c} = P(c=1\mid\by,\bb) \in [0,1]$.
+is denoted $\hat{c} = P(c=1\mid\by;\bb) \in [0,1]$.
 Figure~\ref{fig:lr-basic} shows an example class prediction for an arbitrary input graylevel $y_i$.
 Considering the spatial location $x = [\xxx]$,
-the estimated label image becomes $\hat{C}(x) = P(C(x)=1\mid\bm{Y}(x),\bb)$.
+the estimated label image becomes $\hat{C}(x) = P(C(x)=1\mid\bm{Y}(x);\bb)$.
 \par
 \begin{figure}
   \centering\includegraphics[width=\plotwidth]{lr-basic}
@@ -973,7 +973,7 @@ yielding a separate logistic regression model for each voxel
 -- i.e. ``Voxel-wise Logistic Regression'' (VLR).
 Mathematically, this is
 \begin{equation}
-P\big(c(x)=1\mid\by(x),\bb(x)\big) = \frac{1}{1+e^{-\eta(x)}},\qquad\eta = {\bb(x)}^T\bm{Y}(x).%
+P\big(c(x)=1\mid\by(x);\bb(x)\big) = \frac{1}{1+e^{-\eta(x)}},\qquad\eta = {\bb(x)}^T\bm{Y}(x).%
 \label{eq:eq:vlrmodel-intro}
 \end{equation}
 Training the VLR model then yields a complete and unique vector $\bb$ for each voxel,
