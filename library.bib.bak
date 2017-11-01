@@ -138,23 +138,6 @@
   url      = {http://www.sciencedirect.com.subzero.lib.uoguelph.ca/science/article/pii/S1552526014028623},
 }
 
-@Article{Lagarias1998,
-  author   = {Lagarias, Jeffrey C. and Reeds, James A. and Wright, Margaret H. and Wright, Paul E.},
-  title    = {{Convergence Properties of the Nelder--Mead Simplex Method in Low Dimensions}},
-  journal  = {SIAM Journal on Optimization},
-  year     = {1998},
-  volume   = {9},
-  number   = {1},
-  pages    = {112--147},
-  issn     = {1052-6234},
-  abstract = {The Nelder-Mead simplex algorithm, rst published in 1965, is an enormously popular direct search method for multidimensional unconstrained minimization. Despite its widespread use, essentially no theoretical results have been proved explicitly for the Nelder-Mead algorithm. This paper presents convergence properties of the Nelder-Mead algorithm applied to strictly convex functions in dimensions 1 and 2. We prove convergence to a minimizer for dimension 1, and various limited convergence results for dimension 2. A counterexample of McKinnon gives a family of strictly convex functions in two dimensions and a set of initial conditions for which the Nelder-Mead algorithm converges to a nonminimizer. It is not yet known whether the Nelder-Mead method can be proved to converge to a minimizer for a more specialized class of convex functions in two dimensions.},
-  doi      = {10.1137/S1052623496303470},
-  file     = {:C$\backslash$:/Users/Jesse/AppData/Local/Mendeley Ltd/Mendeley Desktop/Downloaded/1998 - Convergence Properties of the Nelder-Mead Simplex Method in Low Dimensions.pdf:pdf},
-  isbn     = {10526234},
-  pmid     = {2906},
-  url      = {http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.120.6062 http://epubs.siam.org/doi/10.1137/S1052623496303470},
-}
-
 @Article{Ashburner2005,
   author   = {Ashburner, John and Friston, Karl J},
   title    = {{Unified segmentation.}},
