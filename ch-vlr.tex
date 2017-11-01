@@ -297,7 +297,7 @@ yielding the following change to the Newton update expression (\ref{eq:newtonmle
   \label{eq:newtonmap}
 \end{align}
 What remains is to select an appropriate value of $\lambda$.
-This is explored experimentally in \S~\ref{ss:toyreg} using a toy model.
+This is explored experimentally in \S~\ref{ss:exp-toy-lam} using a toy model.
 % ==================================================================================================
 \subsection{Pseudo-Lesions}\label{ss:vlr-reg-pseudo}
 The sparsely observed lesion class challenge is less common,
@@ -349,7 +349,7 @@ to complete this model.
 Additionally, such parameters will inevitably play a role
 for subjects with imperfect registration or outlier anatomy.
 The contributions of pseudo-lesions to model fitting
-are explored experimentally in \S~\ref{ss:toyreg}.
+are explored experimentally in \S~\ref{ss:exp-toy-psu}.
 %__JK__ should TPMs be introduced sooner?
 \begin{figure}
   \centering
@@ -399,7 +399,7 @@ Second, such an encoding may introduce artifacts in the resulting parameter imag
 Moreover, it is well known that frequency domain band-limiting
 can be equivalently achieved by convolution (i.e.\ filtering)
 in the spatial domain~\cite{Gonzalez2006}.
-Therefore, only conventional filtering is explored in this work (cf.~\S~\ref{}).
+Therefore, only conventional filtering is explored in this work (cf.~\S~\ref{ss:exp-beta}).
 %__JK__ define this reference in ch-exp
 %__JK__ address MRFs for smoothing here?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -432,7 +432,7 @@ with $\pi_c = 0.5$.
 However, since these assumptions are often only partially true,
 most models are able to achieve better agreement with manual segmentations
 using a different threshold $\pi_c$ for the WMH class.
-In fact several of the freely available toolboxes (cf.~\S~\ref{sss:wmhsegtoolboxes})
+In fact several of the freely available toolboxes% (cf.~\S~\ref{sss:wmhsegtoolboxes})
 permit a user-specified threshold which can be optimized for the user's data.
 During model validation,
 this parameter should be optimized using the training data for each cross validation fold.
@@ -527,8 +527,8 @@ In order to achieve the best possible model performance,
 it is prudent to track tunable model parameters (\textsc{aka} hyperparameters)
 which are distinct from those fitted during each cross validation fold -- i.e.\ $\bb(x)$ and $\pi_c$.
 Considering both the main VLR model and the pre- and post-processing aspects,
-the parameters of the proposed algorithm are summarized in Table~\ref{tab:hyp-base}
-and also programmatically in \nameref{m:hypdef.m}.
+the parameters of the proposed algorithm are summarized in Table~\ref{tab:hyp-base}.
+%and also programmatically in \nameref{m:hypdef.m}.
 The optimization of these model components will be the subject of the next chapter.
 \begin{table}
   \centering
