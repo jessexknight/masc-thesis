@@ -57,7 +57,7 @@ The average distribution of WMH in Dataset A is shown in Figure~\ref{fig:mean-wm
   \centering
   \includegraphics[height=\sliceheight]{mean-G.png}
   \includegraphics[height=\sliceheight]{cmap-mean-G}
-  \caption{Average distribution of WMH in Dataset A.}%
+  \caption{Average distribution of WMH in Dataset A. Best viewed in colour.}%
   \label{fig:mean-wmh}
 \end{figure}
 Regarding simulated MR images,
@@ -292,7 +292,7 @@ but overall highlights the difficulties of segmenting real versus simulated imag
     \caption{Target PMFs for histogram matching operations.}%
     \label{fig:ystd-pmf-target}
   \end{subfigure}
-  \caption{Image intensity PMFs.}
+  \caption{Image intensity PMFs. Best viewed in colour.}
 \end{figure}
 Next, each of the graylevel standardization techniques described in \S~\ref{s:pre-ystd}
 were applied to the FLAIR intensity data.
@@ -334,7 +334,8 @@ therefore these will not be subject to further investigation.
     \caption{Histogram Matching 2: ``Left Skew'' (HM3).}%
     \label{fig:ystd-pmf-hm2}
   \end{subfigure}
-  \caption{Image graylevel PMFs after the two best standardization operations.}%
+  \caption{Image graylevel PMFs after the two best standardization operations.
+    Best viewed in colour.}%
   \label{fig:ystd-pmf-best}
 \end{figure}
 Finally, since the graylevel agreement measures $Z_{\Delta}(x)$ and $Z_{\star}(x)$
@@ -365,7 +366,8 @@ This is illustrated for the raw images and the best performing transformation:
     \includegraphics[height=\sliceheight]{ystd-zx-naop-2.png}
     \includegraphics[height=\sliceheight]{cbar-zx-d-2}%
   }
-  \caption{Spatial depiction of $\Z_{\Delta}(x)$ and $\Z_{\star}(x)$ comparing RM1 and HM2.}%
+  \caption{Spatial depiction of $\Z_{\Delta}(x)$ and $\Z_{\star}(x)$ comparing RM1 and HM2.
+  Best viewed in colour.}%
   \label{fig:jsep-diff-x-narm}
 \end{figure}
 
@@ -464,7 +466,8 @@ thereby limiting the slope parameter $s = \b^1$, as desired.
   \caption{Toy model likelihoods as a function of $\bb$:
     $P(\bb) = e^{\P(\bb)}$ and $J(\bb) = e^{\J(\bb)}$,
     for different $\lambda$, using scenario e.
-    The optimum is shown as a white star.}%
+    The optimum is shown as a white star.
+    Best viewed in colour.}%
   \label{fig:toy-srf-lam}
 \end{figure}
 \par
@@ -500,7 +503,8 @@ and minimal impact in scenarios a--c.
       \centering\includegraphics[width=\textwidth]{toy-lam-\i}%
       \caption{}%
     \end{subfigure}\ }
-  \caption{Toy model MAP estimation results for 6 different scenarios and different $\lambda$.}%
+  \caption{Toy model MAP estimation results for 6 different scenarios and different $\lambda$.
+  Best viewed in colour.}%
   \label{fig:toy-lam}
 \end{figure}
 % ==================================================================================================
@@ -538,7 +542,8 @@ segmentation performance results using the full model.
   \caption{Toy model MAP estimation results for 9 different scenarios and
     different numbers of pseudo-lesions $V$,
     shown as coloured diamonds corresponding to the scenario
-    (spread of diamonds is for visualization only).}%
+    (spread of diamonds is for visualization only).
+    Best viewed in colour.}%
   \label{fig:toy-psu}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -613,7 +618,8 @@ the images have already been registered and transformed to MNI brain space
   \includegraphics[width=1.5\plotwidth]{bar-kfcv}
   \caption{Number of images from each scanner in each KF-CV fold.
     Faded colours show the expected value (evenly distributed, non-whole numbers);
-    full colours show the implementation (approximation, whole numbers).}%
+    full colours show the implementation (approximation, whole numbers).
+    Best viewed in colour.}%
   \label{fig:bar-kfcv}
 \end{figure}
 The three performance metrics for each condition are
@@ -710,7 +716,8 @@ during investigation of regularization strategies.
     \includegraphics[height=\sliceheight]{base-cmap-S}}
   \caption{Fitted parameter images $\mathcal{T}(x)$ and $\mathcal{S}(x)$
     from the first LOSO-CV fold of the baseline model.
-    Obvious artifacts arise from inadequate regularization.}%
+    Obvious artifacts arise from inadequate regularization.
+    Best viewed in colour.}%
   \label{fig:beta-base}
 \end{figure}
 After training and testing this version of the model under LOSO-CV,
@@ -1015,7 +1022,7 @@ yielding the remaining panels in Figure~\ref{fig:beta-smooth}.
     \foreach \i in {1,2,3,4,5,6}{% % chktex 1
       \includegraphics[height=0.9\sliceheight]{S-\i.png}~}%
     \includegraphics[height=0.9\sliceheight]{cmap-beta-2}}
-  \caption{Parameter images following different smoothing filters.}%
+  \caption{Parameter images following different smoothing filters. Best viewed in colour.}%
   \label{fig:beta-smooth}
 \end{figure}
 Performance differences among the different filters
@@ -1118,7 +1125,7 @@ yielding the results shown in Figure~\ref{fig:beta-lpa}.
     \includegraphics[height=\sliceheight]{cmap-LPA}
   }
   \caption{Spatial effect intercept parameter images $\b^0(x)$ from the LPA and VLR algorithms.
-    For visual comparison, image means and variances are matched.}%
+    For visual comparison, image means and variances are matched. Best viewed in colour.}%
   \label{fig:beta-lpa}
 \end{figure}
 The two parameter images appear overall similar,
@@ -1186,7 +1193,7 @@ and an example segmentation is shown in Figure~\ref{fig:exseg}.
     \includegraphics[height=\sliceheight]{final-S.png}
     \includegraphics[height=\sliceheight]{final-cmap-S}}
   \caption{Fitted parameter images $\mathcal{T}(x)$ and $\mathcal{S}(x)$
-    from the first LOSO-CV fold of the final model.}%
+    from the first LOSO-CV fold of the final model. Best viewed in colour.}%
   \label{fig:beta-final}
 \end{figure}
 \begin{figure}
@@ -1202,7 +1209,7 @@ and an example segmentation is shown in Figure~\ref{fig:exseg}.
       \centering\includegraphics[height=\sliceheight]{exseg-\i.png}
       \caption{\cap}
     \end{subfigure}~}
-  \caption{Example segmentation.}%
+  \caption{Example segmentation. Best viewed in colour.}%
   \label{fig:exseg}
 \end{figure}
 % ==================================================================================================
@@ -1278,8 +1285,8 @@ appear in the image.
     \caption{Recall (Re)}%
     \label{fig:seg-final-scat-re}
   \end{subfigure}
-  \caption{Scatter plot pof inal model performance, with 3\ss{rd} order trend line
-    and 90\% confidence interval shown in grey.}%
+  \caption{Scatter plot of final model performance, with 3\ss{rd} order trend line
+    and 90\% confidence interval shown in grey. Best viewed in colour.}%
   \label{fig:seg-final-scat}
 \end{figure}
 It is worth drawing attention to one consistent outlier from the WMH 2017 (1) scanner,
@@ -1329,7 +1336,7 @@ will be explored in the next chapter.
       \includegraphics[height=\sliceheight]{final-\i.png}
       \includegraphics[height=\sliceheight]{final-cmap-tri}}\\[0.5em]}
   \caption{Distribution of True Positives (TP), False Positives (FP), and False Negatives (FN)
-    from all LOSO-CV folds of the final model.}%
+    from all LOSO-CV folds of the final model. Best viewed in colour.}%
   \label{fig:tpfpfn-final}
 \end{figure}
 % --------------------------------------------------------------------------------------------------
@@ -1407,6 +1414,7 @@ but overall had lower recall, mainly due to differences at high LL ($p < 0.001$)
 \par
 \begin{figure}
   \centering
+  \includegraphics[scale=0.4]{lpa-box-leg}
   \begin{subfigure}{0.32\textwidth}
     \centering
     \includegraphics[width=\textwidth]{lpa-box-si}
