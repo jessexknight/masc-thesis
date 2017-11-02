@@ -201,6 +201,9 @@ Convolutional neural networks and the VLR model really occupy opposite ends of t
 model complexity spectrum.
 The VLR model achieves good performance with relatively little fine-tuning,
 since prior knowledge of the problem is incorporated in the model itself.
+This also provides the main advantage of the VLR model
+-- that it is not a ``black box'', that the parameters of the model
+illustrate exactly how the classification probability is assigned.
 However, as shown here, these ``strongly-biased'' models
 often eventually reach a limit in performance due to invalid assumptions.
 For example, the VLR model assumes that in a given spatial location,
