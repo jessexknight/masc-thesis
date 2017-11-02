@@ -413,25 +413,24 @@ Here, these include the connected morphology of WML, and the minimum lesion size
 Discussions of these topics, however, would assume that the label image is already binary,
 whereas the output from the VLR model is probabilistic.
 Therefore, the first post-processing step
-thresholds the WMH class probability to give a ``hard'' classification:
-$\hat{c}\rightarrow \hat{c}^{\circ}$
+thresholds the WMH class probability at a value $\pi$ to give a ``hard'' classification:
+$\hat{c}\rightarrow \hat{c}^{\pi}$
 This also facilitates comparison with manual segmentation masks, which are usually binary.
-%__JK__ better notation for this hard label: \hat{c}^{\circ}? 
 % ==================================================================================================
 \subsection{Thresholding}\label{ss:vlr-thr}
 If the assumptions of any probabilistic model are valid,
-then the ``hard'' classification is straightforward:
+then the ``hard'' classification between any set of classes $c$ is straightforward:
 \begin{equation}
-  \hat{c}^{\circ} = \underset{\omega}{\arg\max}\en p(\omega\mid\by,\bb)\quad\forall \omega.
+  \hat{c}^{\pi} = \underset{c}{\arg\max}\en p(c\mid\by;\bb).
 \end{equation}
-In a 2-class logistic regression model, this simplifies to thresholding:
+In a 2-class logistic regression model, this simplifies to thresholding at $p$:
 \begin{equation}
-  \hat{c}^{\circ} = \begin{cases} 0 & \hat{c} < \pi_c \\ 1 & \hat{c} \ge \pi_c \end{cases},
+  \hat{c}^{\circ} = \begin{cases} 0 & \hat{c} < \pi \\ 1 & \hat{c} \ge \pi \end{cases},
 \end{equation}
-with $\pi_c = 0.5$.
+with $\pi = 0.5$.
 However, since these assumptions are often only partially true,
 most models are able to achieve better agreement with manual segmentations
-using a different threshold $\pi_c$ for the WMH class.
+using a different threshold $\pi$ for the WMH class.
 In fact several of the freely available toolboxes% (cf.~\S~\ref{sss:wmhsegtoolboxes})
 permit a user-specified threshold which can be optimized for the user's data.
 During model validation,
@@ -440,7 +439,7 @@ It is also prudent to illustrate the sensitivity of the model to this parameter,
 a plot of performance versus threshold~\cite{Steenwijk2013}, or
 a precision-recall (PR) curve~\cite{Arbelaez2011}.
 In the current work, both these techniques are employed:
-$\pi_c$ is optimized on the fly, and a PR curve is given after.
+$\pi$ is optimized on the fly, and a PR curve is given after.
 % ==================================================================================================
 \subsection{Minimum Lesion Size}\label{ss:vlr-minx}
 With finite image resolution and appreciable noise in MRI,
@@ -489,7 +488,8 @@ to be determined in the next section.
 The parameter images $\bb(x)$ are then computed using iterative MAP estimation,
 with Newton updates and an augmented dataset.
 These images are smoothed to reflect prior knowledge.
-Finally, the optimal probability threshold $\pi_c$ and  minimum lesion size $\mathrm{x}_{\min}^{c}$
+Finally, the optimal probability threshold $\pi$
+and minimum lesion size $\mathrm{x}_{\min}^{c}$
 are estimated using the training data.
 This completes the training phase.
 \par
@@ -501,7 +501,7 @@ This transformation of the smooth parameter images prior to inference is prefera
 to transforming the detailed label image afterwards.
 The probability of the WMH class is computed
 by evaluating the independent logistic models at every voxel.
-This initial estimate $\hat{C}(x)$ is then thresholded using $\pi_c$,
+This initial estimate $\hat{C}(x)$ is then thresholded using $\pi$,
 and binary objects smaller than $\mathrm{x}_{\min}^{c}$ are removed.
 The resulting label image is the final output.
 These training and testing phases are illustrated in Figure~\ref{fig:modelsum}.
@@ -525,7 +525,8 @@ These training and testing phases are illustrated in Figure~\ref{fig:modelsum}.
 \subsection{Tunable Parameters}
 In order to achieve the best possible model performance,
 it is prudent to track tunable model parameters (\textsc{aka} hyperparameters)
-which are distinct from those fitted during each cross validation fold -- i.e.\ $\bb(x)$ and $\pi_c$.
+which are distinct from those fitted during each cross validation fold
+-- i.e.\ $\bb(x)$ and $\pi$.
 Considering both the main VLR model and the pre- and post-processing aspects,
 the parameters of the proposed algorithm are summarized in Table~\ref{tab:hyp-base}.
 %and also programmatically in \nameref{m:hypdef.m}.
