@@ -602,7 +602,7 @@ Previous approaches to WMH segmentation have generally employed four types of fe
   (e.g.\ ICBM~\cite{Mazziotta2001});
   \item \textbf{Spatial:}
   spatial location, often normalized to a common space
-  (e.g.\ $\xxx$).
+  (e.g.\ $x = \xxx$).
   \item \textbf{Contextual:}
   local graylevel statistics or texture measures
   (e.g.\ local edge magnitude).
@@ -860,8 +860,9 @@ P\big(c=1\mid\by;\bb\big) = \frac{1}{1+e^{-\eta}},\qquad\eta = \bb^T\by.%
 \end{equation}
 This probability -- the estimated lesion class label --
 is denoted $\hat{c} = P(c=1\mid\by;\bb) \in [0,1]$.
-Figure~\ref{fig:lr-basic} shows an example class prediction for an arbitrary input graylevel $y_i$.
-Considering the spatial location $x = [\xxx]$,
+Figure~\ref{fig:lr-basic} shows an example class prediction
+for a single arbitrary input feature $y_i$.
+Considering the spatial location $x = [\xxx]$ -- ,
 the estimated label image becomes $\hat{C}(x) = P(C(x)=1\mid\bm{Y}(x);\bb)$.
 \par
 \begin{figure}
@@ -892,7 +893,8 @@ Again, the potential utility of spatial features is highlighted.
 % --------------------------------------------------------------------------------------------------
 \subsubsection{Lesion Prediction Algorithm}\label{sss:limits-lpa}
 An alternative approach by \citeauthor{Schmidt2017a} aims to solve this issue
-by introducing a spatial effect parameter, namely the intercept $\b^0 \rightarrow \b^0(x)$.
+by introducing a spatial effect parameter, namely the intercept $\b^0 \rightarrow \b^0(x)$,
+which is defined uniquely for each location -- i.e.\ voxel $x$ -- in the imaged volume.
 In this method, a Gaussian MRF model is used to estimate the spatial parameter $\b^0(x)$,
 while the other $\b$ parameters
 -- in fact there is only one: $\b^1$, corresponding to the FLAIR graylevel --
@@ -977,7 +979,7 @@ Mathematically, this is
 P\big(c(x)=1\mid\by(x);\bb(x)\big) = \frac{1}{1+e^{-\eta(x)}},\qquad\eta = {\bb(x)}^T\bm{Y}(x).%
 \label{eq:eq:vlrmodel-intro}
 \end{equation}
-Training the VLR model then yields a complete and unique vector $\bb$ for each voxel,
+Training the VLR model then yields a complete and unique vector $\bb$ for each voxel $x$,
 or equivalently, one complete image for each parameter.
 Only one additional $\b$ is used here, again corresponding to the FLAIR graylevel.
 This formulation allows completely independent estimation of the logistic model for each voxel $x$,
