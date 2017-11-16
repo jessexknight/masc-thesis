@@ -1,0 +1,9 @@
+rm *.aux
+rm *.bcf
+rm *.blg
+rm *.lof
+rm *.lot
+rm *.out
+rm *.synctex.gz
+rm *.toc
+rm *.txt

@@ -21,6 +21,7 @@
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{nameref}
+\usepackage{xstring}
 \usepackage{tikz}
 \usepackage{matlab-prettifier}
 \usepackage{listings}
@@ -33,7 +34,7 @@
 \usepackage[colorlinks,
             pdfusetitle]%
             {hyperref}
-\usepackage[backend=biber,
+\usepackage[backend=bibtex,
             style=numeric,
             maxcitenames=2,
             sorting=none,
@@ -46,7 +47,7 @@
 \usetikzlibrary{shapes,arrows.meta,calc}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % resources
-\addbibresource{./library.bib}
+\addbibresource{library.bib}
 \graphicspath{{figs/}{figs/tikz/}{figs/tikz/algorithm/}{figs/ystd/}{figs/toy/}{figs/seg/}}
 \newcommand{\matlabdir}{m/}
 \makeatletter\newcommand{\setmaxcitenames}[1]{\numdef\blx@maxcitenames{#1}}\makeatother
