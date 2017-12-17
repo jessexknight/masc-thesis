@@ -1,47 +1,66 @@
-## Voxel-Wise Logistic Regression for White Matter Hyperintensity Segmentation
+## Voxel-Wise Image Analysis for White Matter Hyperintensity Segmentation
 #### MASc Thesis
 #### Jesse Knight
 #### University of Guelph
 
 ---
 
-#### LaTeX Comment Conventions
+#### Code
 
-`% This is document text under construction`
+Git:     https://github.com/uoguelph-mlrg/vlr
 
-`%__JK__ this is a comment by (JK) for collaborators / reviewers`
+Contact: jesse.x.knight@gmail.com
 
+#### Abstract
 
-#### To Do
-- [ ] Add: some details about gpuArray in Matlab
-- [ ] Add: (?) mean lesion intensity (standardized/relaxometry?) by anatomical region
-- [ ] Add: more potential filters
-- [ ] Add: introduction to manual segmentations & use as "silver standard" for supervision
-- [ ] Check: scanner notation - colours, ordering (.m vs .tex too)
-- [ ] Discuss: how (un)important pseudo-lesion regularization is? (like paper)
-- [ ] Decide: introduce image registration / spatial standardization earlier & more gracefully
-- [ ] Decide: ordering of baseline, toy, full model results in Ch.3
-- [ ] Decide: introduce TPMs sooner?
-- [ ] Decide: Swap versions of priorwork.tex? (currently: paper[long] vs thesis[short])
-- [ ] Fix: formatting of Fig \ref{fig:m08-rev}
+White matter hyperintensities (WMH) are regions of increased pixel intensity
+in T2-weighted magnetic resonance images (MRI)
+which are correlated with several neurodegenerative diseases,
+including vascular dementia and multiple sclerosis.
+Manual segmentation of WMH -- labelling of image voxels as 'healthy' or 'lesion' --
+is used for diagnosis and monitoring of these diseases.
+However, human performance of this task is time consuming,
+and is subject to variability which eclipses the subtle lesion changes of interest.
+Therefore, automation of WMH segmentation is an attractive goal.
 
-#### To Done
-- [x] src: big chktex retrospective
-- [x] src: line-breaks every 100 chars, for git diff and edits tracking
-- [x] src: all sentences on their own line for git diff.
-- [x] Add: what is image registration, MNI space, etc.?
-- [x] Add: methods parameter image smoothing
-- [x] Add: motivate, introduce, and selling the VLR model
-- [x] Add: support claim of spatial heterogeneity of lesion graylevels
-- [x] Add: FLAIR contrast simulation (ap-math)
-- [x] Add: methods for LPA: Schmidt thesis - discuss and compare to current work
-- [x] Add: brainmask to appendix
-- [x] Add: Vectorized implementation maths
-- [x] Add: psuedo-lesions details
-- [x] Add: rewrite prior-work section for difference from paper
-- [x] Check: notation - bold, caligraphic/roman, capitals
-- [x] Decide: when to introduce lambda regularization / implementation (methods or ap-impl)
-- [x] Decide: where to put reparameterization of the sigmoid \beta to \tau and s
-- [x] Resolve: double symbol use - J for objective & gradient (parallel impl)
+While many algorithms for this task have previously been proposed
+these have been generally either interpretable, or accurate, but not both.
+Additionally, variability in protocols for estimating algorithm performance
+has precluded robust identification of superior approaches.
+In particular, few algorithms have been validated on MRI from different sources.
+This is significant, since algorithms are often sensitive to
+source-specific image features, including
+inter-tissue contrasts, image resolution, scanner model, and field strength.
+
+This thesis addresses these two challenges.
+First, a segmentation algorithm called
+'Voxel-Wise Logistic Regression' (VLR) is introduced,
+which provides both good interpretability and good segmentation performance.
+The model inspired by an existing open-source algorithm,
+'Lesion Prediction Algorithm' (LPA),
+which uses fluid attenuation inversion recovery (FLAIR) MRI
+to estimate the the WMH class probability image.
+In the proposed VLR model,
+all logistic regression feature weights are parameterized spatially
+-- i.e.\ $\bm{\beta} \rightarrow \bm{\beta}(x)$ --
+rather than just the intercept.
+This significantly reduces training time and necessary modelling approximations,
+and yields 'parameter images' $\bm{\beta}(x)$
+which concisely summarize the model class discrimination.
+
+Next, a validation framework called
+'Leave-One-Source-Out Cross Validation' (LOSO-CV) is introduced,
+which provides more realistic estimation of model performance
+on 'never-before-seen' MRI sources.
+Segmentation performance of the VLR model under LOSO-CV
+is then used to guide optimization of pre- and post-processing operations,
+as well as regularization strategies (incorporation of prior knowledge).
+In the spirit of open research,
+only data from recent WMH segmentation competitions
+were used in this work, totalling 96 image sets from 7 MRI sources.
+Additionally, the proposed algorithm will be deployed as a 3D Slicer application
+for use by clinicians and researchers,
+and source code for all investigations will be released on GitHub.
+
 
 
