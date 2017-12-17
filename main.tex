@@ -1,5 +1,4 @@
 \documentclass[openany,11pt,vi,oneside]{mitthesis}
-\usepackage{lgrind}
 \usepackage{calc}
 \usepackage{cmap}
 \usepackage{mathtools}
@@ -7,28 +6,21 @@
 \usepackage{bm}
 \usepackage{upgreek}
 \usepackage{enumitem}
-\usepackage{scrextend}
 \usepackage{lscape}
 \usepackage{geometry}
 \usepackage{multicol}
 \usepackage{multirow}
 \usepackage{xcolor}
 \usepackage{float}
-\usepackage{afterpage}
 \usepackage{rotating}
 \usepackage{tabu}
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{subcaption}
-\usepackage{nameref}
 \usepackage{xstring}
 \usepackage{tikz}
-\usepackage{matlab-prettifier}
 \usepackage{listings}
-\usepackage{mdframed}
 \usepackage{catchfile}
-%\usepackage{minitoc-hyper}
-%\usepackage[T1]{fontenc}
 \usepackage[export]{adjustbox}
 \usepackage[hang, flushmargin]{footmisc}
 \usepackage[colorlinks,
@@ -49,7 +41,6 @@
 % resources
 \addbibresource{library.bib}
 \graphicspath{{figs/}{figs/tikz/}{figs/tikz/algorithm/}{figs/ystd/}{figs/toy/}{figs/seg/}}
-\newcommand{\matlabdir}{m/}
 \makeatletter\newcommand{\setmaxcitenames}[1]{\numdef\blx@maxcitenames{#1}}\makeatother
 \newcounter{papercount}
 \newcommand{\citefortable}[1]{%
@@ -99,6 +90,8 @@
 \newcommand{\abs}[1]{\left|#1\right|}
 \newcommand{\norm}[1]{\left|\left|#1\right|\right|}
 \newcommand{\vox}[1]{\mathbb{#1}}
+\newcommand{\et}{\thinspace}
+\newcommand{\en}{\enspace}
 % scanner stuff
 \newcommand{\sname}[1]{%
   \IfStrEqCase{#1}{%
@@ -135,8 +128,6 @@
 \renewcommand{\_}{\char`_}
 \renewcommand{\ss}[1]{\textsuperscript{#1}}
 \newcommand{\hreftt}[1]{\href{#1}{\footnotesize{\texttt{\lstinline|#1|}}}}
-\newcommand{\et}{\thinspace}
-\newcommand{\en}{\enspace}
 \renewcommand\labelitemi{\raisebox{0.2em}{\fontsize{0.3em}{0}$\blacksquare$}}
 \renewcommand\labelitemii{\raisebox{0.2em}{\fontsize{0.3em}{0}$\square$}}
 \newcommand{\medfilt}[1]{\mathrm{Med}_{#1\times#1}}
@@ -156,18 +147,6 @@
 \newlength{\sliceheight}\setlength{\sliceheight}{3.5cm}
 \newlength{\fullheight}\setlength{\fullheight}{5cm}
 \renewcommand*{\bibfont}{\footnotesize}
-% appendix
-\newcommand{\matlabsty}{\color{black}\ttfamily\footnotesize}
-\global\mdfdefinestyle{graybar}{topline=false,rightline=false,bottomline=false,linewidth=0.2em,linecolor=lightgray,innertopmargin=0pt,innerbottommargin=0pt}
-\lstnewenvironment{matlab}{%
-  \linespread{1}\mdframed[style=graybar]%
-  \lstset{style=Matlab-editor,basicstyle=\matlabsty,basewidth=0.5em}}%
-  {\endmdframed}
-\newcommand{\includecode}[1]%
-  {\subsubsection[\ttfamily{#1}]{\hspace*{-1.5em}\ttfamily{>> #1}}\label{m:#1}%
-  \begin{mdframed}[style=graybar]%
-    \lstinputlisting[style=Matlab-editor,basicstyle=\linespread{1}\matlabsty]{\matlabdir#1}%
-  \end{mdframed}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
   \include{front}

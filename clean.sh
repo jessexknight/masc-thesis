@@ -1,9 +1,12 @@
 rm *.aux
+rm *.bbl
 rm *.bcf
 rm *.blg
 rm *.lof
+rm *.log
 rm *.lot
 rm *.out
+rm *.run.xml
 rm *.synctex.gz
 rm *.toc
 rm *.txt
