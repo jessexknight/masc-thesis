@@ -110,12 +110,27 @@ and apply them in the forward or reverse directions efficiently.
 This can save significant time during cross validation,
 since the estimated parameter images $\bm{\b}(x)$ must eventually be transformed
 to the native space of every subject.
-Finally, the SPM ``New Segment'' model additionally estimates the bias field during execution
+Finally, the SPM New Segment model additionally estimates the bias field during execution
 with high accuracy, saving an additional step (cf.~\S~\ref{s:pre-bias}, below). 
 For all these reasons, the registration performed by SPM New Segment was used throughout this work.
 After satisfactory visual inspection of all training set images,
 no other registration tools were investigated.
 The default brain space of this module is MNI.
+\par
+The algorithm underlying New Segment combines several models
+in a unified probabilistic framework~\cite{Ashburner2005}.
+Graylevels are modelled using a mixture of Gaussians,
+parameterized by means $\bm{\mu}$ and covariances $\bm{\Sigma}$ (for-multi-image compatibility);
+potential bias field is modelled using a discrete cosine transform,
+parameterized by a vector $\bm{b}$;
+spatial tissue priors in MNI space are deformed according to a similar discrete cosine transform,
+parameterized by a vector $\bm{a}$~\cite{Ashburner1999}.
+The parameters of each sub-model are optimized using expectation maximization
+-- i.e.\ iteratively maximizing the likeliness of each parameter set,
+given the data (input images), while fixing the others, until convergence.
+The deformation field defined by the optimal $\bm{a}$ then gives
+the transformation from MNI space to native space,
+which can be inverted as needed.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Bias Correction}\label{s:pre-bias}
 As noted in \S~\ref{ss:autochallenges}, bias field (\textsc{aka} intensity inhomogeneity),
@@ -137,9 +152,8 @@ is perhaps the most popular, it makes minimal assumptions about the image.
 This method aims to sharpen the image histogram by dividing the image by an estimated bias field,
 parameterized by B-splines for smoothness.
 As noted above, the SPM Segment model~\cite{Ashburner2005} 
-includes integrated bias field estimation and correction.
-The bias field model in this work is parameterized by the discrete cosine transform,
-as described in in a previous work by~\citeauthor{Ashburner2005}~\cite{Ashburner1999}.
+includes integrated bias field estimation and correction,
+and models the field using a discrete cosine transform.
 The FSL Segment feature also estimates bias field in a similar overall model to SPM Segment,
 except the tissue prior probability maps in SPM are replaced with a Markov Random Field Model,
 as described in~\cite{Zhang2001}.
