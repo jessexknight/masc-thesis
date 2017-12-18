@@ -100,24 +100,24 @@ voxel-wise agreement can then be quantified using the following measures:
 \begin{itemize}
   \item \textbf{Similarity Index (SI)}
   (\textsc{aka} Dice Similarity Coefficient, F1-Score)\\
-  Measures overall segmentation performance.
+  Measures overall segmentation performance:
   \begin{equation}
-  SI = \dfrac{2TP}{2TP + FP + FN}%
-  \label{eq:si}
+    SI = \dfrac{2TP}{2TP + FP + FN}.%
+    \label{eq:si}
   \end{equation}
   \item \textbf{Precision (Pr)}
   (\textsc{aka} Overlap Fraction, Positive Predictive Value)\\
-  Fraction of predicted predicted positives which are true positives.
+  Fraction of predicted predicted positives which are true positives:
   \begin{equation}
-  Pr = \dfrac{TP}{TP+FP}% % chktex 35
-  \label{eq:pr}
+    Pr = \dfrac{TP}{TP+FP}.% % chktex 35
+    \label{eq:pr}
   \end{equation}
   \item \textbf{Recall (Re)}
   (\textsc{aka} Sensitivity, True Positive Rate)\\
-  Fraction of true positives which are predicted positive.
+  Fraction of true positives which are predicted positive:
   \begin{equation}
-  Re = \dfrac{TP}{TP+FN}%
-  \label{eq:re}
+    Re = \dfrac{TP}{TP+FN}.%
+    \label{eq:re}
   \end{equation}
 \end{itemize}
 Each measure is $\in [0,1]$, where higher is better.
