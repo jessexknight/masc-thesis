@@ -151,10 +151,10 @@ and integrated in the FreeSurfer toolbox%
 is perhaps the most popular, as it makes minimal assumptions about the image.
 This method aims to sharpen the image histogram by dividing the image by an estimated bias field,
 parameterized by B-splines for smoothness.
-As noted above, the SPM Segment model~\cite{Ashburner2005}
+As noted above, the SPM New Segment model~\cite{Ashburner2005} 
 includes integrated bias field estimation and correction,
 and models the field using a discrete cosine transform.
-The FSL Segment feature also estimates bias field in a similar overall model to SPM Segment,
+The FSL Segment feature also estimates bias field in a similar overall model to SPM New Segment,
 except the tissue prior probability maps in SPM are replaced with a Markov Random Field Model,
 as described in~\cite{Zhang2001}.
 Again, two reviews with quantitative performance comparisons
@@ -175,7 +175,7 @@ alternating conditional estimates to converge on better results overall.
 \par
 Bias field estimation was not a primary focus of this work.
 Therefore, due to the better performance over N3/4,
-and the advantages already afforded by SPM Segment for registration noted above,
+and the advantages already afforded by SPM New Segment for registration noted above,
 this model was employed for bias correction throughout this work.
 No other bias field correction tools were investigated.
 Figure~\ref{fig:pre-bias} shows a FLAIR image with conspicuous bias field,
@@ -218,7 +218,7 @@ For automated analysis of MRI images, therefore, standardization of image grayle
 Graylevel standardization can be achieved using a univariate transformation
 $\uptau:y\mapsto\tilde{y}$, defined as
 \begin{equation}
-\tilde{y} = \uptau(y),
+  \tilde{y} = \uptau(y),
 \end{equation}
 where $\uptau$ is monotonic, and considers characteristics of the input image,
 such as basic graylevel statistics or the histogram.
@@ -226,16 +226,16 @@ The histogram of an image represents the number of occurrences of each graylevel
 Normalizing the histogram by the total number of voxels $X$
 yields the the probability mass function (PMF) $f_{\sy}(y)$,
 \begin{align}
-f_{\sy}(y) &= \frac{1}{X}h_{\sy}(y)\nonumber\\
-&= \frac{1}{X}\sum_{i=1}^{X}
-\begin{cases}
-1&Y(x_i) = y\\
-0&Y(x_i) \ne y\\
-\end{cases}
+  f_{\sy}(y) &= \frac{1}{X}h_{\sy}(y)\nonumber\\
+             &= \frac{1}{X}\sum_{i=1}^{X}
+    \begin{cases}
+      1 & Y(x_i) = y\\
+      0 & Y(x_i) \ne y.\\
+    \end{cases}
 \end{align}
 The cumulative density function (CDF) $F_{\sy}(y)$ is the cumulative sum of $f_{\sy}(y)$,
 \begin{equation}
-F_{\sy}(y) = \sum_{\gamma=y_{\min}}^{y} f_{\sy}(\gamma)
+  F_{\sy}(y) = \sum_{\gamma=y_{\min}}^{y} f_{\sy}(\gamma).
 \end{equation}
 The PMF of an MRI can be decomposed into the contributions of each constituent tissue,
 as shown in Figure~\ref{fig:simflairplot}.
@@ -283,7 +283,7 @@ Previously proposed methods of standardizing MRI intensities include the followi
   This transform is defined as
   the function composition of the input CDF and the inverse target CDF,
   \begin{equation}
-    \uptau(y) = {F_{\tilde{\sy}}}^{-1}\big(F_{\sy}(y)\big)
+    \uptau(y) = {F_{\tilde{\sy}}}^{-1}\big(F_{\sy}(y)\big).
   \end{equation}
   While histogram matching yields images with different contrast characteristics than
   histogram equalization, these two methods are equivalent in their ability
@@ -296,7 +296,7 @@ Previously proposed methods of standardizing MRI intensities include the followi
   connecting the $Q$ quantiles of the input PMF $q$, with quantiles of a target PMF $r$,
   \begin{equation}
     \uptau(y) = r_i + \left(y-q_i\right)
-      \left(\frac{r_{i+1}-r_i}{q_{i+1}-q_i}\right),\quad y\in[q_i,q_{i+1}]
+      \left(\frac{r_{i+1}-r_i}{q_{i+1}-q_i}\right),\quad y\in[q_i,q_{i+1}].
     \end{equation}
   However, it can be shown that this transformation is
   a non-uniform trapezoidal Riemann approximation of true histogram matching,
@@ -340,8 +340,8 @@ the objective function $\Z_{\Delta}$ is defined as
   \Z_{\Delta} = \sum_{n=1}^{N-1}
      \begin{cases}
       1 & \C_s^{n} \ne \C_s^{n+1}\\
-      0 & \C_s^{n}  =  \C_s^{n+1}
-    \end{cases}.%
+      0 & \C_s^{n}  =  \C_s^{n+1}.
+    \end{cases}%
     \label{eq:zsep-diff}
 \end{equation}
 This function is discrete and bounded, as in
@@ -360,7 +360,7 @@ This objective function $\Z_{\star}$ can be defined as
     \frac{\min\{p(\psi \mid c=1), p(\psi \mid c=0)\}}
          {\max\{p(\psi \mid c=1), p(\psi \mid c=0)\}}\d\psi,
     \qquad p(\psi \mid c)
-      \approx \sum_{\tilde{y}\in\{\tilde{\Y}\mid c\}}\delta(\psi-\tilde{y}) \star G_{\sigma}(\psi)%
+      \approx \sum_{\tilde{y}\in\{\tilde{\Y}\mid c\}}\delta(\psi-\tilde{y}) \star G_{\sigma}(\psi).%
       \label{eq:zsep-conv}
 \end{equation}
 where $G_{\sigma}(\psi)$ is a Gaussian convolution kernel with width $\sigma$.
@@ -404,12 +404,12 @@ but many other optimization paradigms which do not require gradients could be us
 \section{Pre-Processing Summary}
 In summary, to train the VLR model,
 a set of labelled training images must first be registered to a standard brain space (MNI).
-This is achieved using the SPM Segment tool, which also produces bias corrected images.
+This is achieved using the SPM New Segment tool, which also produces bias corrected images.
 Next, image intensities are standardized using a graylevel transformation,
 to be determined in Chapter~\ref{ch-exp}.
 Training then proceeds to fit the VLR model parameters, as described in Chapter~\ref{ch-vlr}.
 \par
-At test time, SPM Segment is used again to
+At test time, SPM New Segment is used again to
 correct the bias field and estimate the registration to MNI space for a given input image.
 However, the inverse transform is now used to warp the parameter images $\bb(x)$
 from MNI space to the native space.

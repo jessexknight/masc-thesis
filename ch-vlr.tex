@@ -11,8 +11,8 @@ To review, the predicted lesion class label image $\hat{C}(x)$ is defined
 using the subject-specific features $\bY(x) = {[1,Y^1(x),\dots,Y^\sk(x)]}^T$
 and the corresponding model weights $\bb(x) = {[\b^0(x),\b^1(x),\dots,\b^\sk(x)]}^T$,
 \begin{equation}
-\hat{C}(x) = \frac{1}{1+e^{-\eta(x)}},\qquad\eta = {\bb(x)}^T\bm{Y}(x).%
-\label{eq:eq:vlrmodel}
+  \hat{C}(x) = \frac{1}{1+e^{-\eta(x)}},\qquad\eta = {\bb(x)}^T\bm{Y}(x).%
+  \label{eq:eq:vlrmodel}
 \end{equation}
 While the implementation used for experimentation in this work
 uses only one feature image ($K=1$), the FLAIR graylevel,
@@ -110,7 +110,7 @@ The optimal $\bb$ is therefore resolved by maximizing the log-likelihood,
 \begin{align}
   \bb^* &= \underset{\bb}{\arg\max}\en\L(\bb)\nonumber\\
         &= \underset{\bb}{\arg\max}\en\sum_{n=1}^{N}
-             \Big[ c_n \bb^T\by_n - \log (1+e^{\et\bb^T\by_n}) \Big]%
+             \Big[ c_n \bb^T\by_n - \log (1+e^{\et\bb^T\by_n}) \Big].%
   \label{eq:argmaxmle}
 \end{align}
 % ==================================================================================================
@@ -185,8 +185,8 @@ it is possible to reparameterize the sigmoid argument as
            &= s(y-\tau)
            \qquad\begin{cases}
              s = \b^1\\
-             \tau = -\frac{\b^0}{\b^1}
-           \end{cases}.%
+             \tau = -\frac{\b^0}{\b^1}.
+           \end{cases}%
   \label{eq:reparameterize}
 \end{align}
 In this form, the parameters $\tau$ and $s$ emerge
@@ -200,7 +200,7 @@ as shown in Figure~\ref{fig:reparam-s}.
 By contrast, varying the original parameter $\beta^1$ with $\beta^0$ constant
 (Figure~\ref{fig:reparam-b1}) results in correlation of these characteristics.
 These new parameters, and the corresponding images $\mathcal{T}(x)$ and $\mathcal{S}(x)$,
-are therefore salient descriptors of the predictive model.
+are therefore informative descriptors of the predictive model.
 \begin{figure}
   \centering
   \begin{subfigure}{\plotwidth}
@@ -259,7 +259,7 @@ can be applied to the label and FLAIR images following registration to the MNI b
 The potential benefits of this augmentation are explored in \S~\ref{ss:exp-reg}.
 %__JK__ need also to define MNI before here...?
 % ==================================================================================================
-\subsection{Classic Regularization}\label{ss:vlr-reg-lambda}
+\subsection{Parameter Norm Penalties}\label{ss:vlr-reg-lambda}
 The separable classes challenge is well-known in regression problems,
 and a good solution is to penalize the magnitude of model parameters using the $L_p$-norm:
 $\lambda\norm{\bb}_p$~\cite{Zou2005}.
@@ -275,7 +275,7 @@ and the penalty can be appended to the objective function (\ref{eq:argmaxmle}), 
   \bb^* &= \underset{\bb}{\arg\max}\en\J(\bb) \nonumber\\
         &= \underset{\bb}{\arg\max}\en\L(\bb) - \lambda\norm{\bb}_p \nonumber\\
         &= \underset{\bb}{\arg\max}\en\sum_{n=1}^{N}
-           \Big[ c_n \bb^T\by_n - \log (1+e^{\et\bb^T\by_n}) \Big] - \lambda\norm{\bb}_p%
+           \Big[ c_n \bb^T\by_n - \log (1+e^{\et\bb^T\by_n}) \Big] - \lambda\norm{\bb}_p.%
   \label{eq:argmaxmap}
 \end{align}
 Due to its relatively large gradient near zero,
@@ -292,8 +292,8 @@ and the first and second order gradients of (\ref{eq:argmaxmap}) derive easily~\
 For these reasons, only $L_2$ regularization is considered,
 yielding the following change to the Newton update expression (\ref{eq:newtonmle}),
 \begin{align}
-  \Delta\bb &=-{\nabla^2_{\bb}\J}^{-1}\nabla_{\bb}\J \nonumber\\
-            &=-{\left(\nabla^2_{\bb}\L-\lambda I\right)}^{-1}\left(\nabla_{\bb}\L-\lambda\bb\right)%
+  \Delta\bb&=-{\nabla^2_{\bb}\J}^{-1}\nabla_{\bb}\J \nonumber\\
+           &=-{\left(\nabla^2_{\bb}\L-\lambda I\right)}^{-1}\left(\nabla_{\bb}\L-\lambda\bb\right).%
   \label{eq:newtonmap}
 \end{align}
 What remains is to select an appropriate value of $\lambda$.
@@ -340,7 +340,7 @@ and the results summed to give the overall synthetic image,
 \begin{equation}
   \gamma(x) = \gamma_{\gm{}}\cdot\rho_{\gm{}}(x)
             + \gamma_{\wm{}}\cdot\rho_{\wm{}}(x)
-            + \gamma_{\csf{}}\cdot\rho_{\csf{}}(x)
+            + \gamma_{\csf{}}\cdot\rho_{\csf{}}(x).
 \end{equation}
 While WMH are not possible in either the GM or the CSF,
 it is necessary to select a FLAIR graylevel
@@ -425,7 +425,7 @@ then the ``hard'' classification between any set of classes $c$ is straightforwa
 \end{equation}
 In a 2-class logistic regression model, this simplifies to thresholding at $p$:
 \begin{equation}
-  \hat{c}^{\pi} = \begin{cases} 0 & \hat{c} < \pi \\ 1 & \hat{c} \ge \pi \end{cases},
+  \hat{c}^{\pi} = \begin{cases} 0 & \hat{c} < \pi \\ 1 & \hat{c} \ge \pi, \end{cases}
 \end{equation}
 with $\pi = 0.5$.
 However, since these assumptions are often only partially true,
@@ -483,7 +483,7 @@ In summary, the proposed algorithm uses graylevel features
 to train a logistic regression model for each voxel independently -- Voxel-Wise Logistic Regression.
 In order to train the VLR model,
 a set of labelled training images must first be registered to a standard brain space (MNI).
-This is achieved using the SPM Segment tool, which also produces bias corrected images.
+This is achieved using the SPM New Segment tool, which also produces bias corrected images.
 Next, image intensities are standardized using a graylevel transformation,
 to be determined in the next section.
 The parameter images $\bb(x)$ are then computed using iterative MAP estimation,
@@ -494,7 +494,7 @@ and minimum lesion size $\mathrm{x}_{\min}^{c}$
 are estimated using the training data.
 This completes the training phase.
 \par
-At test time, SPM Segment is used again to
+At test time, SPM New Segment is used again to
 correct the bias field and estimate the registration to MNI space for a given input image.
 However, the inverse transform is now used to warp the parameter images $\bb(x)$
 from MNI space to the native space.
@@ -534,7 +534,8 @@ the parameters of the proposed algorithm are summarized in Table~\ref{tab:hyp-ba
 The optimization of these model components will be the subject of the next chapter.
 \begin{table}
   \centering
-  \caption{Model hyperparameters and baseline values.}%
+  \caption{Model hyperparameters and baseline values.
+    The values after optimization are given in Table \ref{tab:hyp-final}}%
  \label{tab:hyp-base}
   \begin{tabular}{llccc}
   	\toprule

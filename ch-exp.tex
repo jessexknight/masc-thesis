@@ -100,24 +100,24 @@ voxel-wise agreement can then be quantified using the following measures:
 \begin{itemize}
   \item \textbf{Similarity Index (SI)}
   (\textsc{aka} Dice Similarity Coefficient, F1-Score)\\
-  Measures overall segmentation performance.
+  Measures overall segmentation performance:
   \begin{equation}
-  SI = \dfrac{2TP}{2TP + FP + FN}%
-  \label{eq:si}
+    SI = \dfrac{2TP}{2TP + FP + FN}.%
+    \label{eq:si}
   \end{equation}
   \item \textbf{Precision (Pr)}
   (\textsc{aka} Overlap Fraction, Positive Predictive Value)\\
-  Fraction of predicted predicted positives which are true positives.
+  Fraction of predicted predicted positives which are true positives:
   \begin{equation}
-  Pr = \dfrac{TP}{TP+FP}% % chktex 35
-  \label{eq:pr}
+    Pr = \dfrac{TP}{TP+FP}.% % chktex 35
+    \label{eq:pr}
   \end{equation}
   \item \textbf{Recall (Re)}
   (\textsc{aka} Sensitivity, True Positive Rate)\\
-  Fraction of true positives which are predicted positive.
+  Fraction of true positives which are predicted positive:
   \begin{equation}
-  Re = \dfrac{TP}{TP+FN}%
-  \label{eq:re}
+    Re = \dfrac{TP}{TP+FN}.%
+    \label{eq:re}
   \end{equation}
 \end{itemize}
 Each measure is $\in [0,1]$, where higher is better.
@@ -280,13 +280,13 @@ This may be due to several of the challenges noted in \S~\ref{ss:autochallenges}
 but overall highlights the difficulties of segmenting real versus simulated images.
 \par
 \begin{figure}
-  \begin{subfigure}{0.5\textwidth}
+  \begin{subfigure}{0.495\textwidth}
     \centering
     \includegraphics[width=\plotwidth]{ystd-pmf-na}
     \caption{Raw image PMFs before standardization.}%
     \label{fig:ystd-pmf-raw}
   \end{subfigure}
-  \begin{subfigure}{0.5\textwidth}
+  \begin{subfigure}{0.495\textwidth}
     \centering
     \includegraphics[width=\plotwidth]{ystd-pmf-hm123}
     \caption{Target PMFs for histogram matching operations.}%
@@ -366,7 +366,8 @@ This is illustrated for the raw images and the best performing transformation:
     \includegraphics[height=\sliceheight]{ystd-zx-naop-2.png}
     \includegraphics[height=\sliceheight]{cbar-zx-d-2}%
   }
-  \caption{Spatial depiction of $\Z_{\Delta}(x)$ and $\Z_{\star}(x)$ comparing RM1 and HM2.
+  \caption{Spatial depiction of $\Z_{\Delta}(x)$ and $\Z_{\star}(x)$ comparing raw images 
+    and images standardized using \textbf{HM3}.
   Best viewed in colour.}%
   \label{fig:jsep-diff-x-narm}
 \end{figure}
@@ -415,8 +416,7 @@ with the resulting distributions shown in Figure~\ref{fig:toy-data-pmf}.
   \label{fig:toy-data-pmf}
 \end{figure}
 % ==================================================================================================
-\subsection[Classic Regularization $\lambda$]%
-{Classic Regularization $\bm{\lambda}$}\label{ss:exp-toy-lam}
+\subsection{Parameter Norm Penalties}\label{ss:exp-toy-lam}
 Before exploring the 9 different scenarios specified above,
 it is worth illustrating the effect of $L_2$ regularization
 on the MAP objective function $\J(\bb)$ in the 2D plane composed of $\bb = [\b^0,\b^1]$.
@@ -880,7 +880,7 @@ particularly with respect to their impact on segmentation performance.
 These include:
 \begin{itemize}[itemsep=0pt,topsep=0pt]
   \item Pseudo-lesion regularization: $V$ -- number to include
-  \item Classic regularization: $\lambda$
+  \item Parameter norm penalties: $\lambda$
   \item Data augmentation:
     $\mathrm{a}_{\textsc{r}}$ -- reflection;
     $\mathrm{a}_{\textsc{s}}$ -- shift.
@@ -929,7 +929,7 @@ Recall was most improved (fewer FN) through inclusion of pseudo-lesions; this is
 since the no-lesion training voxels illustrated in Figure~\ref{fig:chmle-noles}
 maintain the ability to predict $\hat{c} > 0$ under this condition.
 This improvement came at the expense of a slight decrease in Precision.
-Conversely, Precision was greatly improved through classic regularization,
+Conversely, Precision was greatly improved through parameter norm penalties,
 with an associated decrease in Recall.
 This implies that overfitting associated with MLE estimation
 most often results in False Positives,
@@ -946,7 +946,7 @@ become less plausible as training images with small registration errors.
 Therefore, only the $\lambda$ parameter was subject to further formal investigation
 in terms of segmentation performance.
 % --------------------------------------------------------------------------------------------------
-\subsubsection{Classic Regularization}\label{sss:exp-lam}
+\subsubsection{Parameter Norm Penalties}\label{sss:exp-lam}
 Selection of the appropriate $\lambda$ was already partially explored in \S~\ref{ss:exp-toy-lam},
 where it was determined that $\lambda \in [{10}^{-3},{10}^{-2}]$ provided a good trade-off
 between limiting the magnitude of $\bb$ and maintaining MLE characteristics.
@@ -1205,7 +1205,7 @@ and an example segmentation is shown in Figure~\ref{fig:exseg}.
     S/$\mathrm{S}(x)$,
     Q/$\hat{\mathrm{C}}(x)$,
     P/$\et\cdot\et(x)$}{%
-    \begin{subfigure}{0.13\textwidth}
+    \begin{subfigure}{0.15\textwidth}
       \centering\includegraphics[height=\sliceheight]{exseg-\i.png}
       \caption{\cap}
     \end{subfigure}~}
@@ -1391,7 +1391,7 @@ the proposed VLR model directly.
 \subsection{Lesion Prediction Algorithm (LPA)}\label{ss:exp-lpa}
 The LPA algorithm is the only freely available FLAIR-only WMH segmentation tool,
 and has been used in several comparisons with other methods%
-~\cite{Egger2017,Griffanti2016,Brosch2016}%
+~\cite{Egger2017,Griffanti2016,Brosch2016}.%
 \footnote{These methods cite~\cite{Schmidt2012},
   which is the reference requested for citations related to the LST toolbox.
   The PhD thesis describing the LPA algorithm was also only published in~\citeyear{Schmidt2017}.}

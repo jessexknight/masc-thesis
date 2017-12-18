@@ -17,11 +17,11 @@ All computation in the current work was performed using the following workstatio
 \section{Manual Segmentations}
 It was necessary to create and edit a small number of binary segmentation masks during this work.
 To do this, the Editor module from the 3D Slicer imaging platform~\cite{Fedorov2012} was used,%
-\footnote{3D Slicer Editor tool documentation is available here:
+\footnote{3D Slicer Editor tool documentation is available here:\\
   \hreftt{https://www.slicer.org/wiki/Documentation/4.6/Modules/Editor}.}
 including the Wand, Paint, and Erase functions.
 Figure~\ref{fig:m08-rev-slicer} shows the user interface during a lesion segmentation.
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{m08rev-slicer.png}
   \caption{3D Slicer user interface for performing in-house manual segmentations and revisions.
@@ -128,7 +128,7 @@ before the first iteration, as in
     -\vox{Y}_n^k, & \vox{C}_n  <  0.5\\
   \end{cases},\qquad\forall\et k \in \{1,\dots,K\}.
 \end{equation}
-Next, for a given iteration $t$,the following vector-compatible expansions of Equations
+Next, for a given iteration $t$, the following vector-compatible expansions of Equations
 (\ref{eq:llgradient}), (\ref{eq:llhessian}), and (\ref{eq:newtonmap})
 yield the desired update matrix $\Delta\vox{B}^{(t)}$.
 %These calculations are performed in \nameref{m:vlrmap.m}.
@@ -172,7 +172,7 @@ Regarding notation:
              \left[\begin{array}{cc}
                \left(\vox{H}^{1,1}\ep\vox{G}^{0} - \vox{H}^{1,0}\ep\vox{G}^{1} \right) & 
                \left(\vox{H}^{0,1}\ep\vox{G}^{1} - \vox{H}^{0,0}\ep\vox{G}^{0} \right)
-             \end{array}\right]^{T}
+             \end{array}\right]^{T}.
 \end{align}
 % ==================================================================================================
 \subsection{Image Deformations}\label{ss:spmdeform}

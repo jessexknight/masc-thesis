@@ -390,7 +390,7 @@ decreasing cost and scan time in prospective studies,
 and eliminating the need for intra-subject image registration if
 sequences are acquired at different resolutions (as is often the case).
 \par
-\begin{table}[h]
+\begin{table}[ht]
   \caption{Mean inter-rater agreement measures
     for manual and semi-automated WMH segmentation reported in previous works.}%
   \label{tab:interrater-cite}
@@ -626,7 +626,7 @@ A summary of many of these works is also given in Table~\ref{tab:wmlsegtable}.%
   \caption{Summary of previous approaches to WMH segmentation
     with respect to image variability and reported performance (SI).}%
   \label{tab:wmlsegtable}
-  \footnotesize{\centering{\input{tab-priorwork}}}
+  {\renewcommand{\arraystretch}{0.98}\footnotesize{\centering{\input{tab-priorwork}}}}
 \end{table}
 % --------------------------------------------------------------------------------------------------
 \newcommand{\priorworksub}[1]{\subsubsection{#1}}
@@ -741,7 +741,7 @@ Yet, even these works do not optimally estimate the model generalization perform
 for data from new scanners, as will be discussed in \S~\ref{s:cv-frameworks}.
 Moreover, the proposed algorithms in these papers require at least three MRI sequences,
 which fails the objectives of the current work.
-\begin{table}[h]
+\begin{table}[ht]
   \newcommand{\citefortablev}[1]{{\cite{#1}}&{\citeyear{#1}}&{\citeauthor{#1}}}
   \caption{Works demonstrating excellent validation of a WMH segmentation algorithm.}%
   \label{tab:priorworkval}
@@ -857,8 +857,8 @@ given a set of features $\by = {[1,y^1,\dots,y^\sk]}^T$,
 is modelled by a logistic function,
 parameterized by a vector of feature weights $\bb = {[\b^0,\b^1,\dots,\b^\sk]}^T$,
 \begin{equation}
-P\big(c=1\mid\by;\bb\big) = \frac{1}{1+e^{-\eta}},\qquad\eta = \bb^T\by.%
-\label{eq:lrmodel-basic}
+  P\big(c=1\mid\by;\bb\big) = \frac{1}{1+e^{-\eta}},\qquad\eta = \bb^T\by.%
+  \label{eq:lrmodel-basic}
 \end{equation}
 This probability -- the estimated lesion class label --
 is denoted $\hat{c} = P(c=1\mid\by;\bb) \in [0,1]$.
@@ -978,8 +978,8 @@ yielding a separate logistic regression model for each voxel
 -- i.e. ``Voxel-wise Logistic Regression'' (VLR).
 Mathematically, this is
 \begin{equation}
-P\big(c(x)=1\mid\by(x);\bb(x)\big) = \frac{1}{1+e^{-\eta(x)}},\qquad\eta = {\bb(x)}^T\bm{Y}(x).%
-\label{eq:eq:vlrmodel-intro}
+  P\big(c(x)=1\mid\by(x);\bb(x)\big) = \frac{1}{1+e^{-\eta(x)}},\qquad\eta = {\bb(x)}^T\bm{Y}(x).%
+  \label{eq:eq:vlrmodel-intro}
 \end{equation}
 Training the VLR model then yields a complete and unique vector $\bb$ for each voxel $x$,
 or equivalently, one complete image for each parameter.
