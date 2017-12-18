@@ -32,7 +32,7 @@ such as  ``voxel-based morphometry''~\cite{Ashburner2000a}
 and analysis of functional MRI data~\cite{Smith2004}.%
 \footnote{Incidentally, investigation of these topics were the motivations
   for developing of the SPM and FSL software packages, respectively.}
-Source images from multiple subjects are usually registered to the same target image; 
+Source images from multiple subjects are usually registered to the same target image;
 in this context, it is useful to define a ``native space'' and a ``standardized space'',
 denoting the original, subject-specific geometry, and the standardized target geometry.
 By convention, the target brain space is usually either
@@ -54,7 +54,7 @@ with cross-hair shown to highlight differences in alignment corrected by the tra
     From~\cite{WMHSEG2017}.}%
   \label{fig:pre-registration}
 \end{figure}
-Parameters defining registration transforms are fitted by
+Parameters defining registration transforms are fit by
 maximizing some measure of overlap between the images~\cite{Sotiras2013}.
 Simple registration methods employ only affine transformations,
 comprising a combination of translation, scaling, and shear transformations
@@ -62,7 +62,7 @@ comprising a combination of translation, scaling, and shear transformations
 The utility of these methods for neuroimage analysis is limited,
 since there are often significant differences in brain anatomy between subjects.
 Rather, most tools parametrize a spatial warping model,
-permitting local nonlinear deformations to better match brain structures (e.g.\ 
+permitting local nonlinear deformations to better match brain structures (e.g.\
 cubic B-splines in FSL FNIRT~\cite{Andersson2007},
 discrete cosine transform in SPM Normalize~\cite{Ashburner1997,Ashburner2005},
 a general diffeomorphism in the SyN algorithm~\cite{Avants2008}).
@@ -111,7 +111,7 @@ This can save significant time during cross validation,
 since the estimated parameter images $\bm{\b}(x)$ must eventually be transformed
 to the native space of every subject.
 Finally, the SPM New Segment model additionally estimates the bias field during execution
-with high accuracy, saving an additional step (cf.~\S~\ref{s:pre-bias}, below). 
+with high accuracy, saving an additional step (cf.~\S~\ref{s:pre-bias}, below).
 For all these reasons, the registration performed by SPM New Segment was used throughout this work.
 After satisfactory visual inspection of all training set images,
 no other registration tools were investigated.
@@ -126,7 +126,7 @@ parameterized by a vector $\bm{b}$;
 spatial tissue priors in MNI space are deformed according to a similar discrete cosine transform,
 parameterized by a vector $\bm{a}$~\cite{Ashburner1999}.
 The parameters of each sub-model are optimized using expectation maximization
--- i.e.\ iteratively maximizing the likeliness of each parameter set,
+-- i.e.\ iteratively maximizing the likelihood of each parameter set,
 given the data (input images), while fixing the others, until convergence.
 The deformation field defined by the optimal $\bm{a}$ then gives
 the transformation from MNI space to native space,
@@ -148,10 +148,10 @@ several widely accepted algorithms for estimating and correcting bias field have
 The N3 algorithm~\cite{Sled1998}, subsequently updated to N4(ITK)~\cite{Tustison2010}
 and integrated in the FreeSurfer toolbox%
 \footnote{\hreftt{https://surfer.nmr.mgh.harvard.edu/}}
-is perhaps the most popular, it makes minimal assumptions about the image.
+is perhaps the most popular, as it makes minimal assumptions about the image.
 This method aims to sharpen the image histogram by dividing the image by an estimated bias field,
 parameterized by B-splines for smoothness.
-As noted above, the SPM New Segment model~\cite{Ashburner2005} 
+As noted above, the SPM New Segment model~\cite{Ashburner2005}
 includes integrated bias field estimation and correction,
 and models the field using a discrete cosine transform.
 The FSL Segment feature also estimates bias field in a similar overall model to SPM New Segment,
@@ -239,7 +239,8 @@ The cumulative density function (CDF) $F_{\sy}(y)$ is the cumulative sum of $f_{
 \end{equation}
 The PMF of an MRI can be decomposed into the contributions of each constituent tissue,
 as shown in Figure~\ref{fig:simflairplot}.
-This is the fundamental principle underlying mixture models% (cf.~\S~\ref{ss:priorproposed}).
+This is the fundamental principle underlying mixture models.
+% (cf.~\S~\ref{ss:priorproposed}).
 The goal of standardization is therefore to align these sub-distributions as closely as possible.
 \par
 Previously proposed methods of standardizing MRI intensities include the following:%
@@ -326,7 +327,7 @@ However this does not consider potential interactions
 between the standardization method and tunable downstream parameters.}
 This objective function can then be used to optimize
 any tunable parameters in each of the transforms
--- e.g.\ $\bm{\epsilon}$, $Q$, $\X_{\uptau}$ -- 
+-- e.g.\ $\bm{\epsilon}$, $Q$, $\X_{\uptau}$ --
 and also to select the best overall method.
 \par
 Two such functions are proposed.
@@ -405,7 +406,7 @@ In summary, to train the VLR model,
 a set of labelled training images must first be registered to a standard brain space (MNI).
 This is achieved using the SPM New Segment tool, which also produces bias corrected images.
 Next, image intensities are standardized using a graylevel transformation,
-to be determined in the Chapter~\ref{ch-exp}.
+to be determined in Chapter~\ref{ch-exp}.
 Training then proceeds to fit the VLR model parameters, as described in Chapter~\ref{ch-vlr}.
 \par
 At test time, SPM New Segment is used again to

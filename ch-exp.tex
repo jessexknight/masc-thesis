@@ -19,7 +19,7 @@ Except for the MS 2008%
   as described in \S~\ref{ss:m08-rev}.}
 and In-House datasets,
 all of the data are freely available as part of the segmentation competitions.
-Since direct comparison of results on equal datasets is important for establishing state-of-the-art, 
+Since direct comparison of results on equal datasets is important for establishing state-of-the-art,
 results are primarily presented using only these freely available data (``Dataset A''),
 though all the available data (``Dataset B'') are also used for some results.
 The average distribution of WMH in Dataset A is shown in Figure~\ref{fig:mean-wmh} for reference.
@@ -212,7 +212,7 @@ significantly overestimates the generalization performance.
 This is because random training fold selection allows the model
 to perceive source-specific characteristics of the test examples,
 which cannot be repeated for truly new examples.
-In such scenarios, the authors propose the following:
+In such scenarios, the author proposes the following:
 \begin{itemize}
   \item\textbf{LOSO -- Leave-One-Source-Out:}%
   \footnote{The original name used by~\citeauthor{Geras2013} % chktex 42
@@ -301,7 +301,7 @@ For transforms with tunable parameters, several selections were made.
 the target PMFs for histogram matching operations are also shown in Figure~\ref{fig:ystd-pmf-target}.
 Both standardization objective functions were then computed for all voxels,
 and averaged across the image.
-Comparison of these metrics, shown in Table~\ref{tab:ystd-exp}, permits selection of the 
+Comparison of these metrics, shown in Table~\ref{tab:ystd-exp}, permits selection of the
 best graylevel standardization technique.
 \par
 \begin{table}
@@ -564,7 +564,7 @@ in case a few aberrant voxels do not converge.
 In order to determine this number, the model was fitted
 using all available data from Dataset A, including augmentations
 (reflection: $\mathrm{a}_{\textsc{r}} = \true$ and
-shift one voxel in each dimension: $\mathrm{a}_{\textsc{s}} = \mathbf{N}_6$) 
+shift one voxel in each dimension: $\mathrm{a}_{\textsc{s}} = \mathbf{N}_6$)
 starting from the default initialization $\bb = {[0,0]}^T$ for all voxels.
 The magnitude of $\Delta\beta$ (5\ss{th} to 95\ss{th} quantiles)
 was recorded for each fitting iteration and plotted,
@@ -601,7 +601,7 @@ gives a better estimation of generalization performance.
 Practically speaking, this usually equates to a \textit{lower} estimated performance,
 since the other CV frameworks described above allow perception of test scanner characteristics
 within the training set, facilitating better performance.
-In this section, full model is trained and tested under each of the described CV frameworks,
+In this section, the full model is trained and tested under each of the described CV frameworks,
 in order to validate this assertion.
 For a fair comparison with LOSO-CV, the KF-CV condition was implemented
 using the same numbers of images in each fold.
@@ -807,7 +807,7 @@ This parametrization is denoted ``\texttt{default}'', when compared against othe
 % ==================================================================================================
 \subsection{Graylevel Standardization}\label{ss:exp-ystd-seg}
 Five graylevel standardization techniques with promising results
-predicted by the objective functions were 
+predicted by the objective functions were
 identified in \S~\ref{ss:exp-ystd-jsep} (cf.~Table~\ref{tab:ystd-exp}).
 Each of these methods was applied to Dataset A,
 yielding the contrast characteristics shown in Figure~\ref{fig:ystd-y}.
@@ -861,12 +861,12 @@ were used to select \textbf{HM3} as the optimal method going forward.
     \centering\includegraphics[scale=0.4]{ystd-box-re}
     \caption{$Re$}
   \end{subfigure}
-  \caption{Comparison of the optimized model 
+  \caption{Comparison of the optimized model
     employing each graylevel standardization technique.}%
   \label{fig:seg-box-ystd}
 \end{figure}
 These results can be rationalized using Figure~\ref{fig:ystd-y},
-where differences in image contrast produce predictable trade-offs between $Pr$ and $Re$.% chktex 35
+where differences in image contrast produce predictable trade-offs between $Pr$ and $Re$. % chktex 35
 For example, while histogram equalization (\textbf{HE}) gives good lesion contrast,
 a large number of false positives are also typically incurred in the GM,
 decreasing Precision.
@@ -891,7 +891,7 @@ since good regularizations are necessary to produce plausible parameter images
 (cf.~obvious artifacts in Figure~\ref{fig:beta-base}),
 while parameter image smoothing is similarly important.
 Therefore, unless otherwise specified,
-the default non-baseline parameter image smoothing: $G_{\sigma2}$ was throughout this section.
+the default non-baseline parameter image smoothing: $G_{\sigma2}$ was used throughout this section.
 \par
 In order to characterize the contributions of each regularization technique independently,
 each was added, one-at-a-time, to the baseline model.
@@ -948,7 +948,7 @@ in terms of segmentation performance.
 % --------------------------------------------------------------------------------------------------
 \subsubsection{Parameter Norm Penalties}\label{sss:exp-lam}
 Selection of the appropriate $\lambda$ was already partially explored in \S~\ref{ss:exp-toy-lam},
-where it was determined that $\lambda \in [{10}^{-3},{10}^{-2}]$ provided a good trade-off 
+where it was determined that $\lambda \in [{10}^{-3},{10}^{-2}]$ provided a good trade-off
 between limiting the magnitude of $\bb$ and maintaining MLE characteristics.
 A similar range of $\lambda$ was explored in the full model: $[{10}^{-5},{10}^{-1}]$.
 Exploration of the full model for each selection this time
@@ -961,7 +961,7 @@ Performance metric results are again summarized using box plots in Figure~\ref{f
   \includegraphics[scale=0.4]{lam-box-leg}\\[0.5em]
   \begin{subfigure}{0.32\textwidth}
     \centering\includegraphics[scale=0.4]{lam-box-si}
-    \caption{$SI$}% 
+    \caption{$SI$}%
     \label{fig:seg-box-lam-si}
   \end{subfigure}
   \begin{subfigure}{0.32\textwidth}
@@ -1011,7 +1011,7 @@ yielding the remaining panels in Figure~\ref{fig:beta-smooth}.
   \centering
   \begin{tabu} to 4.7\sliceheight {X[c]X[c]X[c]X[c]X[c]X[c]} % chktex 1
     $(\cdot)$ & $\medfilt{3}$ & $\medfilt{5}$ & $G_{\sigma1}$ & $G_{\sigma2}$ & $G_{\sigma3}$
-  \end{tabu}% 
+  \end{tabu}%
   \hphantom{\includegraphics[height=0.9\sliceheight]{cmap-beta-1}}\\[0.5em]
   \subfigureoverl[white]{$\mathcal{T}(x)$}{}{%
     \foreach \i in {1,2,3,4,5,6}{% % chktex 1
@@ -1088,13 +1088,13 @@ Conversely, lower threshold values are observed throughout the GM,
 and in areas of common false positives, facilitating their exclusion.
 The sensitivity image reflects the confidence of the model in the current prediction,
 and is often lower in regions of TP and FP overlap.
-For example, the boarder of the ventricles may contain hyperintensities
+For example, the border of the ventricles may contain hyperintensities
 due to WMH or flow through artifacts in dilated ventricles,
 and similarly, the corpus callosum is often bright,
 but inconsistently included by manual raters in the WMH segmentation.
 \par
 Note that $\mathcal{S}(x)$ is significantly less important for segmentation performance.
-One investigation which replaced this parameter image with it's mean value 
+One investigation which replaced this parameter image with its mean value
 saw only a 0.24 decrease in median $SI$.
 In fact, this approach mirrors the model proposed by~\citeauthor{Schmidt2017} in the LPA algorithm,
 since only the $\b^0$ term is parameterized spatially.
@@ -1233,7 +1233,7 @@ were made during model optimization ($Re = 0.63$ again),
 and Recall performance even decreases for high LL.
 This is likely attributable to the histogram matching operation,
 which begins to attenuate the WMH in images with high LL,
-due to an implicit assumption that a consistent volume of hyperintensities will 
+due to an implicit assumption that a consistent volume of hyperintensities will
 appear in the image.
 \par
 \begin{table}
