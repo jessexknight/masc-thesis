@@ -22,7 +22,7 @@ the derivations and discussions below will maintain generality for any selection
 Fitting the VLR model involves estimating $\bb$ for each voxel $x$.
 This requires some training data:
 feature vectors from a population of $N$ observations $\bY(x) = \{\bY_1(x),\dots,\bY_{\sn}(x)\}$,
-and the corresponding labels $\C(x) = \{C_1(x),\dots,C_{\sn}(x)\}$. 
+and the corresponding labels $\C(x) = \{C_1(x),\dots,C_{\sn}(x)\}$.
 As in many probabilistic models,
 parameter estimation involves maximizing the likelihood of the model, given this data --
 i.e.\ maximum likelihood estimation (MLE).
@@ -44,7 +44,7 @@ The three challenges are:
   In fact, no threshold is ever so perfect,
   and instead a level of uncertainty should be maintained around the decision boundary.
   These two cases are illustrated in Figure~\ref{fig:chmle-sep}.
-  \item\label{chmle:sparse} \textbf{Sparsely observed lesion class:} 
+  \item\label{chmle:sparse} \textbf{Sparsely observed lesion class:}
   Since WML are often distributed in consistent locations,
   many brain regions contain no lesions across the entire training dataset.
   These voxels will be termed ``healthy training'' voxels, and denoted $\X_{h}$.
@@ -56,7 +56,7 @@ The three challenges are:
   the MLE-fitted model may not maintain the ability to predict $\hat{c} = 1$ in such locations,
   regardless of the features.
   However, the ability to predict lesion should be maintained in many of these locations.
-  \item\label{chmle:noisy} \textbf{Smooth parameter images:} 
+  \item\label{chmle:noisy} \textbf{Smooth parameter images:}
   It is assumed that similar locations will contain similar training data,
   yielding smooth parameter images.
   If this assumption is sometimes invalid,
@@ -151,7 +151,7 @@ then the Newton update is given by
   \Delta\bb = -{\nabla^2_{\bb}\L}^{-1}\nabla_{\bb}\L.%
   \label{eq:newtonmle}
 \end{equation}
-In the current model, the gradient is given by 
+In the current model, the gradient is given by
 \begin{equation}
   \nabla_{\bb}\L = \sum_{n=1}^{N} \by_n\left(c_n - \hat{c}_n\right),%
   \label{eq:llgradient}
@@ -406,7 +406,7 @@ Therefore, only conventional filtering is explored in this work (cf.~\S~\ref{ss:
 \section{Post-Processing}\label{s:vlr-post}
 At this point, the motivation and details of the proposed VLR model have been presented,
 in addition to the preprocessing steps required to satisfy its assumptions.
-The last component of a segmentation pipeline typically includes post-processing. 
+The last component of a segmentation pipeline typically includes post-processing.
 In principle, this step aims to incorporate any additional knowledge of the problem
 which has not been considered in upstream elements.
 Here, these include the connected morphology of WML, and the minimum lesion size.
@@ -435,7 +435,7 @@ In fact several of the freely available toolboxes% (cf.~\S~\ref{sss:wmhsegtoolbo
 permit a user-specified threshold which can be optimized for the user's data.
 During model validation,
 this parameter should be optimized using the training data for each cross validation fold.
-It is also prudent to illustrate the sensitivity of the model to this parameter, using either 
+It is also prudent to illustrate the sensitivity of the model to this parameter, using either
 a plot of performance versus threshold~\cite{Steenwijk2013}, or
 a precision-recall (PR) curve~\cite{Arbelaez2011}.
 In the current work, both these techniques are employed:
@@ -455,7 +455,7 @@ which considers all $3\times3\times3-1=26$ candidates surrounding a given voxel 
 Ideally, the number of required connected voxels will adapt to the image resolution,
 and correspond to a minimum lesion volume.
 Typical volumes range from about $\mathrm{x}_{\min}^{c} = $
-$3.5$ mm\textsuperscript{3} in~\cite{Steenwijk2013,Fartaria2015}, to 
+$3.5$ mm\textsuperscript{3} in~\cite{Steenwijk2013,Fartaria2015}, to
 $9.0$ mm\textsuperscript{3} in~\cite{Yoo2014,Elliott2013}.
 \par
 In the current work, the inclusion of a minimum lesion size rule is explored.
