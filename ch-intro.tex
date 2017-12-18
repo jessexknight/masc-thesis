@@ -115,7 +115,7 @@ following proton excitation by an RF pulse.
 The problem is that this small signal decays very quickly due to proton dephasing,
 which occurs even faster than $T2$ would predict due to a third factor,
 inhomogeneity in the main magnetic field~\cite{Chavhan2009}.
-The time constant for this decays is termed $T2^*$,
+The time constant for this decay is termed $T2^*$,
 and its effects are usually undesirable~\cite{Chavhan2009}.
 As a result, $M_{xy}$ is easily overpowered by the magnetic moment from the RF pulse,
 even after it is turned off, due to resonance.
@@ -232,7 +232,7 @@ targeting the white matter, including
 Alzheimer's disease (AD), cerebrovascular disease, and in rare cases Multiple Sclerosis (MS).
 While the etiologies of these diseases are not yet fully understood,
 there is considerable evidence to suggest that the they are intertwined
-~\cite{Debette2010,Conklin2014,Heppner2015,Snyder2015}.
+\cite{Debette2010,Conklin2014,Heppner2015,Snyder2015}.
 \par
 Cerebrovascular disease describes changes to blood vessels in the brain which increase the risk of
 ischemic injury -- a reduction in blood flow due to vessel occlusion or hemorrhage.
@@ -266,7 +266,7 @@ and blood brain barrier disruption~\cite{Bell2009} have emerged,
 painting the picture of a more complex disease.
 \par
 The pathophysiology of multiple sclerosis is similarly unclear,
-though genetics are a necessary factor,and it is known that symptoms arise from erosion of myelin
+though genetics are a necessary factor, and it is known that symptoms arise from erosion of myelin
 -- a fatty insulating layer surrounding axons
 which is critical for normal neuron firing~\cite{Trapp2008}.
 Several theories hypothesize either that this damage is driven by
@@ -313,7 +313,7 @@ as in the 2010 McDonald Criteria~\cite{Polman2011}.
 MRI can also be used to discriminate between MS subtypes,
 which stratify disease aggression and course~\cite{Polman2011,Lublin2014,Traboulsee2015}.
 In numerous clinical trials, WMH have also been used as biomarkers of treatment efficacy
-~\cite{Sormani2013,Fahrbach2013,Ziemssen2015},
+\cite{Sormani2013,Fahrbach2013,Ziemssen2015},
 since WMH have been shown to be more sensitive to disease progression than clinical features
 in certain subtypes~\cite{ORiordan1998}.
 In fact, despite the central role of MRI in management and research of MS,
@@ -331,7 +331,7 @@ for diagnosis of vascular dementia in~\citeyear{Roman1993}~\cite{Roman1993},
 and subsequent revisions to these widely used criteria (NINCDS-ADRDA)
 have added this feature as an \textit{exclusionary} criteria for AD~\cite{Dubois2007}.
 While diagnosis of additional dementia subtypes may be improved using imaging
-~\cite{Sorbi2012,Verhagen2016}, diagnosis of the most prevalent -- AD --
+\cite{Sorbi2012,Verhagen2016}, diagnosis of the most prevalent -- AD --
 continues to be based on clinical features alone~\cite{McKhann2011}.
 As a result, WMH have not been used as an endpoint to any AD clinical trial.
 In fact, only recently have specific standards for
@@ -521,7 +521,7 @@ MICCAI (Medical Image Computing and Computer Assisted Intervention) Conference -
 and the
 ISBI (International Symposium on Biomedical Imaging) Conference --
 2015~\cite{MSISBI2015} --
-in which researchers vie to produce the best segmentation algorithms
+in which researchers vie to produce the best segmentation algorithms.
 %(for more on competitions, cf.~\S~\ref{ss:competitions}).
 \par
 This section reviews the approaches proposed in these competitions and other publications.
@@ -551,7 +551,7 @@ in which sub-tasks are completed in sequence,
 such as: pre-processing, classification, post-processing.
 This approach permits a flexible algorithm definition
 which can incorporate existing methods for individual steps.
-Most thresholding and classic supervised are implemented in this way.
+Most thresholding and classic supervised techniques are implemented in this way.
 The main drawback of this approach is that
 some steps could be improved by the results of downstream steps.
 For example, tissue classifying modules typically assume that the bias field is already corrected,
@@ -576,7 +576,7 @@ Using so-called ``end-to-end'' training, there is no guarantee that the usual su
 though such elements could be expected to develop in the internal relationships
 if they are relevant to the task at hand.
 Most deep learning models still require standardization in space and graylevel,
-and more importantly, large training datasets -- which are rare in medical imaging.
+and more importantly, large labeled training datasets -- which are rare in medical imaging.
 % --------------------------------------------------------------------------------------------------
 \subsubsection{Features}\label{sss:prior-feats}
 Features used in the above segmentation algorithms can be derived from
@@ -985,7 +985,7 @@ Training the VLR model then yields a complete and unique vector $\bb$ for each v
 or equivalently, one complete image for each parameter.
 Only one additional $\b$ is used here, again corresponding to the FLAIR graylevel.
 This formulation allows completely independent estimation of the logistic model for each voxel $x$,
-facilitating improved estimability.
+facilitating improved estimates.
 In turn, this permits essentially complete convergence in significantly less time,
 and does not require sampling approximations or smoothness assumptions
 (though methods of enforcing smoothness post hoc will be explored).
@@ -1018,7 +1018,7 @@ Chapter~\ref{ch-pre} explores the pre-processing steps
 required to satisfy the assumptions of the VLR model.
 Chapter~\ref{ch-vlr} develops the voxel-wise logistic regression model,
 including expected challenges and regularization solutions with this approach;
-Chapter~\ref{ch-exp} explores optimization of model components through experiment,
+Chapter~\ref{ch-exp} explores optimization of model components through experimentation,
 and then presents segmentation performance results under various cross validation schemes;
 Chapter~\ref{ch-conc} draws conclusions about the work,
 and highlights avenues for future investigation.
