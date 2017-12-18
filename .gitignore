@@ -16,3 +16,6 @@ tmp*
 ignore/
 m/
 outline/
+*.fdb_latexmk
+*.fls
+main-blx.bib
