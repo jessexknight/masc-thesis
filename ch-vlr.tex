@@ -55,7 +55,7 @@ The three challenges are:
   As illustrated in Figure~\ref{fig:chmle-noles},
   the MLE-fitted model may not maintain the ability to predict $\hat{c} = 1$ in such locations,
   regardless of the features.
-  However, the ability to predict lesion should be maintained in many of these locations.
+  However, the ability to predict lesions should be maintained in many of these locations.
   \item\label{chmle:noisy} \textbf{Smooth parameter images:}
   It is assumed that similar locations will contain similar training data,
   yielding smooth parameter images.
@@ -431,7 +431,8 @@ with $\pi = 0.5$.
 However, since these assumptions are often only partially true,
 most models are able to achieve better agreement with manual segmentations
 using a different threshold $\pi$ for the WMH class.
-In fact several of the freely available toolboxes% (cf.~\S~\ref{sss:wmhsegtoolboxes})
+In fact several of the freely available toolboxes
+% (cf.~\S~\ref{sss:wmhsegtoolboxes})
 permit a user-specified threshold which can be optimized for the user's data.
 During model validation,
 this parameter should be optimized using the training data for each cross validation fold.
@@ -445,7 +446,7 @@ $\pi$ is optimized on the fly, and a PR curve is given after.
 With finite image resolution and appreciable noise in MRI,
 lesions appearing as only a few connected voxels are indistinguishable from image noise,
 even by human experts.
-Such potential lesions are therefore not included in radiologists assessment of WML.
+Such potential lesions are therefore not included in radiologists' assessment of WML.
 Accordingly, most WMH segmentation algorithms employ
 a minimum-connected-voxels exclusion criterion during post-processing.
 Connectedness can be defined in 2D or 3D,
