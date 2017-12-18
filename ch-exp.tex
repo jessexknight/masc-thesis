@@ -415,8 +415,7 @@ with the resulting distributions shown in Figure~\ref{fig:toy-data-pmf}.
   \label{fig:toy-data-pmf}
 \end{figure}
 % ==================================================================================================
-\subsection[Classic Regularization]%
-{Classic Regularization $\bm{\lambda}$}\label{ss:exp-toy-lam}
+\subsection{Parameter Norm Penalties}\label{ss:exp-toy-lam}
 Before exploring the 9 different scenarios specified above,
 it is worth illustrating the effect of $L_2$ regularization
 on the MAP objective function $\J(\bb)$ in the 2D plane composed of $\bb = [\b^0,\b^1]$.
@@ -880,7 +879,7 @@ particularly with respect to their impact on segmentation performance.
 These include:
 \begin{itemize}[itemsep=0pt,topsep=0pt]
   \item Pseudo-lesion regularization: $V$ -- number to include
-  \item Classic regularization: $\lambda$
+  \item Parameter norm penalties: $\lambda$
   \item Data augmentation:
     $\mathrm{a}_{\textsc{r}}$ -- reflection;
     $\mathrm{a}_{\textsc{s}}$ -- shift.
@@ -929,7 +928,7 @@ Recall was most improved (fewer FN) through inclusion of pseudo-lesions; this is
 since the no-lesion training voxels illustrated in Figure~\ref{fig:chmle-noles}
 maintain the ability to predict $\hat{c} > 0$ under this condition.
 This improvement came at the expense of a slight decrease in Precision.
-Conversely, Precision was greatly improved through classic regularization,
+Conversely, Precision was greatly improved through parameter norm penalties,
 with an associated decrease in Recall.
 This implies that overfitting associated with MLE estimation
 most often results in False Positives,
@@ -946,7 +945,7 @@ become less plausible as training images with small registration errors.
 Therefore, only the $\lambda$ parameter was subject to further formal investigation
 in terms of segmentation performance.
 % --------------------------------------------------------------------------------------------------
-\subsubsection{Classic Regularization}\label{sss:exp-lam}
+\subsubsection{Parameter Norm Penalties}\label{sss:exp-lam}
 Selection of the appropriate $\lambda$ was already partially explored in \S~\ref{ss:exp-toy-lam},
 where it was determined that $\lambda \in [{10}^{-3},{10}^{-2}]$ provided a good trade-off 
 between limiting the magnitude of $\bb$ and maintaining MLE characteristics.
