@@ -24,7 +24,7 @@ In this section, the major contributions and conclusions are summarized.
 \subsection{Algorithm Validation}
 One of the major limitations of previous works in this area
 is the use of validation conditions which over-estimate
-the segmentation performance on images from sources
+the segmentation performance on images from sources that
 were not seen during training.
 These conditions include a small number of different image sources,
 and the use of training data which comes from the same source as the test data,
@@ -127,7 +127,7 @@ At test time, the inverse transform is applied to map the estimated parameter im
 to the native subject space for inference.
 % --------------------------------------------------------------------------------------------------
 \subsubsection{Regularization}
-Estimating independent models for every voxels drastically reduces the number of observations.
+Estimating independent models for every voxel drastically reduces the number of observations.
 This yields several challenges, namely MLE-fitted parameters which
 contradict prior knowledge about the problem, as discussed in cf.~\ref{ss:vlr-chmle}.
 To address these challenges, several regularization strategies were explored.
