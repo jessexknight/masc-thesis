@@ -212,7 +212,7 @@ significantly overestimates the generalization performance.
 This is because random training fold selection allows the model
 to perceive source-specific characteristics of the test examples,
 which cannot be repeated for truly new examples.
-In such scenarios, the authors propose the following:
+In such scenarios, the author proposes the following:
 \begin{itemize}
   \item\textbf{LOSO -- Leave-One-Source-Out:}%
   \footnote{The original name used by~\citeauthor{Geras2013} % chktex 42
@@ -601,7 +601,7 @@ gives a better estimation of generalization performance.
 Practically speaking, this usually equates to a \textit{lower} estimated performance,
 since the other CV frameworks described above allow perception of test scanner characteristics
 within the training set, facilitating better performance.
-In this section, full model is trained and tested under each of the described CV frameworks,
+In this section, the full model is trained and tested under each of the described CV frameworks,
 in order to validate this assertion.
 For a fair comparison with LOSO-CV, the KF-CV condition was implemented
 using the same numbers of images in each fold.
@@ -866,7 +866,7 @@ were used to select \textbf{HM3} as the optimal method going forward.
   \label{fig:seg-box-ystd}
 \end{figure}
 These results can be rationalized using Figure~\ref{fig:ystd-y},
-where differences in image contrast produce predictable trade-offs between $Pr$ and $Re$.% chktex 35
+where differences in image contrast produce predictable trade-offs between $Pr$ and $Re$. % chktex 35
 For example, while histogram equalization (\textbf{HE}) gives good lesion contrast,
 a large number of false positives are also typically incurred in the GM,
 decreasing Precision.
@@ -891,7 +891,7 @@ since good regularizations are necessary to produce plausible parameter images
 (cf.~obvious artifacts in Figure~\ref{fig:beta-base}),
 while parameter image smoothing is similarly important.
 Therefore, unless otherwise specified,
-the default non-baseline parameter image smoothing: $G_{\sigma2}$ was throughout this section.
+the default non-baseline parameter image smoothing: $G_{\sigma2}$ was used throughout this section.
 \par
 In order to characterize the contributions of each regularization technique independently,
 each was added, one-at-a-time, to the baseline model.
@@ -1088,13 +1088,13 @@ Conversely, lower threshold values are observed throughout the GM,
 and in areas of common false positives, facilitating their exclusion.
 The sensitivity image reflects the confidence of the model in the current prediction,
 and is often lower in regions of TP and FP overlap.
-For example, the boarder of the ventricles may contain hyperintensities
+For example, the border of the ventricles may contain hyperintensities
 due to WMH or flow through artifacts in dilated ventricles,
 and similarly, the corpus callosum is often bright,
 but inconsistently included by manual raters in the WMH segmentation.
 \par
 Note that $\mathcal{S}(x)$ is significantly less important for segmentation performance.
-One investigation which replaced this parameter image with it's mean value
+One investigation which replaced this parameter image with its mean value
 saw only a 0.24 decrease in median $SI$.
 In fact, this approach mirrors the model proposed by~\citeauthor{Schmidt2017} in the LPA algorithm,
 since only the $\b^0$ term is parameterized spatially.
