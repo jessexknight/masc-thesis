@@ -71,7 +71,7 @@ mapping a single graylevel feature to the class probabilities.
 This approach is attractive for FLAIR-only methods,
 since it mimics the basic decision making process by human experts.
 However, preliminary investigations (Figure~\ref{fig:tpfpfn-thropt}) showed how
-such techniques can incur a large number of False Positives and False Negatives, 
+such techniques can incur a large number of False Positives and False Negatives,
 even if the optimal threshold%
 \footnote{The threshold which maximizes Similarity Index with the manual segmentation.}
 is used.
@@ -138,7 +138,7 @@ reflection about the midline,
 and shifting by one voxel (1.5 mm) in MNI space.
 In addition, a zero-mean Gaussian prior on the values of $\bb$ was used,
 with variance proportional to a tunable parameter $\lambda$.
-In order to deal with the unique challenge of an unobserved class (the $c=1$ lesion class) 
+In order to deal with the unique challenge of an unobserved class (the $c=1$ lesion class)
 in many of the peripheral voxels,
 pseudo-lesions -- deterministic synthetic data points --
 were appended to the training set.
@@ -160,7 +160,7 @@ L2-priors on $\bb$, pseudo-lesions, and parameter image smoothing.
 % ==================================================================================================
 \subsection{Model Variants}
 Potential solutions to these challenges, which might be the subject of future work, include
-improved graylevel standardization and 
+improved graylevel standardization and
 inclusion of additional features (graylevel or otherwise).
 Improved graylevel standardization is perhaps the most promising,
 since there is evidence to suggest that the histogram matching method employed
@@ -234,9 +234,9 @@ including pseudo-lesion synthetic data,
 parameter constraints (typically already used),
 and preprocessing methods for ensuring consistent distributions of input data,
 might improve performance of convolutional neural networks.
-Indeed, all of the top-performing methods in the 2017 WMH Challenge 
+Indeed, all of the top-performing methods in the 2017 WMH Challenge
 already employed standardization of images in space and graylevel dimensions.
-Moreover -- perhaps more importantly -- validation of these networks 
+Moreover -- perhaps more importantly -- validation of these networks
 can and should make use of the LOSO-CV framework presented here.
 % __JK__ oops, need to add something about optimizing for identification of small lesions
 %        verses similarity index.
