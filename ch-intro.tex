@@ -22,7 +22,8 @@ and briefly introduces the algorithm proposed in this work.
 The brain is composed of three major classes of tissue:
 grey matter (GM), white matter (GM), and cerebrospinal fluid (CSF).
 Grey matter constitutes the peripheral surface of the brain
--- the cortex, approximately 5mm thick-- as well as some deeper structures called the basal ganglia.
+-- the cortex, approximately \SI{5}{\milli\metre} thick --
+as well as some deeper structures called the basal ganglia.
 It contains neuronal cell bodies, and performs the bulk of neural processing.
 The white matter is composed primarily of myelinated axons,
 and functions to relay information between different GM structures in the brain.
@@ -53,7 +54,7 @@ but they create a small magnetic field $M_z$ which is distinct from the main fie
 The aligned protons also rotate about the axis of alignment, imperfectly, like a spinning top;
 this is called precession, and the frequency of rotation is roughly homogeneous and proportional
 to the main field strength~\cite{Bloch1946}.
-If a second magnetic field is applied which is $90^{\circ}$ perpendicular to the first,
+If a second magnetic field is applied which is \ang{90} perpendicular to the first,
 and rotating at the precession frequency, the aligned protons can be forced into
 temporary alignment with this transverse rotating field, before decaying
 back towards their original state, as illustrated in Figure~\ref{fig:mridecay3d}~\cite{Bloch1946}.
@@ -92,15 +93,19 @@ yielding longer T2~\cite{Roberts2007}.
 For this reason, T2-weighted images are especially useful in identifying pathologies
 which degrade tissue structure, since they will have abnormally high T2~\cite{Roberts2007}.
 Both relaxation constants depend in a small way on the main magnetic field strength,
-measured in Tesla (T).
-T1 and T2 values for various brain tissues at 1.5T are summarized in Table~\ref{tab:t1t2tissues}.
+measured in Tesla (\si{\tesla}).
+T1 and T2 values for various brain tissues at \SI{1.5}{\tesla}
+are summarized in Table~\ref{tab:t1t2tissues}.
 \par
 \begin{table}
   \caption{T1 and T2 constants for brain tissues at 1.5 Tesla.}%
   \label{tab:t1t2tissues}
   \centering{\setlength{\tabcolsep}{2pt}
     \begin{tabular}{ccrclcrclcrclcl}\toprule
-      Tissue && \multicolumn{3}{c}{T1 (ms)} && \multicolumn{3}{c}{T2 (ms)} && \multicolumn{3}{c}{$K [H]$ (a.u.)}&& Ref\\\midrule
+      Tissue && \multicolumn{3}{c}{T1 (\si{\milli\second})}
+             && \multicolumn{3}{c}{T2 (\si{\milli\second})}
+             && \multicolumn{3}{c}{$K [H]$ (a.u.)}
+             && Ref\\\midrule
       WM  &&  719 & $\pm$ &  33 &&   73 & $\pm$ &   6 && 0.81 & $\pm$ & 0.03 &&\cite{Schmitt2004}\\
       GM  && 1165 & $\pm$ &  88 &&   92 & $\pm$ &  11 && 0.98 & $\pm$ & 0.07 &&\cite{Schmitt2004}\\
       CSF && 3337 & $\pm$ & 111 && 2562 & $\pm$ & 123 && 1.00 & $\pm$ & 0.07 &&\cite{Schmitt2004}\\
@@ -128,8 +133,8 @@ manifests again for sensing, no longer confounded by RF coil resonance~\cite{Hah
 \par
 This second signal is called the Spin Echo ($SE$),
 and the interval $2t$ is termed the echo time ($TE$).
-Reversing the direction of rotation can be achieved by a $180^{\circ}$ RF pulse
-at time $TE/2$, in the same way the original excitation is achieved using a $90^{\circ}$
+Reversing the direction of rotation can be achieved by a \ang{180} RF pulse
+at time $TE/2$, in the same way the original excitation is achieved using a \ang{90}
 RF pulse (amount of rotation is proportional to the energy of the pulse).
 Acquisition of an entire image requires repetitions of this sequence with an interval
 called the repetition time ($TR$).
@@ -176,11 +181,11 @@ making delineation of lesions -- especially periventricular ones --
 difficult in T2 images (Figure~\ref{fig:4mriT2}).
 To solve this problem, an adaptation of the spin echo RF pulse sequence can be used,
 called an inversion recovery (IR)~\cite{Bydder1985}.
-In this sequence, an additional $180^{\circ}$ inverting RF pulse is added before the
-$90^{\circ}$ pulse, so that the longitudinal magnetization $M_z$ is inverted,
+In this sequence, an additional \ang{180} inverting RF pulse is added before the
+\ang{90} pulse, so that the longitudinal magnetization $M_z$ is inverted,
 then recovers to the original state, passing for a brief moment through zero net magnetization.
 The rate of recovery is governed by $T1$, so it is tissue specific.
-Furthermore, if the $90^{\circ}$ pulse is applied at the instant of zero net magnetization,
+Furthermore, if the \ang{90} pulse is applied at the instant of zero net magnetization,
 no transverse moment will develop, nor the subsequent spin echo.
 Therefore this time interval, called the inversion time ($TI$),
 can be chosen to null the signal from any tissue with a unique $T1$.

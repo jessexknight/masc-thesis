@@ -33,7 +33,7 @@ The average distribution of WMH in Dataset A is shown in Figure~\ref{fig:mean-wm
     \begin{tabu} to \textwidth {crclX[c]X[c]X[c]cc}
     	\toprule
     	Img  &                                      &                   &                    & TE   & TR    & TI   &         Voxel Size         & Manuals  \\
-    	(\#) &                             Database &        Ref.       & Scanner            & (ms) & (ms)  & (ms) &            (mm)            &   (\#)   \\ \midrule
+    	(\#) & Database & Ref.  & Scanner & (\si{\milli\second}) & (\si{\milli\second}) & (\si{\milli\second})     &   (\si{\milli\metre})      &   (\#)   \\ \midrule
     	 20  & \sname{01} {\sclr{01}$\blacksquare$} & \cite{WMHSEG2017} & 3T Philips Achieva & 125  & 11000 & 2800 & $0.96\times0.96\times3.00$ & 1 \ss{a} \\ % chktex 2
     	 20  & \sname{02} {\sclr{02}$\blacksquare$} & \cite{WMHSEG2017} & 3T Siemens TrioTim & 82   & 9000  & 2500 & $1.00\times1.00\times3.00$ & 1 \ss{a} \\ % chktex 2
     	 20  & \sname{03} {\sclr{03}$\blacksquare$} & \cite{WMHSEG2017} & 3T GE Signa HDxt   & 126  & 8000  & 2340 & $0.98\times1.20\times3.00$ & 1 \ss{a} \\ % chktex 2
@@ -741,10 +741,10 @@ This may be attributable to their notably different TE/TR/TI parameters
 In particular, a large performance drop is observed for
 the data from Scanner 2 in the MS 2016 dataset;
 two factors may help explain these results.
-First, this is the only 1.5T scanner in the dataset,
+First, this is the only \SI{1.5}{\tesla} scanner in the dataset,
 which implies higher levels of noise due to
 smaller MR signal magnitude during image acquisition.
-Second, the median LL for these subjects was only 5 mL,
+Second, the median LL for these subjects was only \SI{5}{\milli\litre},
 which is expected to correlate with decreased performance, as noted above.
 \par
 \begin{table}
@@ -1027,7 +1027,7 @@ yielding the remaining panels in Figure~\ref{fig:beta-smooth}.
 \end{figure}
 Performance differences among the different filters
 (Figure~\ref{fig:seg-box-beta}) were not large in magnitude.
-However, the Gaussian filter with $\sigma = 2$ MNI voxels (3 mm)
+However, the Gaussian filter with $\sigma = 2$ MNI voxels (\SI{3}{\milli\metre})
 achieved statistically higher performance than all other conditions except $G_{\sigma1}$.
 This method also has the advantage of producing exceedingly smooth parameter images,
 which are less likely to contain artifacts associated with the training set.
@@ -1174,7 +1174,7 @@ and an example segmentation is shown in Figure~\ref{fig:exseg}.
   	                                 & Regularization       &         $\lambda$         &           $\Re$            &           $1\times{10}^{-3}$           \\
   	                                 & Pseudo-Lesions       &         $\bV(x)$          &    $\{\et\cdot\in\Re\}$    &             $\{y_{\max}\}$             \\
   	                                 & $\bb$ Filter         &         $F_{\bb}$         & $f: \Re(x) \mapsto \Re(x)$ & $\tilde{\bb}(x) = G_{\sigma2}(\bb(x))$ \\ \midrule
-  	\multirow{1}{*}{Post-Processing} & Min Lesion  Size     &  $\mathrm{x}_{\min}^{c}$  &  $\Re\en(\text{mm}^{3})$   &                  $1$                   \\ \bottomrule
+  	\multirow{1}{*}{Post-Processing} & Min Lesion  Size     &  $\mathrm{x}_{\min}^{c}$  &  $\Re\en(\text{\si{\milli\metre\cubed}})$   &           $0$         \\ \bottomrule
   \end{tabular}
   \tablepost{Notation.
     $\mathbb{B}$: boolean value;

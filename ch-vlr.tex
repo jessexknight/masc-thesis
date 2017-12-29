@@ -456,8 +456,8 @@ which considers all $3\times3\times3-1=26$ candidates surrounding a given voxel 
 Ideally, the number of required connected voxels will adapt to the image resolution,
 and correspond to a minimum lesion volume.
 Typical volumes range from about $\mathrm{x}_{\min}^{c} = $
-$3.5$ mm\textsuperscript{3} in~\cite{Steenwijk2013,Fartaria2015}, to
-$9.0$ mm\textsuperscript{3} in~\cite{Yoo2014,Elliott2013}.
+\SI{3.5}{\milli\metre\cubed} in~\cite{Steenwijk2013,Fartaria2015}, to
+\SI{9.0}{\milli\metre\cubed} in~\cite{Yoo2014,Elliott2013}.
 \par
 In the current work, the inclusion of a minimum lesion size rule is explored.
 The optimal value for $\mathrm{x}_{\min}^{c}$ is resolved experimentally
@@ -551,7 +551,7 @@ The optimization of these model components will be the subject of the next chapt
   	                                 & Regularization         &         $\lambda$         &           $\Re$            &            $0$            \\
   	                                 & Pseudo-Lesions         &         $\bV(x)$          &    $\{\et\cdot\in\Re\}$    &          $\{\}$           \\
   	                                 & $\bb$ Filter           &         $F_{\bb}$         & $f: \Re(x) \mapsto \Re(x)$ & $\tilde{\bb}(x) = \bb(x)$ \\ \midrule
-  	\multirow{1}{*}{Post-Processing} & Min Lesion  Size       &  $\mathrm{x}_{\min}^{c}$  &  $\Re\en(\text{mm}^{3})$   &            $0$            \\ \bottomrule
+  	\multirow{1}{*}{Post-Processing} & Min Lesion  Size       &  $\mathrm{x}_{\min}^{c}$  &  $\Re\en(\text{\si{\milli\metre\cubed}})$   & $0$      \\ \bottomrule
   	%                                & MRF Iterations         &      $N_{t}^{\mrf}$       &        $\mathbb{Z}$        &            $0$            \\
   	%                                & MRF Weights            &        $W_{\mrf}$         & $\{w_{\Delta},w_{F},w_y\}$ &        $\{1,1,1\}$
   \end{tabular}
