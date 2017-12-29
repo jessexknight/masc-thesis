@@ -126,7 +126,7 @@ which is typically much larger than $TP + FP + FN$ combined -- i.e.\ $c=1$ is a 
 \par
 Overall volume agreement between segmentations is characterized using
 the 2-way mixed-effects single-rater absolute intraclass correlation coefficient (ICC)%
-\footnote{Option \texttt{`A-1'} in the Matlab function \texttt{ICC} from
+\footnote{Option \texttt{`A-1'} in the \matlab\ function \texttt{ICC} from
   \hreftt{https://www.mathworks.com/matlabcentral/fileexchange/22099}}%
 ~\cite{Koo2016}, while trends in over/undersegmentation with lesion load
 are illustrated using Blant-Altman plots~\cite{Altman1983}.
@@ -626,7 +626,7 @@ summarized using box plots in Figure~\ref{fig:seg-box-cv}.
 The general trend in reported performance is as expected:
 LOSO-CV $<$ KF-CV $\approx$ LOO-CV $\approx$ OSAAT-CV $<$ No-CV.
 Ignoring the LL groupings (i.e.\ $N = 96$),
-a paired non-parametric statistical test (\texttt{signrank} in MATLAB)
+a paired non-parametric statistical test (\texttt{signrank} in \matlab)
 was used to test for significant differences among these conditions.
 The No-CV condition reported significantly higher performance in both $SI$ and $Re$,
 versus LOO-CV, KF-CV, and LOSO-CV, (6 of 6 comparisons).
@@ -1371,7 +1371,7 @@ are consistent with other reports in the literature (Table~\ref{tab:interrater-c
     \bottomrule
   \end{tabular}
 \end{table}
-Next, non-parametric unpaired tests (\texttt{ranksum} in MATLAB) compared
+Next, non-parametric unpaired tests (\texttt{ranksum} in \matlab) compared
 the human inter-rater $SI$ values ($n=21$, $n=315$)
 to the VLR-vs-human $SI$ values ($n=96$),
 to test for significant differences.

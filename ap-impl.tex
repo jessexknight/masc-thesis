@@ -11,7 +11,7 @@ All computation in the current work was performed using the following workstatio
   \item \textbf{RAM:} 16.0 GB DDR4
   \item \textbf{GPU:} NVIDIA GeForce GTX 980 Ti
   \item \textbf{OS:} Windows 10
-  \item \textbf{Code:} Matlab R2011a
+  \item \textbf{Code:} \matlab\ R2011a
 \end{itemize}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Manual Segmentations}
@@ -102,7 +102,7 @@ it is possible to do this in parallel, since every estimation is independent.
 To do so, the training data must first be vectorized with respect to spatial location $x$,
 and matrix operations expanded explicitly to accommodate the new dimension.
 \par
-% __JK__ add some details about gpuArray in Matlab?
+% __JK__ add some details about gpuArray in \matlab?
 To begin, the standardized training data from all subjects
 -- features $\tilde{\bm{\Y}}_{\gamma}(x)$, with $\tilde{\Y}_{\gamma}^{\et0}=1$,
 and labels $\C_{\gamma}(x)$ --
@@ -193,8 +193,8 @@ The SPM function \texttt{spm\_diffeo} can then be used
 to apply the transformation to any new image, in either the forward or reverse direction.
 The only downside to this workflow is that
 \texttt{spm\_diffeo} uses only \texttt{.nii} files for all input and output data flows,
-so the estimated $\bb(x)$ images must be written from Matlab to file before transformation,
-and loaded from file into Matlab afterwards.
+so the estimated $\bb(x)$ images must be written from \matlab\ to file before transformation,
+and loaded from file into \matlab\ afterwards.
 % ==================================================================================================
 \subsection{Half Resolution Model Estimation}\label{ss:halfres}
 Following the results from \S~\ref{sss:exp-beta-smooth},
