@@ -58,13 +58,13 @@ Parameters defining registration transforms are fit by
 maximizing some measure of overlap between the images~\cite{Sotiras2013}.
 Simple registration methods employ only affine transformations,
 comprising a combination of translation, scaling, and shear transformations
-(e.g.\ the FLIRT tool~\cite{Jenkinson2002} in FSL).
+(e.g.\ the \tool{FLIRT} tool~\cite{Jenkinson2002} in FSL).
 The utility of these methods for neuroimage analysis is limited,
 since there are often significant differences in brain anatomy between subjects.
 Rather, most tools parametrize a spatial warping model,
 permitting local nonlinear deformations to better match brain structures (e.g.\
-cubic B-splines in FSL FNIRT~\cite{Andersson2007},
-discrete cosine transform in SPM Normalize~\cite{Ashburner1997,Ashburner2005},
+cubic B-splines in FSL \tool{FNIRT}~\cite{Andersson2007},
+discrete cosine transform in SPM \tool{Normalize}~\cite{Ashburner1997,Ashburner2005},
 a general diffeomorphism in the SyN algorithm~\cite{Avants2008}).
 While these models are more difficult to fit,
 several robust algorithms have been released for general use,
@@ -88,12 +88,12 @@ As noted by~\citeauthor{Harmouche2015}~\cite{Harmouche2015}, in smoothly varying
 small registration errors can be expected to have a negligible impact.
 Therefore, registration was not a primary focus of optimization in this work.
 \par
-While the registration component of the SPM8 ``Segment'' feature~\cite{Ashburner2005}
+While the registration component of the SPM8 \tool{Segment} feature~\cite{Ashburner2005}
 was not among the top performing in the~\citeyear{Klein2009} study~\cite{Klein2009},
 subsequent implementation revisions in SPM12%
 \footnote{\hreftt{http://www.fil.ion.ucl.ac.uk/spm/software/spm12/SPM12_Release_Notes.pdf}}
-called ``New Segment'' have apparently improved results.
-In the~\citeyear{Kazemi2014} study~\cite{Kazemi2014}, the SPM12 New Segment method
+called \tool{New Segment} have apparently improved results.
+In the~\citeyear{Kazemi2014} study~\cite{Kazemi2014}, the SPM12 \tool{New Segment} method
 achieved the highest Similarity Index of all methods on real (IBSR~\cite{IBSR}) data.
 \par
 Furthermore, the SPM module has several other features amenable to this work.
@@ -110,14 +110,15 @@ and apply them in the forward or reverse directions efficiently.
 This can save significant time during cross validation,
 since the estimated parameter images $\bm{\b}(x)$ must eventually be transformed
 to the native space of every subject.
-Finally, the SPM New Segment model additionally estimates the bias field during execution
+Finally, the SPM \tool{New Segment} model additionally estimates the bias field during execution
 with high accuracy, saving an additional step (cf.~\S~\ref{s:pre-bias}, below).
-For all these reasons, the registration performed by SPM New Segment was used throughout this work.
+For all these reasons, the registration performed by SPM \tool{New Segment}
+was used throughout this work.
 After satisfactory visual inspection of all training set images,
 no other registration tools were investigated.
 The default brain space of this module is MNI.
 \par
-The algorithm underlying New Segment combines several models
+The algorithm underlying \tool{New Segment} combines several models
 in a unified probabilistic framework~\cite{Ashburner2005}.
 Graylevels are modelled using a mixture of Gaussians,
 parameterized by means $\bm{\mu}$ and covariances $\bm{\Sigma}$ (for-multi-image compatibility);
@@ -151,10 +152,11 @@ and integrated in the FreeSurfer toolbox%
 is perhaps the most popular, as it makes minimal assumptions about the image.
 This method aims to sharpen the image histogram by dividing the image by an estimated bias field,
 parameterized by B-splines for smoothness.
-As noted above, the SPM New Segment model~\cite{Ashburner2005}
+As noted above, the SPM \tool{New Segment} model~\cite{Ashburner2005}
 includes integrated bias field estimation and correction,
 and models the field using a discrete cosine transform.
-The FSL Segment feature also estimates bias field in a similar overall model to SPM New Segment,
+The FSL \tool{Segment} feature also estimates bias field
+in a similar overall model to SPM \tool{New Segment},
 except the tissue prior probability maps in SPM are replaced with a Markov Random Field Model,
 as described in~\cite{Zhang2001}.
 Again, two reviews with quantitative performance comparisons
@@ -175,13 +177,12 @@ alternating conditional estimates to converge on better results overall.
 \par
 Bias field estimation was not a primary focus of this work.
 Therefore, due to the better performance over N3/4,
-and the advantages already afforded by SPM New Segment for registration noted above,
+and the advantages already afforded by SPM \tool{New Segment} for registration noted above,
 this model was employed for bias correction throughout this work.
 No other bias field correction tools were investigated.
 Figure~\ref{fig:pre-bias} shows a FLAIR image with conspicuous bias field,
 the bias field estimated by SPM, and the corrected image.
 \par
-% could use another couple references here...
 \begin{figure}
   \centering
   \begin{subfigure}{0.3\textwidth}
@@ -411,12 +412,12 @@ Due to time constraints, these methods were not explored.
 \section{Pre-Processing Summary}
 In summary, to train the VLR model,
 a set of labelled training images must first be registered to a standard brain space (MNI).
-This is achieved using the SPM New Segment tool, which also produces bias corrected images.
+This is achieved using the SPM \tool{New Segment} tool, which also produces bias corrected images.
 Next, image intensities are standardized using a graylevel transformation,
 to be determined in Chapter~\ref{ch-exp}.
 Training then proceeds to fit the VLR model parameters, as described in Chapter~\ref{ch-vlr}.
 \par
-At test time, SPM New Segment is used again to
+At test time, SPM \tool{New Segment} is used again to
 correct the bias field and estimate the registration to MNI space for a given input image.
 However, the inverse transform is now used to warp the parameter images $\bb(x)$
 from MNI space to the native space.

@@ -486,7 +486,7 @@ In summary, the proposed algorithm uses graylevel features
 to train a logistic regression model for each voxel independently -- Voxel-Wise Logistic Regression.
 In order to train the VLR model,
 a set of labelled training images must first be registered to a standard brain space (MNI).
-This is achieved using the SPM New Segment tool, which also produces bias corrected images.
+This is achieved using the SPM \tool{New Segment} tool, which also produces bias corrected images.
 Next, image intensities are standardized using a graylevel transformation,
 to be determined in the next section.
 The parameter images $\bb(x)$ are then computed using iterative MAP estimation,
@@ -497,7 +497,7 @@ and minimum lesion size $\mathrm{x}_{\min}^{c}$
 are estimated using the training data.
 This completes the training phase.
 \par
-At test time, SPM New Segment is used again to
+At test time, SPM \tool{New Segment} is used again to
 correct the bias field and estimate the registration to MNI space for a given input image.
 However, the inverse transform is now used to warp the parameter images $\bb(x)$
 from MNI space to the native space.

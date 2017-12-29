@@ -674,9 +674,12 @@ nor has any been taken up for use in the wider research community.
 This is contrasted with other neuroimaging tasks,
 where several robust tools noted above are now regularly used in analysis pipelines -- e.g.
 N3/4~\cite{Tustison2010} for bias field correction,
-BET for brain extraction~\cite{Smith2002a},
-SPM Segment~\cite{Ashburner2005} / FSL FAST~\cite{Zhang2001} for healthy brain segmentation,
-SPM Normalize~\cite{Ashburner2005} / FSL FNIRT~\cite{Andersson2007} for registration.
+BET~\cite{Smith2002a}
+for brain extraction,
+SPM \tool{Segment}~\cite{Ashburner2005} / FSL \tool{FAST}~\cite{Zhang2001}
+for healthy brain segmentation,
+SPM \tool{Normalize}~\cite{Ashburner2005} / FSL \tool{FNIRT}~\cite{Andersson2007}
+for registration.
 \par
 Some general reasons for
 the lack of confidence placed in previous approaches will be explored in the next section.
@@ -909,7 +912,7 @@ while the other $\b$ parameters
 -- in fact there is only one: $\b^1$, corresponding to the FLAIR graylevel --
 are fixed for the entire image.
 A pre-trained version of this method was released as
-the Lesion Prediction Algorithm (LPA) in the LST toolbox.%
+the \tool{Lesion Prediction Algorithm} (LPA) in the LST toolbox.%
 \footnote{\hreftt{http://www.applied-statistics.de/lst.html}}
 \par
 This particular parametrization has significant implications for model estimation, however,
