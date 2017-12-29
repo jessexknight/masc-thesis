@@ -10,19 +10,19 @@ The segmentation performance of the full model is then presented
 under several cross validation frameworks, and compared to a similar algorithm.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Data}\label{s:data}
-For the several reasons (cf.~\ref{s:cv-frameworks})
+For the several reasons (cf.~\S~\ref{s:cv-frameworks})
 it was important to collect a large and diverse database of FLAIR images for model validation.
-Two datasets were defined using 129 FLAIR images from from 10 different scanners.
-The number of images and scan parameters are summarized in Table~\ref{tab:database}.
+A total of 129 FLAIR images from from 10 different scanners were collected;
+the number of images and scan parameters are summarized in Table~\ref{tab:database}.
 Except for the MS 2008%
-\footnote{The manual segmentations used in this dataset were generated in-house,
+\footnote{The manual segmentations used in this dataset were revised in-house,
   as described in \S~\ref{ss:m08-rev}.}
 and In-House datasets,
 all of the data are freely available as part of the segmentation competitions.
 Since direct comparison of results on equal datasets is important for establishing state-of-the-art,
-results are primarily presented using only these freely available data (``Dataset A''),
-though all the available data (``Dataset B'') are also used for some results.
-The average distribution of WMH in Dataset A is shown in Figure~\ref{fig:mean-wmh} for reference.
+all results are presented using only these freely available data (``Dataset A''),
+though all the available data are summarized for reference.
+The average distribution of WMH in Dataset A is shown in Figure~\ref{fig:mean-wmh}.
 \par
 \begin{table}[t]
   % __JK__ please excuse this large table...
@@ -43,15 +43,14 @@ The average distribution of WMH in Dataset A is shown in Figure~\ref{fig:mean-wm
     	 21  & \sname{07} {\sclr{07}$\blacksquare$} & \cite{MSISBI2015} & 3T Philips         & 68   & 11000 & 2800 & $0.43\times0.43\times3.00$ & 2 \ss{c} \\ \midrule % chktex 2
     	 13  & \sname{08} {\sclr{08}$\blacksquare$} &       ---         & 3T Philips Achieva & 125  & 9000  & 2800 & $1.00\times1.00\times1.00$ & 1 \ss{d} \\ % chktex 2
     	 10  & \sname{09} {\sclr{09}$\blacksquare$} & \cite{MSSEG2008}  & ---                & ---  & ---   & ---  & $0.50\times0.50\times0.50$ & 1 \ss{e} \\ % chktex 2
-    	 10  & \sname{10} {\sclr{10}$\blacksquare$} & \cite{MSSEG2008}  & 3T Siemens Allegra & 125  & 9000  & 2800 & $0.50\times0.50\times0.50$ & 1 \ss{f} \\ \bottomrule % chktex 2
+    	 10  & \sname{10} {\sclr{10}$\blacksquare$} & \cite{MSSEG2008}  & 3T Siemens Allegra & 125  & 9000  & 2800 & $0.50\times0.50\times0.50$ & 1 \ss{e} \\ \bottomrule % chktex 2
     \end{tabu}}
   \tablepost{\ss{a}~Manuals were generated following the standards outlined in~\cite{Caligiuri2015},
     and were subsequently reviewed by a second rater, only WMH labels were included;
     \ss{b}~Manuals were fused using the LOP-STAPLE method~\cite{Akhondi-Asl2014};
     \ss{c}~Manuals were fused using logical `and';
     \ss{d}~Manuals were generated in-house;
-    \ss{e}~[X];
-    \ss{f}~[X].}
+    \ss{e}~Manuals were revised in-house (cf.~\S~\ref{ss:m08-rev}).}
 \end{table}
 \begin{figure}
   \centering
@@ -1082,7 +1081,7 @@ corresponding to a 50\% probability of the lesion class $\hat{c}$,
 while the sensitivity image $\mathcal{S}(x)$ describes
 the rate of change in predicted probability near the threshold.
 The regions of low threshold appear to align with
-the typical distribution of lesions (cf. Figure~\ref{fig:mean-wmh}),
+the typical distribution of lesions (cf.\ Figure~\ref{fig:mean-wmh}),
 permitting even small hyperintensities in these areas to be recognized as WMH.
 Conversely, lower threshold values are observed throughout the GM,
 and in areas of common false positives, facilitating their exclusion.
