@@ -127,7 +127,8 @@ At test time, the inverse transform is applied to map the estimated parameter im
 to the native subject space for inference.
 % --------------------------------------------------------------------------------------------------
 \subsubsection{Regularization}
-Estimating independent models for every voxel drastically reduces the number of observations.
+Estimating independent models for every voxel drastically reduces the number of observations
+available to estimate each parameter.
 This yields several challenges, namely MLE-fitted parameters which
 contradict prior knowledge about the problem, as discussed in cf.~\ref{ss:vlr-chmle}.
 To address these challenges, several regularization strategies were explored.
