@@ -178,6 +178,17 @@ T1 or T2 intensities, which makes their inclusion on the logistic regression mod
 Similarly, texture features, derived from raw MRI sequences could possibly be explored,
 but the inclusion of many features significantly erodes the model interpretability,
 and there is little evidence to suggest that WMH have unique texture characteristics.
+\par
+Alternatively, the classification model (currently ``logistic regression'') could be
+replaced by a more complex, non-linear model in order to incorporate additional features,
+such as a multilayer perceptron~\cite{Hornik1989}.
+The contributions of the VLR paradigm to such a model would then derive from 
+explicit spatial parametrization of the model parameters,
+though this would imply a drastic increase in their number.
+This approach is contrasted with methods which employ spatial features (e.g.\ coordinate values)
+alongside graylevel features within the segmentation model~\cite{Valverde2017},
+and could afford improvements through
+differential regularization of conventional and spatial features.
 % ==================================================================================================
 \subsection{Open Sourcing}
 The VLR model may be of interest to other researchers, either
