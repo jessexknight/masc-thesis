@@ -231,9 +231,9 @@ are therefore informative descriptors of the predictive model.
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Regularization}\label{s:vlr-reg}
-Regularizations are
-methods of controlling 
-methods of injecting prior knowledge about the expected model into the optimization.
+Regularizations are methods of controlling the capacity of a model,
+so that it does not \textit{overfit} the training data (cf.~\S~\ref{s:cv-frameworks}).
+Often, this involves injecting prior knowledge about the expected model into the optimization.
 Assuming voxel-wise independence of model parameters requires the use of regularization strategies
 to solve the challenges outlined in \S~\ref{ss:modelfitting}.
 Several regularization methods are explored below.
@@ -253,6 +253,12 @@ For example, the space of potential $100\times100\times100$-sized images has $10
 Generating synthetic examples in this space is therefore challenging,
 especially for segmentation tasks,
 where the outputs have dimensionality roughly equal to the input.
+Recent work~\cite{Devries2017,Zhang2017} has explored interpolation
+in a lower dimensional embedding of the data,
+which has yielded both empirically plausible training examples
+and generalization performance improvements.
+However, in the current work, no such representations are readily available,
+since the segmentation model does not leverage deep learning methods.
 \par
 Alternatively, simple image manipulations can still afford model improvements~\cite{Krizhevsky2012}.
 In segmentation tasks, both the input image(s) and the corresponding label images can be
