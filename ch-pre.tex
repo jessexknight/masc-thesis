@@ -403,8 +403,10 @@ That is, a \textit{supervised graylevel standardization}.%
 If $\Z$ is differentiable, then this optimization can be performed
 using gradient descent, or similar methods.
 Unfortunately, neither of the above objective functions $\Z$ were reasonably differentiable,
-but many other optimization paradigms which do not require gradients could be used.
-% some examples? is this genetic algorithms?
+but many other optimization paradigms which do not require
+differentiable objective functions could be used
+-- e.g.\ reinforcement learning~\cite{Mnih2015} or Bayesian Optimization~\cite{Shahriari2016}.
+Due to time constraints, these methods were not explored.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Pre-Processing Summary}
 In summary, to train the VLR model,
