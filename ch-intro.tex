@@ -569,8 +569,10 @@ robust convergence issues,
 and reduced ability to include external tools.
 \par
 The final paradigm, deep learning,
-uses error back-propagation to update thousands of parameters
-in a large, relatively unstructured model mapping the input MRI to the output segmentation image.
+uses an optimization algorithm -- e.g. stochastic gradient descent~\cite{Robbins1951} --
+in conjunction with error back-propagation~\cite{Rumelhart1986}
+to update thousands of model parameters in large cascaded layers to yield
+complex, relatively unstructured mappings from the input MRI to the output segmentation image.
 Using so-called ``end-to-end'' training, there is no guarantee that the usual sub-components
 (e.g.\ bias field, tissue graylevel distributions, etc.) will be estimated,
 though such elements could be expected to develop in the internal relationships
