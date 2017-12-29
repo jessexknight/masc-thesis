@@ -132,6 +132,9 @@ conjugate gradient, iterative scaling (and variants), and dual optimization.%
 For small feature dimensionality ($K$), performance differences among the options were small.
 Classic Newton updates gave a good balance between memory requirements and computational order,
 so they are used.
+However, since computation of the exact Hessian matrix is $\mathcal{O}(K^2)$,
+addition of a few additional features can significantly increase the memory and computational
+costs of this approach.
 \par
 If the gradient $\nabla_{\bb}\L$ and Hessian matrix $\nabla^2_{\bb}\L$ are defined as
 \begin{align}
