@@ -444,7 +444,6 @@ However, since these assumptions are often only partially true,
 most models are able to achieve better agreement with manual segmentations
 using a different threshold $\pi$ for the WMH class.
 In fact several of the freely available toolboxes
-% (cf.~\S~\ref{sss:wmhsegtoolboxes})
 permit a user-specified threshold which can be optimized for the user's data.
 During model validation,
 this parameter should be optimized using the training data for each cross validation fold.
@@ -452,7 +451,8 @@ It is also prudent to illustrate the sensitivity of the model to this parameter,
 a plot of performance versus threshold~\cite{Steenwijk2013}, or
 a precision-recall (PR) curve~\cite{Arbelaez2011}.
 In the current work, both these techniques are employed:
-$\pi$ is optimized on the fly, and a PR curve is given after.
+$\pi$ is optimized using the training data in native space,
+and a PR curve is given after. % __JK__ update this on completion #57
 % ==================================================================================================
 \subsection{Minimum Lesion Size}\label{ss:vlr-minx}
 With finite image resolution and appreciable noise in MRI,
@@ -475,20 +475,6 @@ In the current work, the inclusion of a minimum lesion size rule is explored.
 The optimal value for $\mathrm{x}_{\min}^{c}$ is resolved experimentally
 during each cross validation fold, and the resulting values compared with the above conventions.
 Additionally, the gains in performance afforded by this step are quantified.
-% __JK__ I was going to include the MRF in this section too,
-% but since I really didn't investigate these in any great detail,
-% I was hoping to omit this overall. I would save a lot of time running experiments,
-% and also they never seemed to improve performance (in fact, the opposite).
-% It would require a lot more tinkering to get some good results,
-% and I don't think I'm really in that position right now.
-% __JK__
-% \subsection{Connected Morphology of WML}
-% \par...\par
-% Preliminary qualitative investigations into lesions with these characteristics
-% suggested that errors in this area were not a significant problem for the model.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% __JK__ what to do about this ugly \hat{c}^{\circ} notation from above?
-%        Keep for all references to the hard labelled images? :(
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Model Summary}
 In summary, the proposed algorithm uses graylevel features
@@ -542,7 +528,6 @@ which are distinct from those fitted during each cross validation fold
 -- i.e.\ $\bb(x)$ and $\pi$.
 Considering both the main VLR model and the pre- and post-processing aspects,
 the parameters of the proposed algorithm are summarized in Table~\ref{tab:hyp-base}.
-%and also programmatically in \nameref{m:hypdef.m}.
 The optimization of these model components will be the subject of the next chapter.
 \begin{table}
   \centering
@@ -564,8 +549,6 @@ The optimization of these model components will be the subject of the next chapt
   	                                 & Pseudo-Lesions         &         $\bV(x)$          &    $\{\et\cdot\in\Re\}$    &          $\{\}$           \\
   	                                 & $\bb$ Filter           &         $F_{\bb}$         & $f: \Re(x) \mapsto \Re(x)$ & $\tilde{\bb}(x) = \bb(x)$ \\ \midrule
   	\multirow{1}{*}{Post-Processing} & Min Lesion  Size       &  $\mathrm{x}_{\min}^{c}$  &  $\Re\en(\text{\si{\milli\metre\cubed}})$   & $0$      \\ \bottomrule
-  	%                                & MRF Iterations         &      $N_{t}^{\mrf}$       &        $\mathbb{Z}$        &            $0$            \\
-  	%                                & MRF Weights            &        $W_{\mrf}$         & $\{w_{\Delta},w_{F},w_y\}$ &        $\{1,1,1\}$
   \end{tabular}
   \tablepost{Notation.
     $\mathbb{B}$: boolean value;

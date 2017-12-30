@@ -102,7 +102,6 @@ it is possible to do this in parallel, since every estimation is independent.
 To do so, the training data must first be vectorized with respect to spatial location $x$,
 and matrix operations expanded explicitly to accommodate the new dimension.
 \par
-% __JK__ add some details about gpuArray in \matlab?
 To begin, the standardized training data from all subjects
 -- features $\tilde{\bm{\Y}}_{\gamma}(x)$, with $\tilde{\Y}_{\gamma}^{\et0}=1$,
 and labels $\C_{\gamma}(x)$ --
@@ -131,7 +130,6 @@ before the first iteration, as in
 Next, for a given iteration $t$, the following vector-compatible expansions of Equations
 (\ref{eq:llgradient}), (\ref{eq:llhessian}), and (\ref{eq:newtonmap})
 yield the desired update matrix $\Delta\vox{B}^{(t)}$.
-%These calculations are performed in \nameref{m:vlrmap.m}.
 Regarding notation:
 1.\ the iteration index ${}^{(t)}$ is omitted for clarity,
 2.\ element-wise multiplication is denoted by $\circ$, and
@@ -173,6 +171,7 @@ Regarding notation:
                \left(\vox{H}^{1,1}\ep\vox{G}^{0} - \vox{H}^{1,0}\ep\vox{G}^{1} \right) &
                \left(\vox{H}^{0,1}\ep\vox{G}^{1} - \vox{H}^{0,0}\ep\vox{G}^{0} \right)
              \end{array}\right]^{T}.
+             
 \end{align}
 % ==================================================================================================
 \subsection{Image Deformations}\label{ss:spmdeform}

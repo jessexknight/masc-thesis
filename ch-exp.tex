@@ -25,7 +25,6 @@ though all the available data are summarized for reference.
 The average distribution of WMH in Dataset A is shown in Figure~\ref{fig:mean-wmh}.
 \par
 \begin{table}[t]
-  % __JK__ please excuse this large table...
   \centering
   \caption{Summary of experimental image database.}%
   \label{tab:database}
@@ -164,9 +163,9 @@ The most popular CV frameworks include:
 Many authors also validate their model using LOO-CV,
 but only use images from a consistent source during training,
 repeating the process for all sources.
-%This only approximates performance on images from a consistent source,
-%and therefore assumes that labelled training data
-%will always be available from the use-case scanner.
+This only approximates performance on images from a consistent source,
+and therefore assumes that labelled training data
+will always be available from the use-case scanner.
 This framework can be summarized as follows:
 \begin{itemize}
   \item\textbf{OSAAT -- One-Scanner-At-A-Time:}
@@ -237,27 +236,6 @@ which will perform well on any given FLAIR MRI,
 the LOSO framework was initially developed without knowledge of the work by~\citeauthor{Geras2013}.
 However, this paper happily corroborates the importance of LOSO CV to the current work.
 In this case, one data source is defined as a unique scanner-parameter combination.
-% ==================================================================================================
-%\subsection{Competition Frameworks}\label{ss:competitions}
-%One notable exception to this trend in WMH algorithms have been
-%segmentation competitions~\cite{MSSEG2008,MSISBI2015,MSSEG2016,WMHSEG2017}.
-%These generally provide both multi-source datasets and a robust validation framework.
-%Table~\ref{tab:datacomp}
-%\begin{table}[h]
-%  \centering
-%  \caption{Summary of competition image databases.}%
-%  \label{tab:datacomp}
-%    \begin{tabu} to \textwidth {lccccc}
-%      \toprule
-%      && \multicolumn{2}{c}{Training} & \multicolumn{2}{c}{Testing} \\
-%      Database     &       Ref.        & $I$ & $S$ & $I$ & $S$ \\ \midrule
-%      WMH 2017     & \cite{WMHSEG2017} & 60  &  3  & 110 &  5  \\ % chktex 2
-%      MS 2016      & \cite{MSSEG2016}  & 15  &  3  & 38  &  4  \\ % chktex 2
-%      MS 2015 ISBI & \cite{MSISBI2015} & 21  &  1  & 61  &  1  \\ % chktex 2
-%      MS 2008      & \cite{MSSEG2008}  & 20  &  2  & 32  &  2  \\ \bottomrule % chktex 2
-%    \end{tabu}
-%\end{table}
-%\par\dots\par
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Graylevel Standardization}\label{ss:exp-ystd-jsep}
 The objective of graylevel standardization in this work is relatively simple:
@@ -296,7 +274,6 @@ but overall highlights the difficulties of segmenting real versus simulated imag
 Next, each of the graylevel standardization techniques described in \S~\ref{s:pre-ystd}
 were applied to the FLAIR intensity data.
 For transforms with tunable parameters, several selections were made.
-%as summarized in Table~\ref{tab:ystd-exp};
 the target PMFs for histogram matching operations are also shown in Figure~\ref{fig:ystd-pmf-target}.
 Both standardization objective functions were then computed for all voxels,
 and averaged across the image.
@@ -435,9 +412,6 @@ and $L(\bb)$ (Figure~\ref{fig:toy-srf-lamy}),
 yielding Figures~\ref{fig:toy-srf-lamy-3},~\ref{fig:toy-srf-lamy-2},~and~\ref{fig:toy-srf-lamy-1}.
 Thus, as expected, increasing $\lambda$ reduces the magnitudes of fitted $\bb$,
 thereby limiting the slope parameter $s = \b^1$, as desired.
-% __JK__ really this should only affect $\b^1$, and *not* $\b^0$
-% (code is implemented this way)
-% but this may add more confusion...
 \par
 \begin{figure}
   \centering
@@ -482,7 +456,6 @@ Note that a heuristic rule is used to ignore lesion observations
 which are below the mean graylevel of the non-lesion class
 -- i.e.\ the data $\{\Y_{c=1}\mid y<\mathbb{E}[\Y_{c=0}]\}$ are ignored;
 this is demonstrated in scenario f.
-%__JK__ this rule should be discussed elsewhere...?
 \par
 When the data from both classes overlap (scenarios a--c),
 the results with and without regularization are roughly the same,
@@ -775,21 +748,6 @@ which is expected to correlate with decreased performance, as noted above.
   \caption{Baseline model performance, stratified by LL tertiles.}%
   \label{fig:seg-base}
 \end{figure}
-%Figure~\ref{fig:ba-base} shows the volume agreement between
-%the manually segmented WMH and the VLR-predicted WMH.
-%As predicted by the $Pr$ and $Re$ results,
-%the model tends to underestimate the LL,
-%with underestimation getting worse for very high LL.
-%Correction of this error will be one aim of the parameter exploration in the next section.
-%\par
-%\begin{figure}
-%  \centering
-%  \includegraphics[width=\plotwidth]{base-ba-1}
-%  \includegraphics[width=\plotwidth]{base-ba-2}
-%  \caption{Bland-Altman plot showing total LL agreement between manual and VLR-segmented WMH.
-%    Shown in Log-scale to better illustrate results for small LL.}%
-%  \label{fig:ba-base}
-%\end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Full Model -- Performance Results}
 Next, the full model is trained and tested under a large variety of different conditions.
@@ -1058,21 +1016,6 @@ These details are presented in \S~\ref{ss:halfres}.
     using different $\bb(x)$ smoothing.}%
   \label{fig:seg-box-beta}
 \end{figure}
-%\begin{table}
-%  \centering
-%  \caption{Image filters investigated for smoothing the estimated parameter images.}%
-%  \label{tab:exp-filters}
-%  \begin{tabular}{l}
-%    \toprule
-%    Name          \\ \midrule
-%    $\medfilt{3}$ \\
-%    $\medfilt{5}$ \\
-%    $G_{\sigma1}$ \\
-%    $G_{\sigma2}$ \\
-%    $G_{\sigma3}$ \\
-%    $\mathrm{Bilat}_{\sigma_y}^{\sigma_x}$ \\ \bottomrule
-%  \end{tabular}
-%\end{table}
 % --------------------------------------------------------------------------------------------------
 \subsubsection{Interpretation}\label{sss:exp-beta-interp}
 The final parameter images provide concise descriptions of the VLR model.
@@ -1367,7 +1310,6 @@ are consistent with other reports in the literature (Table~\ref{tab:interrater-c
     \midrule
     \cite{MSSEG2016}  & MSSEG 2016   &  7  & 15 images & 0.63$\pm$0.16 & 0.91 \\ % chktex 2
     \cite{MSISBI2015} & MS 2015 ISBI &  2  & 21 images & 0.73$\pm$0.10 & 0.98 \\ % chktex 2
-%    ---               & Dataset A    & --- & 96 images & 0.64$\pm$0.17 & 0.58 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1512,4 +1454,3 @@ Limitations such as this will be further discussed in the next chapter.
 % ==================================================================================================
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Finally,  ... (cf.~Training / Validation / Test Sets in~\cite{Ripley1995})
