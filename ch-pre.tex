@@ -351,9 +351,10 @@ $\Z_{\Delta}\in\mathbb{Z}\left[1,\lfloor\frac{N}{2}\rfloor\right]$%
 and the lower bound is optimal -- i.e.\ $\Z_{\Delta}$ should be minimized.
 \par
 The second function is continuous, and inspired by probability theory.
-It measures the relative overlap of class distributions,
+It measures the overlap of the two class distributions,
 $p(\tilde{y}\mid c=1)$ and $p(\tilde{y}\mid c=0)$,
 estimated using kernel smoothing,
+relative to the total distribution of the data,
 as shown in Figures~\ref{fig:jsep-conv-1} and~\ref{fig:jsep-conv-2}.
 This objective function $\Z_{\star}$ can be defined as
 \begin{equation}
@@ -367,7 +368,8 @@ This objective function $\Z_{\star}$ can be defined as
 where $G_{\sigma}(\psi)$ is a Gaussian convolution kernel with width $\sigma$.
 This function is continuous and bounded, as in
 $\Z_{\Delta}\in\left[0,1\right]$,
-and the lower bound is again optimal.
+and the lower bound is again optimal,
+since data overlap between the classes is undesirable.
 \par
 \begin{figure}
   \centering
