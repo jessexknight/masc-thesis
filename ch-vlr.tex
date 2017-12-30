@@ -27,63 +27,9 @@ As in many probabilistic models,
 parameter estimation involves maximizing the likelihood of the model, given this data --
 i.e.\ maximum likelihood estimation (MLE).
 % ==================================================================================================
-\subsection{Challenges}\label{ss:vlr-chmle}
-Three major challenges emerge during model fitting.
-These challenges involve contradictions between prior knowledge
-and the fitted model using the available training data.
-That is, these challenges could all be overcome by a more complete training set,
-but this is rarely available.
-The three challenges are:
-\begin{enumerate}
-  \item\label{chmle:separable} \textbf{Separable classes:}
-  When data from two classes are perfectly separable,
-  the MLE-fitted logistic model can approach a step-function -- i.e.\ $\b^k\rightarrow+\infty$.
-  This implies that on either side of a specific graylevel threshold,
-  the model is either 100\% confident in predicting the healthy class,
-  or 100\% confident in predicting the lesion class.
-  In fact, no threshold is ever so perfect,
-  and instead a level of uncertainty should be maintained around the decision boundary.
-  These two cases are illustrated in Figure~\ref{fig:chmle-sep}.
-  \item\label{chmle:sparse} \textbf{Sparsely observed lesion class:}
-  Since WML are often distributed in consistent locations,
-  many brain regions contain no lesions across the entire training dataset.
-  These voxels will be termed ``healthy training'' voxels, and denoted $\X_{h}$.
-  In some locations, this is expected
-  (e.g.\ the GM, since by definition WMH manifest in the WM),
-  while in others, prior knowledge predicts lesions will eventually be observed
-  (e.g.\ the rest of the WM).
-  As illustrated in Figure~\ref{fig:chmle-noles},
-  the MLE-fitted model may not maintain the ability to predict $\hat{c} = 1$ in such locations,
-  regardless of the features.
-  However, the ability to predict lesions should be maintained in many of these locations.
-  \item\label{chmle:noisy} \textbf{Smooth parameter images:}
-  It is assumed that similar locations will contain similar training data,
-  yielding smooth parameter images.
-  If this assumption is sometimes invalid,
-  parameter images could contain noise or discontinuities,
-  creating artifacts in estimated lesion class images.
-\end{enumerate}
-\begin{figure}
-  \centering
-  \begin{subfigure}{\plotwidth}
-    \includegraphics[width=\textwidth]{chmle-sep}
-    \caption{Separable classes}%
-    \label{fig:chmle-sep}
-  \end{subfigure}
-  \begin{subfigure}{\plotwidth}
-    \includegraphics[width=\textwidth]{chmle-noles}
-    \caption{No lesions}%
-     \label{fig:chmle-noles}
-   \end{subfigure}
-  \caption{Challenges encountered during estimation of a logistic model.}%
-  \label{fig:chmle}
-\end{figure}
-% ==================================================================================================
 \subsection{Maximum Likelihood Estimation}
-Each parameter vector $\bb(x)$ is considered completely independent.
-Doing so greatly simplifies model fitting, but does not address the challenges described above.
-These must instead be addressed using regularization strategies,
-as discussed below in \S~\ref{s:vlr-reg}.
+Each parameter vector $\bb(x)$ is considered completely independent,
+and doing so greatly simplifies model fitting.
 In this section, ML estimation of independent parameter vectors $\bb$ is developed.
 For clarity, only a single voxel is considered -- i.e.\ $y$ from $Y(x)$, etc.
 \par
@@ -232,6 +178,58 @@ are therefore informative descriptors of the predictive model.
   \end{subfigure}
   \caption{Effect of varying the logistic model parameters.}%
   \label{fig:reparam}
+\end{figure}
+% ==================================================================================================
+\subsection{Challenges}\label{ss:vlr-chmle}
+Three major challenges emerge during model fitting.
+These challenges involve contradictions between prior knowledge
+and the fitted model using the available training data.
+That is, these challenges could all be overcome by a more complete training set,
+but this is rarely available.
+The three challenges are:
+\begin{enumerate}
+  \item\label{chmle:separable} \textbf{Separable classes:}
+  When data from two classes are perfectly separable,
+  the MLE-fitted logistic model can approach a step-function -- i.e.\ $\b^k\rightarrow+\infty$.
+  This implies that on either side of a specific graylevel threshold,
+  the model is either 100\% confident in predicting the healthy class,
+  or 100\% confident in predicting the lesion class.
+  In fact, no threshold is ever so perfect,
+  and instead a level of uncertainty is desirable around the decision boundary.
+  Figure~\ref{fig:chmle-sep} illustrates these two cases.
+  \item\label{chmle:sparse} \textbf{Sparsely observed lesion class:}
+  Since WML are often distributed in consistent locations,
+  many brain regions contain no lesions across the entire training dataset.
+  These voxels will be termed ``healthy training'' voxels, and denoted $\X_{h}$.
+  In some locations, this is expected
+  (e.g.\ the GM, since by definition WMH manifest in the WM),
+  while in others, prior knowledge predicts lesions will eventually be observed
+  (e.g.\ the rest of the WM).
+  As illustrated in Figure~\ref{fig:chmle-noles},
+  the MLE-fitted model may not maintain the ability to predict $\hat{c} = 1$ in such locations,
+  regardless of the features.
+  However, the ability to predict lesions should be maintained in many of these locations.
+  \item\label{chmle:noisy} \textbf{Smooth parameter images:}
+  It is assumed that similar locations will contain similar training data,
+  yielding smooth parameter images.
+  If this assumption is sometimes invalid,
+  parameter images could contain noise or discontinuities,
+  creating artifacts in estimated lesion class images.
+\end{enumerate}
+\begin{figure}
+  \centering
+  \begin{subfigure}{\plotwidth}
+    \includegraphics[width=\textwidth]{chmle-sep}
+    \caption{Separable classes}%
+    \label{fig:chmle-sep}
+  \end{subfigure}
+  \begin{subfigure}{\plotwidth}
+    \includegraphics[width=\textwidth]{chmle-noles}
+    \caption{No lesions}%
+    \label{fig:chmle-noles}
+  \end{subfigure}
+  \caption{Challenges encountered during estimation of a logistic model.}%
+  \label{fig:chmle}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Regularization}\label{s:vlr-reg}
