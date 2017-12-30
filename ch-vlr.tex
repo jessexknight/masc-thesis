@@ -8,7 +8,7 @@ in more detail, and explores the specific parameters and regularization strategi
 requiring optimization.
 \par
 To review, the predicted lesion class image $\hat{C}(x)$ is defined
-using the subject-specific features $\bY(x) = {[1,Y^1(x),\dots,Y^\sk(x)]}^T$
+using the subject-specific features $\bm{Y}(x) = {[1,Y^1(x),\dots,Y^\sk(x)]}^T$
 and the corresponding model weights $\bb(x) = {[\b^0(x),\b^1(x),\dots,\b^\sk(x)]}^T$,
 \begin{equation}
   \hat{C}(x) = \frac{1}{1+e^{-\eta(x)}},\qquad\eta = {\bb(x)}^T\bm{Y}(x).%
@@ -21,7 +21,7 @@ the derivations and discussions below will maintain generality for any selection
 \section{Model Fitting}\label{ss:modelfitting}
 Fitting the VLR model involves estimating $\bb$ for each voxel $x$.
 This requires some training data:
-feature vectors from a population of $N$ observations $\bY(x) = \{\bY_1(x),\dots,\bY_{\sn}(x)\}$,
+feature vectors from a population of $N$ observations $\bY(x) = \{\bm{Y}_1(x),\dots,\bm{Y}_{\sn}(x)\}$,
 and the corresponding labels $\C(x) = \{C_1(x),\dots,C_{\sn}(x)\}$.
 As in many probabilistic models,
 parameter estimation involves maximizing the likelihood of the model, given this data --
@@ -88,20 +88,24 @@ In this section, ML estimation of independent parameter vectors $\bb$ is develop
 For clarity, only a single voxel is considered -- i.e.\ $y$ from $Y(x)$, etc.
 \par
 As note above, the optimal $\bb$ for each independent voxel can be resolved using MLE.
-If the training data are also assumed to be independently observed,
+If the training data --
+features $\bY = \{\by_1,\dots,\by_{\sn}\}$ and
+labels $\C = \{c_1,\dots,c_{\sn}\}$
+-- are also assumed to be independently observed,
 then the likelihood (conditioned on the data) is defined from binomial theory as
 \begin{align}
   L(\bb\mid\C,\bY) &= \prod_{n=1}^{N} {P(c=1\mid\by_n;\bb)}^{c_n}
-                              \left(1-{P(c=1\mid\by_n;\bb)}^{1-c_n}\right)\nonumber\\
+                              {\left(1-P(c=1\mid\by_n;\bb)\right)}^{1-c_n}\nonumber\\
                    &= \prod_{n=1}^{N} \Big[\hat{c}_n^{\en c_n}
-                                   \left(1-\hat{c}_n^{\en 1-c_n}\right)\Big].%
+                                  {\left(1-\hat{c}_n\right)}^{1-c_n}\Big].%
   \label{eq:likelihood}
 \end{align}
-For computational reasons,
-it is simpler and asymptotically equivalent to maximize the log-likelihood,
+For computational reasons, it is simpler and asymptotically equivalent to
+maximize the log-likelihood, denoted $\L(\bb)$,
+with the conditioning on $\C$ and $\bY$ omitted for clarity,
 \begin{align}
   \L(\bb) &= \log{ \prod_{n=1}^{N} \Big[\hat{c}_n^{\en c_n}
-                                \left(1-\hat{c}_n^{\en 1-c_n}\right)\Big] }\nonumber\\
+                               {\left(1-\hat{c}_n\right)}^{1-c_n}\Big] }\nonumber\\
           &= \sum_{n=1}^{N} \Big[ c_n \log \hat{c}_n + (1-c_n) \log (1-\hat{c}_n) \Big] \nonumber\\
           &= \sum_{n=1}^{N} \Big[ c_n \bb^T\by_n - \log (1+e^{\bb^T\by_n}) \Big].%
   \label{eq:loglikelihood}
