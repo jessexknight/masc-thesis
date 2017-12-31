@@ -538,7 +538,7 @@ using all available data from Dataset A, including augmentations
 (reflection: $\mathrm{a}_{\textsc{r}} = \true$ and
 shift one voxel in each dimension: $\mathrm{a}_{\textsc{s}} = \mathbf{N}_6$)
 starting from the default initialization $\bb = {[0,0]}^T$ for all voxels.
-The magnitude of $\Delta\beta$ (5\ss{th} to 95\ss{th} quantiles)
+The magnitude of $\Delta\beta$ (5\% quantiles)
 was recorded for each fitting iteration and plotted,
 as shown in Figure~\ref{fig:converge}.
 \par
@@ -624,7 +624,7 @@ to provide a better estimate of expected performance.
 \par
 \begin{figure}
   \centering
-  \includegraphics[scale=0.4]{cv-box-leg}\\[0.5em]
+  \includegraphics[scale=0.5]{cv-box-leg}\\[0.5em]
   \begin{subfigure}{0.32\textwidth}
     \centering\includegraphics[scale=0.4]{cv-box-si}
     \caption{$SI$}%
@@ -695,7 +695,7 @@ during investigation of regularization strategies.
 After training and testing this version of the model under LOSO-CV,
 the median performance metrics are summarized in Table~\ref{tab:seg-base};
 the same metrics are illustrated in Figure~\ref{fig:seg-base}, stratified by LL tertiles.
-The overall median SI was 0.63, Precision 0.77, and Recall 0.63.
+The overall median SI was 0.64, Precision 0.70, and Recall 0.70.
 Considering the artifacts in Figure~\ref{fig:beta-base},
 these results are surprisingly good,
 rivalling many of the reported performances in Table~\ref{tab:priorworkval},
@@ -704,10 +704,10 @@ As is often the case, performance is correlated with LL,
 since voxel misclassifications have a larger effect
 when the number of positive examples is small.
 \par
-With $Pr > Re$, it can be inferred that % chktex 35
-the model incurs more FN than FP -- i.e.\ it is more specific than sensitive.
-This would therefore predict an underestimation of the total LL.
-The performance among the three MS 2016 scanners is also low.
+With $Pr > Re$ for high LL, it can be inferred that % chktex 35
+the model incurs more FN than FP at high LL -- i.e.\ it is more specific than sensitive.
+This would therefore predict an underestimation of the total LL in these subjects.
+The performance among the first two MS 2016 scanners is also low.
 This may be attributable to their notably different TE/TR/TI parameters
 (Table~\ref{tab:database}), which are simulated in Figure~\ref{fig:simflair}.
 In particular, a large performance drop is observed for
@@ -797,13 +797,13 @@ at low and medium LL, yielding suboptimal $SI$ performance.
 Two histogram matching operations, (\textbf{HM1} and \textbf{HM3})
 having higher contrast at the upper end of the graylevel range,
 were more successful in terms of segmentation performance.
-Considering the near equivalence of these two methods (paired $SI$ test: $p = 0.4923$),
-the objective function results from \S~\ref{ss:exp-ystd-jsep}
-were used to select \textbf{HM3} as the optimal method going forward.
+Considering both the slight advantage of \textbf{HM3} over \textbf{HM1} here,
+and the objective function results from \S~\ref{ss:exp-ystd-jsep},
+\textbf{HM3} was selected as the optimal method going forward.
 \par
 \begin{figure}
   \centering
-  \includegraphics[scale=0.4]{ystd-box-leg}
+  \includegraphics[scale=0.5]{ystd-box-leg}
   \begin{subfigure}{0.9\textwidth}
     \centering\includegraphics[scale=0.4]{ystd-box-si}
     \caption{$SI$}
@@ -857,7 +857,7 @@ The performance metrics under each condition are summarized in Figure~\ref{fig:s
 \par
 \begin{figure}
   \centering
-  \includegraphics[scale=0.4]{ovb-box-leg}\\[0.5em]
+  \includegraphics[scale=0.5]{ovb-box-leg}\\[0.5em]
   \begin{subfigure}{0.32\textwidth}
     \centering\includegraphics[scale=0.4]{ovb-box-si}
     \caption{$SI$}%
@@ -893,7 +893,7 @@ most often results in False Positives,
 which are minimized through the use of $\lambda$.
 \par
 The results in \S~\ref{ss:exp-toy-psu} demonstrated that use of additional
-pseudo lesions did not have appreciable impacts on the fitted parameters
+pseudo lesions ($V > 1$) did not have appreciable impacts on the fitted parameters
 (cf. Figure~\ref{fig:toy-psu}), so additional selections of $V$ are not presented here.
 Similarly, the reflection data augmentation is always helpful to include,
 but no further investigations are needed.
@@ -908,14 +908,14 @@ Selection of the appropriate $\lambda$ was already partially explored in \S~\ref
 where it was determined that $\lambda \in [{10}^{-3},{10}^{-2}]$ provided a good trade-off
 between limiting the magnitude of $\bb$ and maintaining MLE characteristics.
 A similar range of $\lambda$ was explored in the full model: $[{10}^{-5},{10}^{-1}]$.
-Exploration of the full model for each selection this time
+Exploration for each selection this time
 employed the final optimized model parameters summarized in Table~\ref{tab:hyp-final},
 in order to consider interactions between the different regularization strategies.
 Performance metric results are again summarized using box plots in Figure~\ref{fig:seg-box-lam}.
 \par
 \begin{figure}
   \centering
-  \includegraphics[scale=0.4]{lam-box-leg}\\[0.5em]
+  \includegraphics[scale=0.5]{lam-box-leg}\\[0.5em]
   \begin{subfigure}{0.32\textwidth}
     \centering\includegraphics[scale=0.4]{lam-box-si}
     \caption{$SI$}%
@@ -939,10 +939,8 @@ From these results, it can be seen that overal $SI$ performance
 is surprisingly robust to the definition of $\lambda$.
 This may be attributable to the effects of other regularizations,
 especially the data augmentations and parameter image smoothing.
-However, a maximum in Recall is achieved using $\lambda = 10^{-3}$.
-This is desirable, since balancing $Pr$ and $Re$ should give % chktex 35
-more accurate total LL estimates, and Recall is often much lower than Precision.
-Therefore, $\lambda = 10^{-3}$ was selected as the optimal value.
+However, a maximum in Similarity Index is achieved using $\lambda = 10^{-3}$;
+therefore, this value was selected as the optimal $\lambda$.
 % ==================================================================================================
 \subsection{Parameter Images}\label{ss:exp-beta}
 Noting the obvious artifacts in Figure~\ref{fig:beta-base},
@@ -996,7 +994,7 @@ to the model estimation procedure.
 These details are presented in \S~\ref{ss:halfres}.
 \begin{figure}
   \centering
-  \includegraphics[scale=0.4]{beta-box-leg}\\[0.5em]
+  \includegraphics[scale=0.5]{beta-box-leg}\\[0.5em]
   \begin{subfigure}{0.32\textwidth}
     \centering\includegraphics[scale=0.4]{beta-box-si}
     \caption{$SI$}%
@@ -1048,7 +1046,8 @@ afforded by the current approach are significant.
 The inspiration for the current algorithm came from the LPA algorithm by~\citeauthor{Schmidt2017}.
 In this method, the logistic regression is parametrized by only one spatial effect term: $\b^0(x)$.
 This parameter was extracted from the toolbox%
-\footnote{\texttt{sp\_mni2\_Bf2} in the \texttt{LST\_lpa\_stuff.mat} datafile from the toolbox.}
+\footnote{The variable \texttt{sp\_mni2\_Bf2}
+  in the \texttt{LST\_lpa\_stuff.mat} datafile from the toolbox.}
 and reconstructed in MNI space, for comparison with the equivalent VLR-fitted parameter image.%
 \footnote{The seven VLR model $\b^0(x)$ images from LOSO-CV folds
   using \textbf{SS} standardization were averaged,
@@ -1158,20 +1157,20 @@ and an example segmentation is shown in Figure~\ref{fig:exseg}.
 \subsection{Segmentation Performance}\label{ss:exp-finalseg}
 This section explores more detailed segmentation performance results
 associated with the final model definition.
-Median overall $SI$ performance was 0.69, a reasonable improvement over the baseline of 0.63,
+Median overall $SI$ performance was 0.69, a reasonable improvement over the baseline of 0.64,
 and only 0.02 lower than the maximum possible performance of 0.71 using no cross validation.
 As with the baseline model, results are broken down by scanner in Table~\ref{tab:seg-final},
-where it can be seen that data from ISBI 2015 and MS 2016 (2)
+where it can be seen that data from ISBI 2015 and MS 2016 (1)
 have been the major beneficiaries of model improvements.
 The same overall trends in scanner performance persist, however,
 likely due to representation imbalances,
 since there are only 5 images from each of the three MS 2016 scanners.
-The model is also still significantly more precise than sensitive,
+The model is also still more precise than sensitive,
 particularly for high LL, as shown in
 Figures~\ref{fig:seg-final-pr}~and~\ref{fig:seg-final-scat-pr}.
 Several subjects even reach near 100\% Precision.
-Conversely, no overall improvements in Recall
-were made during model optimization ($Re = 0.63$ again),
+Conversely, little overall improvements in Recall
+were made during model optimization ($Re = 0.70$ to $0.71$),
 and Recall performance even decreases for high LL.
 This is likely attributable to the histogram matching operation,
 which begins to attenuate the WMH in images with high LL,
@@ -1231,25 +1230,16 @@ appear in the image.
     and 90\% confidence interval shown in grey. Best viewed in colour.}%
   \label{fig:seg-final-scat}
 \end{figure}
-It is worth drawing attention to one consistent outlier from the WMH 2017 (1) scanner,
-for which no TP were predicted (resulting in zero for all metrics).
-The cause of this error was imperfect registration to MNI space by SPM,
-resulting in bright skull tissue within the static brain mask.
-While this did not yield any FP, due to the ability of the VLR model to exclude these regions,
-the large number of other hyperintensities in the image
-affected the histogram matching operation used for standardization,
-resulting in WMH which were much darker than usual, as noted above.
-\par
 Figure~\ref{fig:ba-final} shows the volume agreement between
 the manually segmented WMH and the VLR-estimated WMH.
 As predicted by the $Pr$ and $Re$ results, % chktex 35
 the model tends to underestimate the LL,
 with underestimation getting worse for very high LL.
-This trend is likely a result of the histogram-matching graylevel standardization,
+Again, this trend is likely a result of the histogram-matching graylevel standardization,
 since this histogram-based nonlinear transformation,
 acts to equalize the proportion of hyperintensity in every image.
 Therefore, in subjects with more hyperintensities, lesion contrast is reduced.
-This unfortunately led to a poor overall volume agreement, as measured by ICC: 0.58.
+This unfortunately led to a poor overall volume agreement, as measured by ICC: 0.71.
 \par
 \begin{figure}
   \centering
@@ -1266,7 +1256,7 @@ are presented again here in Figure~\ref{fig:tpfpfn-final}.
 The distribution of FP is now limited to the same spatial regions as TP,
 implying that practically all the problematic regions of FP shown in Figure~\ref{fig:tpfpfn-thropt}
 have been managed though the spatial parametrization.
-In fact, the distributions of FP and FN are now essentially identical,
+In fact, the distributions of FP and FN are now very similar,
 suggesting that little more can be done with the current model to distinguish these classes.
 This conclusion is also corroborated by the No-CV segmentation performance results,
 which indicate a maximum possible performance of the current model.
@@ -1281,6 +1271,39 @@ will be explored in the next chapter.
   \caption{Distribution of True Positives (TP), False Positives (FP), and False Negatives (FN)
     from all LOSO-CV folds of the final model. Best viewed in colour.}%
   \label{fig:tpfpfn-final}
+\end{figure}
+% --------------------------------------------------------------------------------------------------
+\subsubsection{Threshold Optimization}\label{sss:exp-thropt}
+The initial output from the VLR model is a probabilistic lesion class image,
+which is thresholded at a probability $\pi$
+for comparison with manual segmentation in performance analysis.
+Varying this threshold can trade sensitivity for specificity,
+and the relationship between these three parameters can be summarized in a
+Precision-Recall Curve.
+Figure~\ref{fig:curve-pr-re} gives this result,
+where each profile represents the performance metrics for an image in the dataset,
+while varying the value of $\pi$ from 0 to 1.
+The area under this curve gives an indication of the overall performance of the model,
+and in this case, the value is 0.80.
+Similarly, Figure~\ref{fig:curve-si} illustrates the effect of threshold value $\pi$
+on the overall Similarity Index,
+and implies an optimal value of $\pi$ where $SI$ is maximized.
+It is worth noting that the left-right skew of these profiles is attributable to LL,
+where lower LL favours a higher threshold to avoid false positives,
+whereas higher LL favours a lower threshold to avoid false negatives.
+\begin{figure}
+  \centering
+  \begin{subfigure}{\plotwidth}
+    \includegraphics[width=\textwidth]{curve-pr-re}
+    \caption{Precision-Recall Curve}%
+    \label{fig:curve-pr-re}
+  \end{subfigure}
+  \begin{subfigure}{\plotwidth}
+    \includegraphics[width=\textwidth]{curve-si}
+    \caption{Threshold versus Similarity Index}%
+    \label{fig:curve-si}
+  \end{subfigure}
+  \caption{Effect of the threshold $\pi$ on performance}
 \end{figure}
 % --------------------------------------------------------------------------------------------------
 \subsubsection{``Turing Test''}\label{sss:exp-turing}
@@ -1317,8 +1340,8 @@ Next, non-parametric unpaired tests (\texttt{ranksum} in \matlab) compared
 the human inter-rater $SI$ values ($n=21$, $n=315$)
 to the VLR-vs-human $SI$ values ($n=96$),
 to test for significant differences.
-Differences were significant in the MS 2015 ISBI comparison,
-but not for MS 2016 comparison.
+Differences were significant in the MS 2015 ISBI comparison ($p = 0.037$),
+but not for MS 2016 comparison ($p = 0.086$).
 This implies that the VLR algorithm was indistinguishable from the human raters
 in the MS 2016 dataset.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1351,12 +1374,12 @@ The VLR algorithm easily outperforms its LPA forerunner
 in $SI$ at small and medium LL ($p < 0.001$),
 while differences at large LL were not significant.
 Overall, median $SI$ were 0.69 and 0.58, respectively, also significantly different ($p < 0.001$).
-The VLR algorithm was also more precise at all lesion loads than the LPA algorithm ($p \le 0.001$),
-but overall had lower recall, mainly due to differences at high LL ($p < 0.001$).
+The VLR algorithm was also more precise at high lesion loads than the LPA algorithm ($p < 0.001$),
+but overall had lower recall, mainly due to significant differences at high LL ($p < 0.001$).
 \par
 \begin{figure}
   \centering
-  \includegraphics[scale=0.4]{lpa-box-leg}\\
+  \includegraphics[scale=0.5]{lpa-box-leg}\\[0.5em]
   \begin{subfigure}{0.32\textwidth}
     \centering
     \includegraphics[width=\textwidth]{lpa-box-si}
