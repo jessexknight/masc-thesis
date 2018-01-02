@@ -180,15 +180,6 @@
     \typeout{Single spaced}
     \def\mystretch{1}}	
 
-%% `vi' and `upcase' document style options.  Krishna Sethuraman (1990)
-\newcount\vithesis
-\DeclareOption{vi}{\typeout{Course VI/VIII thesis style.}\advance\vithesis by1}
-\vithesis=0
-
-\DeclareOption{upcase}{\typeout{Uppercase cover page.}
-	\gdef\choosecase#1{\uppercase\expandafter{#1}}}
-\def\choosecase#1{#1}
-
 %% leftblank option by Kevin Fu
 \newif\if@leftblank \@leftblankfalse
 
@@ -365,18 +356,14 @@
 
 % \title and \author already exist
 
-\def\prevdegrees#1{\gdef\@prevdegrees{#1}}
-\def\@prevdegrees{}
-
 \def\department#1{\gdef\@department{#1}}
 
-% If you are getting two degrees, use \and between the names.
-\def\degree#1{\setbox0\hbox{#1}	 %for side effect of setting \@degreeword
+\def\degree#1{\setbox0\hbox{#1}
   \gdef\@degree{#1}}
 
-% \and is used inside the \degree argument to separate two degrees
-\def\and{\gdef\@degreeword{degrees} \par and \par}
-\def\@degreeword{degree}
+\def\program#1{\setbox0\hbox{#1}
+  \gdef\@program{#1}}
+
 
 % The copyright notice stuff is a tremendous mess.
 %
@@ -392,32 +379,7 @@
 % copyright to ``(C) Your Name, Current Year in Roman Numerals.''
 % followed by the permission notice.
 
-% If there is no \copyrightnotice command, it is asssumed that MIT
-% holds the copyright.  This commands adds the copyright symbol to the
-% beginning, and puts the standard permission notice below.
-%% ``All rights reserved'' added.  Krishna Sethuraman (1990)
-\def\copyrightnotice#1{\copyrightnoticetext{\copyright\ #1.  All rights
-reserved.\par\permission}}
-
-% Occacionally you will need to exactly specify the text of the 
-% copyright notice.  The \copyrightnoticetext command is then useful.
-\long\def\copyrightnoticetext#1{\gdef\@copyrightnotice{#1}}
-\def\@copyrightnotice{\copyright\ \Inst\ \@degreeyear.  All rights reserved.}
-
-%% `vi' documentclass option: Specifying this option automatically
-%% copyrights the thesis to the author and gives MIT permission to copy and
-%% distribute the document.  If you want, you can still specify
-%% \copyrightnotice{stuff} to copyright to someone else, or
-%% \copyrightnoticetext{stuff} to specify the exact text of the copyright
-%% notice.
-\ifodd\vithesis \copyrightnoticetext{\copyright\ \@author,
-\uppercase\expandafter{\romannumeral\@degreeyear}.  All rights reserved.\par\permission}
-%% or just
-%%\@degreeyear}}
-\typeout{Copyright given to author,
-	permission to copy/distribute given to MIT.}
-\else \typeout{Thesis document copyright MIT unless otherwise (manually) specified}
-\fi
+\def\@copyrightnotice{\copyright~\@author,~\@degreemonth,~\@degreeyear}
 
 \def\thesisdate#1{\gdef\@thesisdate{#1}}
 
@@ -445,47 +407,23 @@ reserved.\par\permission}}
 % department chairman, not thesis committee chairman
 \def\chairman#1#2{\gdef\@chairmanname{#1}\gdef\@chairmantitle{#2}}
 
-%% `upcase' documentclass option: \choosecase is defined either as a dummy or
-%% a macro to change the (expanded) argument to uppercase.
+% generate the title page
 \def\maketitle{\begin{titlepage}
-\vskip 5\baselineskip
+\vskip 6\baselineskip
 \large
-{\def\baselinestretch{1.2}\Large\bf \choosecase{\@title} \par}
-by\par
-{\Large  \choosecase{\@author}}
-\par
-\@prevdegrees
-\par
-\choosecase{Submitted to the} \choosecase{\@department} \\
-\choosecase{in partial fulfillment of the requirements for the}
-\choosecase{\@degreeword} 
-\choosecase{of}
-\par
-\choosecase{\@degree}
-\par
-at the
-\par\INST\par
-\@degreemonth\ \@degreeyear
-\par
-\@copyrightnotice
+{\def\baselinestretch{1.2}\Large\bf \@title}
+\par by \par
+{\Large \@author} \\
+\vskip 6\baselineskip
+A Thesis \\ presented to \\ \Inst \\
+\vskip 6\baselineskip
+In partial fulfilment of requirements \\ for the degree of \\
+\@degree \\ in \\ \@program \\
 \vfill
-% __JK__
-%\par
-%\vskip 3\baselineskip
-%\signature{Author}{\@department \\ \@thesisdate}
-%\par
-%\vfill
-%\unvbox\@titlesupervisor
-%\par
-%\vfill
-%\signature{Accepted by}{\@chairmanname \\ \@chairmantitle}
-%\vfill
-% __JK__
+\City \par \@copyrightnotice
 \end{titlepage}}
 
-% this environment should probably be called abstract,
-% but we want people to also be able to get at the more
-% basic abstract environment
+% generate the abstract page
 \def\abstractpage{\cleardoublepage
 \begin{center}{\large{\bf \@title} \\
 by \\
@@ -494,7 +432,7 @@ by \\
 \def\baselinestretch{1}\@normalsize
 Submitted to the \@department \\
 on \@thesisdate, in partial fulfillment of the \\
-requirements for the \@degreeword\ of \\
+requirements for the degree of \\
 \@degree
 \end{center}
 \par
@@ -524,8 +462,8 @@ requirements for the \@degreeword\ of \\
 % The \kern0pt pushes any depth into the height.  Thanks to Richard Stone.
 \def\endtitlepage{\par\kern 0pt\egroup\vss\egroup\newpage}
 
-\def\INST{UNIVERSITY OF GUELPH}
-\def\Inst{University of Guelph}
+\def\Inst{The University of Guelph}
+\def\City{Guelph, Ontario, Canada}
 
 \def\permission{\par\noindent{\centering
    The author hereby grants to the University of Guelph permission to reproduce and to
