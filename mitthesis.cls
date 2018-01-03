@@ -322,27 +322,13 @@
 
 % Redefine '/chapter' to always start on an odd page.
 % Should make no difference in singleside mode.
-%
-\if@leftblank
-% Prints "THIS PAGE INTENTIONALLY LEFT BLANK" on blank pages.
-\def\chapter{\clearpage\ifodd\c@page\else
-   \hbox{}\par\vfill\centerline%
-   {THIS PAGE INTENTIONALLY LEFT BLANK}%
-   \vfill\newpage\fi
-   \thispagestyle{plain}	% Page style of chapter page is 'plain'
-   \global\@topnum\z@		% Prevents figures from going at top of page.
-   \@afterindentfalse		% Suppresses indent in first paragraph.  Change
-   \secdef\@chapter\@schapter}	% to \@afterindenttrue to have indent.
-\else
 \def\chapter{\cleardoublepage	% Starts new page.
    \thispagestyle{plain}	% Page style of chapter page is 'plain'
-   \global\@topnum\z@		% Prevents figures from going at top of page.
-   \@afterindentfalse		% Suppresses indent in first paragraph.  Change
+   \global\@topnum\z@		  % Prevents figures from going at top of page.
+   \@afterindentfalse		  % Suppresses indent in first paragraph.  Change
    \secdef\@chapter\@schapter}	% to \@afterindenttrue to have indent.
-\fi
 % If using the report style, use - instead of . in the figure number.
-\@ifundefined{thechapter}{}{\def\thefigure{\thechapter.\arabic{figure}}} %__JK__
-
+\@ifundefined{thechapter}{}{\def\thefigure{\thechapter.\arabic{figure}}}
 
 %%%%%%%%%  End of Style parameters %%%%
 
@@ -357,33 +343,17 @@
 % \title and \author already exist
 
 \def\department#1{\gdef\@department{#1}}
+\def\degree#1{\setbox0\hbox{#1}\gdef\@degree{#1}}
+\def\program#1{\gdef\@program{#1}}
+\def\advisor#1{\gdef\@advisor{#1}}
+\def\inst#1{\gdef\@inst{#1}}
+\def\city#1{\gdef\@city{#1}}
 
-\def\degree#1{\setbox0\hbox{#1}
-  \gdef\@degree{#1}}
-
-\def\program#1{\setbox0\hbox{#1}
-  \gdef\@program{#1}}
-
-
-% The copyright notice stuff is a tremendous mess.
-%
-% \@copyrightnotice is used by \maketitle to actually put text on the
-% page; it defaults to ``Copyright MIT 19xx.  All rights reserved.''
-% \copyrightnoticetext takes an argument and defined \@copyrightnotice
-% to that argument.  \copyrightnotice takes an argument, and calls
-% \copyrightnoticetext with that argument, preceeded by a copyright
-% symbol and followed by ``All rights reserved.'' and the standard
-% permission notice.
-% 
-% If you use the 'vi' option, \copyrightnoticetext is used to set the
-% copyright to ``(C) Your Name, Current Year in Roman Numerals.''
-% followed by the permission notice.
+% Copyright notice stuff
 
 \def\@copyrightnotice{\copyright~\@author,~\@degreemonth,~\@degreeyear}
 
 \def\thesisdate#1{\gdef\@thesisdate{#1}}
-
-% typically just a month and year
 \def\degreemonth#1{\gdef\@degreemonth{#1}}
 \def\degreeyear#1{\gdef\@degreeyear{#1}}
 
@@ -396,84 +366,43 @@
 % to \supervisor
 \newbox\@titlesupervisor 	\newbox\@abstractsupervisor
 
-\def\supervisor#1#2{\setbox\@titlesupervisor\vbox
-  {\unvbox\@titlesupervisor \vskip 10pt% plus 1fil minus 1fil
-  \def\baselinestretch{1}\large
-  \signature{Certified by}{#1 \\ #2 \\ Thesis Supervisor}}
-  \setbox\@abstractsupervisor\vbox{\unvbox\@abstractsupervisor
-  \vskip\baselineskip \def\baselinestretch{1}\@normalsize 
-  \par\noindent Thesis Supervisor: #1 \\ Title: #2}}
-
-% department chairman, not thesis committee chairman
-\def\chairman#1#2{\gdef\@chairmanname{#1}\gdef\@chairmantitle{#2}}
-
 % generate the title page
-\def\maketitle{\begin{titlepage}
-\vskip 6\baselineskip
-\large
-{\def\baselinestretch{1.2}\Large\bf \@title}
-\par by \par
-{\Large \@author} \\
-\vskip 6\baselineskip
-A Thesis \\ presented to \\ \Inst \\
-\vskip 6\baselineskip
-In partial fulfilment of requirements \\ for the degree of \\
-\@degree \\ in \\ \@program \\
-\vfill
-\City \par \@copyrightnotice
-\end{titlepage}}
+\def\maketitle{
+\begin{singlespace}
+  \begin{center}
+    \large
+    \vspace*{6em}
+    {\def\baselinestretch{1.2}\Large\bf \@title}
+    \par by \par
+    {\Large \@author} \\
+    \vspace*{5em}
+    A Thesis \\ presented to \\ \@inst \\
+    \vspace*{5em}
+    In partial fulfilment of requirements \\ for the degree of \\
+    \@degree \\ in \\ \@program \\
+    \vfill
+    \@city \par \@copyrightnotice\\
+  \end{center}
+\end{singlespace}}
 
 % generate the abstract page
 \def\abstractpage{\cleardoublepage
-\begin{center}{\large{\bf \@title} \\
-by \\
-\@author \\[\baselineskip]}
-\par
-\def\baselinestretch{1}\@normalsize
-Submitted to the \@department \\
-on \@thesisdate, in partial fulfillment of the \\
-requirements for the degree of \\
-\@degree
-\end{center}
-\par
+\begin{singlespace}
+  \begin{center}
+    \uppercase{abstract}\\[3em]
+    \bf{\uppercase\expandafter{\@title}}\\[3em]
+  \end{center}
+  \parbox{0.70\textwidth}{\@author\\\@inst,~\@degreeyear}
+  \parbox{0.28\textwidth}{Advisor:\\\@advisor}
+\end{singlespace}
+\vspace*{3em}
 \begin{abstract}}
 
-%% Changed from \unvbox to \unvcopy for use with multiple copies of abstract
-%% page.
-%% Krishna Sethuraman (1990)
-\def\endabstractpage{\end{abstract}\newpage} %__JK__
-% \unvcopy\@abstractsupervisor \newpage}
-%\def\endabstractpage{\end{abstract}\noindent
-% \unvcopy\@abstractsupervisor \newpage}
-
-%% This counter is used to save the page number for the second copy of
-%% the abstract.
-\newcounter{savepage}
-
-% You can use the titlepage environment to do it all yourself if you
-% don't want to use \maketitle.  If the titlepage environment, the
-% paragraph skip is infinitely stretchable, so if you leave a blank line
-% between lines that you want space between, the space will stretch so
-% that the title page fills up the entire page.
-\def\titlepage{\cleardoublepage\centering
-  \thispagestyle{empty}
-  \parindent 0pt \parskip 10pt plus 1fil minus 1fil
-  \def\baselinestretch{1}\@normalsize\vbox to \vsize\bgroup\vbox to 9in\bgroup}
-% The \kern0pt pushes any depth into the height.  Thanks to Richard Stone.
-\def\endtitlepage{\par\kern 0pt\egroup\vss\egroup\newpage}
-
-\def\Inst{The University of Guelph}
-\def\City{Guelph, Ontario, Canada}
-
-\def\permission{\par\noindent{\centering
-   The author hereby grants to the University of Guelph permission to reproduce and to
-   distribute publicly paper and electronic copies of this thesis
-   document in whole or in part in any medium now known or hereafter
-   created.}\par}
+\def\endabstractpage{\end{abstract}\newpage}
 
 \def\signature#1#2{\par\noindent#1\dotfill\null\\*
   {\raggedleft #2\par}}
 
-\def\abstract{\subsection*{Abstract}\small\def\baselinestretch{1}\@normalsize}
+\def\abstract{\def\baselinestretch{1}\@normalsize}
 \def\endabstract{\par}
 
