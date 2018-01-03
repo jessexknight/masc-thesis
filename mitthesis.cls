@@ -368,6 +368,7 @@
 
 % generate the title page
 \def\maketitle{
+\thispagestyle{empty}
 \begin{singlespace}
   \begin{center}
     \large
@@ -386,7 +387,8 @@
 \end{singlespace}}
 
 % generate the abstract page
-\def\abstractpage{\cleardoublepage
+\def\abstractpage{
+\thispagestyle{empty}
 \begin{singlespace}
   \begin{center}
     \uppercase{abstract}\\[3em]
