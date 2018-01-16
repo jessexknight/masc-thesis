@@ -62,5 +62,11 @@ Additionally, the proposed algorithm will be deployed as a 3D Slicer application
 for use by clinicians and researchers,
 and source code for all investigations will be released on GitHub.
 
+#### Compiling
 
+$ `pdflatex main.tex && bibtex main.aux && pdflatex main.tex`
+
+Tested with: Ubuntu 16.04 & pdfTeX 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian)
+
+Cleaning: $ `./clean.sh`
 
