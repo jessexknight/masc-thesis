@@ -394,8 +394,8 @@
     \uppercase{abstract}\\[3em]
     \bf{\uppercase\expandafter{\@title}}\\[3em]
   \end{center}
-  \parbox{0.70\textwidth}{\@author\\\@inst,~\@degreeyear}
-  \parbox{0.28\textwidth}{Advisor:\\\@advisor}
+  \parbox{0.66\textwidth}{\@author\\\@inst,~\@degreeyear}
+  \parbox{0.33\textwidth}{Advisors:\\\@advisor}
 \end{singlespace}
 \vspace*{3em}
 \begin{abstract}}
